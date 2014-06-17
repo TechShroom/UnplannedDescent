@@ -1,0 +1,11 @@
+# package
+*.jar
+
+# eclipse
+.classpath
+.project
+.metadata/
+
+# gradle
+.gradle/
+build/
