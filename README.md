@@ -3,5 +3,12 @@ UnplannedDescent
 
 The third iteration of TechShroom Libraries. A rebuild; like LWJGL 3.
 
-###Build###
+Build
+-----
 [![Build Status](https://travis-ci.org/TechShroom/UnplannedDescent.svg?branch=master)](https://travis-ci.org/TechShroom/UnplannedDescent)
+
+Setup
+-----
+This repo is a workspace from Eclipse, without the Eclipse files. UDAPI, UDCore, UDGraphics, UDKeyboard, UDMouse, UDUtil, and UDWindows are each eclipse projects, but can be used with anything else.
+
+Gradle is used to build everything. Normally `gradle build` should cover everything, placing each in `build/libs` under each project.
