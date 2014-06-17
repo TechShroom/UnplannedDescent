@@ -1,3 +1,17 @@
+def subdeps = [
+    "UDAPI": [],
+    "UDCore": [],
+    "UDGraphics": [],
+    "UDKeyboard": [],
+    "UDMouse": [],
+    "UDWindows": []
+]
+
+subdeps.entrySet().each{
+    if (it.key != "UDCore")
+        it.value.add("UDCore")
+}
+
 subprojects {
     println "=== Configuring $name ==="
     apply plugin: 'java'
@@ -10,8 +24,8 @@ subprojects {
     dependencies {
         compile group: 'net.sf.sociaal', name: 'lwjgl', version: '3.+'
 
-        if (name != "UDCore") {
-            compile project(":UDCore")
+        subdeps[name].each{
+            compile project(":$it")
         }
 
         testCompile group: 'junit', name: 'junit', version: '4.+'
