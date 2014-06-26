@@ -9,12 +9,12 @@ import java.util.List;
 import com.techshroom.unplanned.modloader.modules.ModuleSystem;
 import com.techshroom.unplanned.util.LUtils;
 
-public class Mods {
+public final class Mods {
 	private static ArrayList<IMod> loaded = new ArrayList<IMod>();
 	private static boolean loaded_mods = false;
 
 	public static void findAndLoad() {
-		if (loaded_mods) {
+		if (hasLoadedMods()) {
 			System.err
 					.println("Already loaded mod system, trying to load again?");
 			return;
@@ -68,10 +68,14 @@ public class Mods {
 	}
 
 	public static List<IMod> getLoadedMods() {
-		if (!loaded_mods) {
+		if (!hasLoadedMods()) {
 			throw new IllegalStateException(
 					"Getting loaded mods list before loading mods!");
 		}
 		return Collections.unmodifiableList(loaded);
+	}
+	
+	public static boolean hasLoadedMods() {
+		return loaded_mods;
 	}
 }
