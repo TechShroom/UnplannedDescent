@@ -10,12 +10,16 @@ import com.techshroom.unplanned.modloader.Mods;
 public final class ModuleSystem {
 
     private static ArrayList<IModule> modules = new ArrayList<IModule>();
+    private static boolean loaded_modules = false;
 
     private ModuleSystem() {
         throw new AssertionError("Please don't create the module system.");
     }
 
     public static void loadModulesFromMods() {
+    	if (!Mods.hasLoadedMods()) {
+    		Mods.findAndLoad();
+    	}
         List<IMod> loaded = Mods.getLoadedMods();
         for (IMod m : loaded) {
             if (m instanceof IModule) {
@@ -36,7 +40,7 @@ public final class ModuleSystem {
             Class<T> moduleClass) {
         T[] array = BetterArrays.newArray(moduleClass, 0);
         if (moduleClass == null) {
-            return array;
+            throw new IllegalArgumentException("Module class cannot be null");
         }
         ArrayList<IModule> matched = new ArrayList<IModule>();
         for (IModule m : modules) {
@@ -45,5 +49,9 @@ public final class ModuleSystem {
             }
         }
         return matched.toArray(array);
+    }
+    
+    public static boolean hasLoadedModules() {
+    	return loaded_modules;
     }
 }
