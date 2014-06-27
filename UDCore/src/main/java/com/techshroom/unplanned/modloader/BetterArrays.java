@@ -179,14 +179,15 @@ public final class BetterArrays {
             throw new IllegalArgumentException("step == 0");
         }
         int len = end - start; // get length when step == 1
+        boolean back = step < 0;
+        step = Math.abs(step);
         if (step > 1) {
             int mod = len % step; // modulo to get leftovers
             len -= mod; // remove them to floor the result
             len /= step; // divide by step
         }
         T out = newArray(array.getClass().getComponentType(), len);
-        if (step < 0) {
-            step = -step;
+        if (back) {
             for (int i = end - 1, index = 0; i >= start; i -= step, index++) {
                 Array.set(out, index, Array.get(array, i));
             }
