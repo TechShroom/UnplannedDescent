@@ -158,6 +158,9 @@ public final class BetterArrays {
         }
         if (slen > 1) {
             end = splice[1];
+            if (end < 0) {
+            	end = Array.getLength(array);
+            }
         }
         if (slen > 2) {
             step = splice[2];
