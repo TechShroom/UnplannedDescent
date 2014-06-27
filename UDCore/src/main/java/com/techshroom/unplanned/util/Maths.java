@@ -262,7 +262,7 @@ public final class Maths {
 		}
 	}
 
-	public static boolean isPowerOfTwo(int num) {
-		return num == 0 || Integer.bitCount(num) == 1;
+	public static boolean isPowerOfTwo(int x) {
+		return x != 0 && (x & (x - 1)) == 0;
 	};
 }
