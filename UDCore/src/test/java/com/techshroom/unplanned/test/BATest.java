@@ -12,6 +12,7 @@ public class BATest {
 	private static Object[] GENERIC_array, GENERIC_reverse;
 	private static int[] NOTGENERIC_arrayi, NOTGENERIC_reversei;
 	private static Object[] FILL_notfilled, FILL_filled;
+	private static Object[] CREATE_equivarray;
 	private static Object[] SPL_original, SPL_normalcp, SPL_reversecp,
 			SPL_bigstepcp, SPL_rbigstepcp;
 
@@ -25,6 +26,7 @@ public class BATest {
 		FILL_notfilled = new Object[10];
 		FILL_filled = new Object[] { 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
 				'a', 'a' };
+		CREATE_equivarray = new Object[1];
 		SPL_original = new Object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		SPL_normalcp = new Object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		SPL_reversecp = new Object[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
@@ -66,6 +68,15 @@ public class BATest {
 	public void createAndFillsArray() {
 		Object[] wascreated = BetterArrays.createAndFill(Object.class, 10, 'a');
 		assertArrayEquals(FILL_filled, wascreated);
+	}
+
+	/**
+	 * BetterArrays can create an array.
+	 */
+	@Test
+	public void createsArray() {
+		assertArrayEquals(CREATE_equivarray, BetterArrays.<Object[]> newArray(
+				Object.class, CREATE_equivarray.length));
 	}
 
 	/**
