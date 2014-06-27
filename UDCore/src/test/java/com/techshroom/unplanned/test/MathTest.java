@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.techshroom.unplanned.modloader.BetterArrays;
+import com.techshroom.unplanned.util.BetterArrays;
 import com.techshroom.unplanned.util.Maths;
 import com.techshroom.unplanned.util.Maths.TrigTableLookup;
 

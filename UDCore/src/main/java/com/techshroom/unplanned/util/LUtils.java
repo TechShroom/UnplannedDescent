@@ -28,7 +28,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-import com.techshroom.unplanned.modloader.BetterArrays;
 import com.techshroom.unplanned.modloader.StackTraceInfo;
 import com.techshroom.unplanned.modloader.Strings;
 import com.techshroom.unplanned.util.imported.IconLoader;

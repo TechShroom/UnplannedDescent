@@ -5,7 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.techshroom.unplanned.modloader.BetterArrays;
+import com.techshroom.unplanned.util.BetterArrays;
 
 public class BATest {
 

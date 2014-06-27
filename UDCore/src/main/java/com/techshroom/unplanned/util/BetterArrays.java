@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.modloader;
+package com.techshroom.unplanned.util;
 
 import java.io.PrintStream;
 import java.lang.reflect.Array;

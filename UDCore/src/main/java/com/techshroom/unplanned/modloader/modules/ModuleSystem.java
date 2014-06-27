@@ -3,9 +3,9 @@ package com.techshroom.unplanned.modloader.modules;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.techshroom.unplanned.modloader.BetterArrays;
 import com.techshroom.unplanned.modloader.IMod;
 import com.techshroom.unplanned.modloader.Mods;
+import com.techshroom.unplanned.util.BetterArrays;
 
 public final class ModuleSystem {
 
