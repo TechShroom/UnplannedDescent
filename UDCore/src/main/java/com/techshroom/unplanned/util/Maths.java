@@ -3,14 +3,13 @@ package com.techshroom.unplanned.util;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import com.techshroom.unplanned.modloader.BetterArrays;
-
 public final class Maths {
 
 	public static final double med = calculateMachineEpsilonDouble();
 
 	static {
 		System.err.println("Got MED " + med);
+		System.err.println("Java reports ulp for 1.0 is " + Math.ulp(1.0));
 	}
 
 	private static double calculateMachineEpsilonDouble() {
@@ -54,7 +53,8 @@ public final class Maths {
 			Point2D[] points = new Point2D[] { new Point2D.Double(x, y),
 					new Point2D.Double(w + x, h + y) };
 			// calc cos/sin
-			double s = qsin(theta), c = qcos(theta);
+			double s = TrigTableLookup.sin(theta), c = TrigTableLookup
+					.cos(theta);
 			// expand rect to fit
 			for (Point2D p : points) {
 				p.setLocation((p.getX() * c) - (p.getY() * s), (p.getX() * s)
@@ -216,73 +216,53 @@ public final class Maths {
 	 * imat.m11 = (float) sy; imat.m22 = (float) sz; return imat; }
 	 */
 
-	/* "quick" trig: shortcuts default values for accuracy and speed */
-	/*
-	 * Worse under non-default values due to lookup taking time, but is small
-	 * enough to be negligible
-	 */
+	public static final class TrigTableLookup {
+		// Set to Math.PI*2 if you want radians, or 360d for degrees
+		private static final double circleSize = 360d;
+		private static final double doubleCircleSize = circleSize * 2;
+		private static final int virtualSize = 1048576;
+		private static final double conversionFactor = (virtualSize / circleSize);
+		private static final double tanLeadingCoefficient = (-circleSize
+				/ Math.PI * 2);
+		private static final double[] SinTable = new double[16384];
 
-	private static double[] sin = (double[]) BetterArrays.createAndFill(
-			double.class, 361, -5);
-	private static double[] cos = (double[]) BetterArrays.createAndFill(
-			double.class, 361, -5);
-	private static double[] tan = (double[]) BetterArrays.createAndFill(
-			double.class, 361, -5);
-	private static int zero = 0, thirty = 30, fortyfive = 45, sixty = 60,
-			ninety = 90, oneeighty = 180, twoseventy = 270;
-	static {
-		Double negone = -1d, one = 1d, zerod = 0d;
-		double SQRT3 = Math.sqrt(3), SQRT2 = Math.sqrt(2);
-		// sin predetermined vals
-		sin[zero] = zerod;
-		sin[thirty] = 1d / 2;
-		sin[fortyfive] = 1d / SQRT2;
-		sin[sixty] = SQRT3 / 2;
-		sin[ninety] = one;
-		sin[oneeighty] = zerod;
-		sin[twoseventy] = negone;
-		// cos predetermined vals
-		cos[zero] = 1d;
-		cos[thirty] = SQRT3 / 2;
-		cos[fortyfive] = 1d / SQRT2;
-		cos[sixty] = 1d / 2;
-		cos[ninety] = zerod;
-		cos[oneeighty] = negone;
-		cos[twoseventy] = zerod;
-		// tan predetermined vals
-		tan[zero] = zerod;
-		tan[thirty] = 1 / SQRT3;
-		tan[fortyfive] = one;
-		tan[sixty] = SQRT3;
-		tan[oneeighty] = zerod;
-	}
-
-	public static double qcos(double theta) {
-		theta = normalizeDeg(theta);
-		return (((int) theta) == theta && cos[(int) theta] != -5) ? cos[(int) theta]
-				: Math.cos(Math.toRadians(theta));
-	}
-
-	public static double qsin(double theta) {
-		theta = normalizeDeg(theta);
-		return (((int) theta) == theta && sin[(int) theta] != -5) ? sin[(int) theta]
-				: Math.sin(Math.toRadians(theta));
-	}
-
-	public static double qtan(double theta) {
-		theta = normalizeDeg(theta);
-		return (((int) theta) == theta && tan[(int) theta] != -5) ? tan[(int) theta]
-				: Math.tan(Math.toRadians(theta));
-	}
-
-	public static double normalizeDeg(double theta) {
-		while (theta < 0) {
-			theta += 360;
+		static {
+			for (int i = 0; i < 16384; i++) {
+				SinTable[i] = Math.sin(i * Math.PI * 2 / 16384);
+			}
 		}
-		while (theta >= 360) {
-			theta -= 360;
+
+		private static double lookup(int val) {
+			int index = val / 64;
+			double LUTSinA = SinTable[index & 16383];
+			double LUTSinB = SinTable[(index + 1) & 16383];
+			double LUTSinW = (val & 63) / 63d;
+			return LUTSinW * (LUTSinB - LUTSinA) + LUTSinA;
 		}
-		return theta;
+
+		public static double sin(double Value) {
+			return lookup((int) (Value * conversionFactor));
+		}
+
+		public static double cos(double Value) {
+			return lookup((int) (Value * conversionFactor) + 262144);
+		}
+
+		public static double tan(double Value) {
+			int k = (int) (Value * conversionFactor);
+			// Central 5000 values use
+			// the 1/x form
+			int wrapped = (((k + 2000) << 13) >> 13);
+			if (wrapped < -258144) { // 262144-5000
+				return tanLeadingCoefficient
+						/ ((4 * Value) % (doubleCircleSize) - circleSize);
+			}
+			return lookup(k) / lookup(k + 262144);
+
+		}
 	}
 
+	public static boolean isPowerOfTwo(int num) {
+		return num == 0 || Integer.bitCount(num) == 1;
+	};
 }
