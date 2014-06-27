@@ -31,7 +31,7 @@ public class BATest {
 	}
 
 	/**
-	 * BetterArrays can reverse an array.
+	 * BetterArrays can reverse a non-generic array.
 	 */
 	@Test
 	public void reversesNonGenericArray() {
