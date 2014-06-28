@@ -170,16 +170,20 @@ public final class LUtils {
 	 */
 	@Deprecated
 	public static void print(String msg) {
+		print(msg, LoggingGroup.INFO);
 	}
 
 	public static void print(String msg, LoggingGroup group) {
+		if (!logGroups.contains(group)) {
+			return;
+		}
 		try {
 			checkAccessor(ACCEPT, StackTraceInfo.getInvokingClassName());
 		} catch (Exception e) {
 			throw new RuntimeException(new IllegalAccessException("Not "
 					+ SHORT_LIB_NAME + " trusted class"));
 		}
-		System.err.println(libPrintPrefix + " " + msg);
+		System.err.println("[" + group + "] " + libPrintPrefix + " " + msg);
 	}
 
 	private static void injectNatives() {
