@@ -40,6 +40,9 @@ import com.techshroom.unplanned.util.imported.IconLoader;
 
 public final class LUtils {
 
+	private LUtils() {
+	}
+
 	/**
 	 * A dummy method to load this class. Does nothing.
 	 */
@@ -105,6 +108,23 @@ public final class LUtils {
 
 	private static Set<LoggingGroup> logGroups = EnumSet.of(LoggingGroup.INFO,
 			LoggingGroup.WARNING, LoggingGroup.ERROR);
+
+	public static Set<LoggingGroup> getValidGroups() {
+		return EnumSet.copyOf(logGroups);
+	}
+
+	public static Set<LoggingGroup> setValidGroups(Set<LoggingGroup> groups) {
+		logGroups = EnumSet.copyOf(groups);
+		return getValidGroups();
+	}
+
+	public static Set<LoggingGroup> setValidGroups(LoggingGroup... groups) {
+		return setValidGroups(EnumSet.copyOf(Arrays.asList(groups)));
+	}
+
+	public static boolean isValidGroup(LoggingGroup g) {
+		return getValidGroups().contains(g);
+	}
 
 	private static final Logger bkupLog = Logger.getLogger(SHORT_LIB_NAME
 			+ " backup log");
