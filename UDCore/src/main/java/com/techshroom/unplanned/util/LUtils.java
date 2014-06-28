@@ -13,7 +13,13 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -49,6 +55,85 @@ public final class LUtils {
 			LOWER_SHORT_LIB_NAME = SHORT_LIB_NAME.toLowerCase().intern();
 
 	/**
+	 * <p>
+	 * These logging groups are used to filter certain information. The default
+	 * logging combo is INFO + WARNING + ERROR.
+	 * </p>
+	 * 
+	 * Logging groups from lowest to highest: INFO, WARNING, DEBUG, JUNK.<br>
+	 * <br>
+	 * 
+	 * Recommended usages:
+	 * <dl>
+	 * <dt>INFO</dt>
+	 * <dd>- STDOUT</dd>
+	 * <dt>WARNING</dt>
+	 * <dd>- warnings like non-fatal OpenGL errors</dd>
+	 * <dt>ERROR</dt>
+	 * <dd>- STDERR</dd>
+	 * <dt>DEBUG</dt>
+	 * <dd>- debug info for developing</dd>
+	 * <dt>JUNK</dt>
+	 * <dd>- for batch-dumping information</dd>
+	 * </dl>
+	 */
+	public static enum LoggingGroup {
+		/**
+		 * Standard output for users; etc.
+		 */
+		INFO,
+		/**
+		 * Non-fatal errors or suggestions for performance
+		 */
+		WARNING,
+		/**
+		 * Fatal errors
+		 */
+		ERROR,
+		/**
+		 * Debug output for developing
+		 */
+		DEBUG,
+		/**
+		 * Dump group for unloading tons of data
+		 */
+		JUNK;
+
+		public static final EnumSet<LoggingGroup> ALL = EnumSet
+				.allOf(LoggingGroup.class);
+	}
+
+	private static Set<LoggingGroup> logGroups = EnumSet.of(LoggingGroup.INFO,
+			LoggingGroup.WARNING, LoggingGroup.ERROR);
+
+	private static final Logger bkupLog = Logger.getLogger(SHORT_LIB_NAME
+			+ " backup log");
+	private static final Logger log = Logger.getLogger(LIB_NAME);
+
+	static {
+		bkupLog.setLevel(Level.ALL);
+		// log setup
+		try {
+			String basename = LIB_NAME + ".log";
+			File oldLog = new File(basename);
+			if (oldLog.exists()) {
+				if (!oldLog.renameTo(new File(basename + ".old"))) {
+					if (!oldLog.delete()) {
+						bkupLog.warning("Couldn't delete old log '"
+								+ oldLog.getAbsolutePath() + "'");
+					}
+				}
+			}
+			FileHandler fh = new FileHandler(basename);
+			log.addHandler(fh);
+			fh.setFormatter(new SimpleFormatter());
+		} catch (Exception e) {
+			bkupLog.throwing(LUtils.class.getName(), "<clinit>", e);
+			System.exit(-1);
+		}
+	}
+
+	/**
 	 * What packages are accepted for EL
 	 */
 	private static final String[] ACCEPT = { "com.techshroom."
@@ -76,17 +161,25 @@ public final class LUtils {
 		overrideStandardStreams();
 	}
 
-	public static final String elPrintStr = String.format("[" + LIB_NAME
-			+ "-%s]", LUtils.VERSION);
+	public static final String libPrintPrefix = String.format("[%s-%s]",
+			LIB_NAME, LUtils.VERSION);
 
+	/**
+	 * 
+	 * @deprecated Specify your group with {@link #print(String, LoggingGroup)}.
+	 */
+	@Deprecated
 	public static void print(String msg) {
+	}
+
+	public static void print(String msg, LoggingGroup group) {
 		try {
 			checkAccessor(ACCEPT, StackTraceInfo.getInvokingClassName());
 		} catch (Exception e) {
 			throw new RuntimeException(new IllegalAccessException("Not "
 					+ SHORT_LIB_NAME + " trusted class"));
 		}
-		System.err.println(elPrintStr + " " + msg);
+		System.err.println(libPrintPrefix + " " + msg);
 	}
 
 	private static void injectNatives() {
