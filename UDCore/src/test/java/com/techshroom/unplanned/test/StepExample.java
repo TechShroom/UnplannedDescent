@@ -22,8 +22,11 @@ public class StepExample {
 	private static final int D_VALUE = 3;
 	private static final String MESSAGE_VALUE = "0123!";
 
+	/**
+	 * StepBuilder interfaces can be implemented in a concise way and work.
+	 */
 	@Test
-	public void test() {
+	public void buildersImplementAndWork() {
 		Build build = new Build.Builder().start().a(A_VALUE).b(B_VALUE)
 				.c(C_VALUE).d(D_VALUE).message(MESSAGE_VALUE).build();
 		assertEquals(build.getA(), A_VALUE);
