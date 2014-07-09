@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.techshroom.unplanned.test.StepExample.Build.Builder.FirstStep;
 import com.techshroom.unplanned.util.stepbuilder.FinalStep;
 import com.techshroom.unplanned.util.stepbuilder.OneArgStep;
 import com.techshroom.unplanned.util.stepbuilder.StepBuilder;
@@ -75,111 +74,126 @@ public class StepExample {
 		 */
 		public static final class Builder implements
 				StepBuilder<Build, FirstStep> {
-			private int a, b, c, d;
-			private String message;
-
-			/*
-			 * Some steps implemented, notice that these could technically be
-			 * private.
-			 * 
-			 * Also, note how the overridden method must be exposed but the
-			 * better method that names the variable is also there. This is a
-			 * side effect of using interfaces.
-			 */
-
-			public class FirstStep implements
-					OneArgStep<Build, Integer, SecondStep> {
-				private FirstStep() {
-				}
-
-				@Override
-				public SecondStep step(Integer arg1) {
-					Builder.this.a = arg1;
-					return new SecondStep();
-				}
-
-				public SecondStep a(Integer a) {
-					return step(a);
-				}
-			}
-
-			public class SecondStep implements
-					OneArgStep<Build, Integer, ThirdStep> {
-				private SecondStep() {
-				}
-
-				@Override
-				public ThirdStep step(Integer arg1) {
-					Builder.this.b = arg1;
-					return new ThirdStep();
-				}
-
-				public ThirdStep b(Integer b) {
-					return step(b);
-				}
-			}
-
-			public class ThirdStep implements
-					OneArgStep<Build, Integer, FourthStep> {
-				private ThirdStep() {
-				}
-
-				@Override
-				public FourthStep step(Integer arg1) {
-					Builder.this.c = arg1;
-					return new FourthStep();
-				}
-
-				public FourthStep c(Integer c) {
-					return step(c);
-				}
-			}
-
-			public class FourthStep implements
-					OneArgStep<Build, Integer, FifthStep> {
-				private FourthStep() {
-				}
-
-				@Override
-				public FifthStep step(Integer arg1) {
-					Builder.this.d = arg1;
-					return new FifthStep();
-				}
-
-				public FifthStep d(Integer d) {
-					return step(d);
-				}
-			}
-
-			public class FifthStep implements
-					OneArgStep<Build, String, FinalStep<Build>> {
-				private FifthStep() {
-				}
-
-				@Override
-				public FinalStep<Build> step(String arg1) {
-					Builder.this.message = arg1;
-					return new FinalStep<Build>() {
-
-						@Override
-						public Build build() {
-							Build build = new Build(a, b, c, d, message);
-
-							// normally you would check things here
-
-							return build;
-						}
-					};
-				}
-
-				public FinalStep<Build> message(String message) {
-					return step(message);
-				}
-			}
+			 int a, b, c, d;
+			 String message;
 
 			@Override
 			public FirstStep start() {
-				return new FirstStep();
+				return new FirstStep(this);
+			}
+		}
+
+		/*
+		 * Some steps implemented, notice that these could technically be
+		 * private.
+		 * 
+		 * Also, note how the overridden method must be exposed but the better
+		 * method that names the variable is also there. This is a side effect
+		 * of using interfaces.
+		 */
+
+		public static class FirstStep implements
+				OneArgStep<Build, Integer, SecondStep> {
+			private final Builder b;
+			
+			private FirstStep(Builder b) {
+				this.b = b;
+			}
+
+			@Override
+			public SecondStep step(Integer arg1) {
+				b.a = arg1;
+				return new SecondStep(b);
+			}
+
+			public SecondStep a(Integer a) {
+				return step(a);
+			}
+		}
+
+		public static class SecondStep implements
+				OneArgStep<Build, Integer, ThirdStep> {
+			private final Builder b;
+			
+			private SecondStep(Builder b) {
+				this.b = b;
+			}
+
+			@Override
+			public ThirdStep step(Integer arg1) {
+				b.b = arg1;
+				return new ThirdStep(b);
+			}
+
+			public ThirdStep b(Integer b) {
+				return step(b);
+			}
+		}
+
+		public static class ThirdStep implements
+				OneArgStep<Build, Integer, FourthStep> {
+			private final Builder b;
+			
+			private ThirdStep(Builder b) {
+				this.b = b;
+			}
+
+			@Override
+			public FourthStep step(Integer arg1) {
+				b.c = arg1;
+				return new FourthStep(b);
+			}
+
+			public FourthStep c(Integer c) {
+				return step(c);
+			}
+		}
+
+		public static class FourthStep implements
+				OneArgStep<Build, Integer, FifthStep> {
+			private final Builder b;
+			
+			private FourthStep(Builder b) {
+				this.b = b;
+			}
+
+			@Override
+			public FifthStep step(Integer arg1) {
+				b.d = arg1;
+				return new FifthStep(b);
+			}
+
+			public FifthStep d(Integer d) {
+				return step(d);
+			}
+		}
+
+		public static class FifthStep implements
+				OneArgStep<Build, String, FinalStep<Build>> {
+			private final Builder b;
+			
+			private FifthStep(Builder b) {
+				this.b = b;
+			}
+
+			@Override
+			public FinalStep<Build> step(String arg1) {
+				b.message = arg1;
+				return new FinalStep<Build>() {
+
+					@Override
+					public Build build() {
+						Build build = new Build(b.a, b.b, b.c, b.d, b.message);
+
+						// normally you would check things here
+
+						return build;
+					}
+				};
+			}
+
+			public FinalStep<Build> message(String message) {
+				return step(message);
 			}
 		}
 	}
