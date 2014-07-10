@@ -104,7 +104,7 @@ task setupDirectory(dependsOn: ['cleanDirectory']) << {
         return
     }
     getFromGit('.', 'https://github.com/LWJGL/lwjgl3')
-    getFromGit('generated', 'https://github.com/kenzierocks/lwjgl3-generated')
+    // getFromGit('generated', 'https://github.com/kenzierocks/lwjgl3-generated')
 }
 
 setupDirectory.onlyIf { !file("lib/lwjgl3.jar").exists() ||
