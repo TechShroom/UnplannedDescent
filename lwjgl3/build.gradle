@@ -25,7 +25,7 @@ boolean tryDelete(tempFile) {
 // the following gets lwjgl3 into the current directory
 task setupDirectory() {
     // check for git
-    if (!tryDelete(file(".git"))) {
+    if (!tryDelete(file(".git")) && file(".git").exists()) {
         // some reason git won't go away. delete when possible and exit
         println file(".git")
         file(".git").deleteOnExit()
