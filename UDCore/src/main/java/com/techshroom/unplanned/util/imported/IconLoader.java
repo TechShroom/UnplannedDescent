@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLUtil;
+import org.lwjgl.LWJGLUtil.Platform;
 
 /*****************************************************************************
  * A convenience class for loading icons from images.
@@ -29,9 +30,9 @@ import org.lwjgl.LWJGLUtil;
  * @author Chris Molini
  *****************************************************************************/
 public class IconLoader {
-	private static final int PLATFORM = LWJGLUtil.getPlatform();
+	private static final Platform PLATFORM = LWJGLUtil.getPlatform();
 	static {
-		System.err.println("Assuming platform " + LWJGLUtil.getPlatformName());
+		System.err.println("Assuming platform " + PLATFORM.getName());
 	}
 
 	/*************************************************************************
@@ -51,11 +52,11 @@ public class IconLoader {
 			e.printStackTrace();
 		}
 		ByteBuffer[] buffers = null;
-		if (PLATFORM == LWJGLUtil.PLATFORM_WINDOWS) {
+		if (PLATFORM == Platform.WINDOWS) {
 			buffers = new ByteBuffer[2];
 			buffers[0] = loadInstance(image, 16);
 			buffers[1] = loadInstance(image, 32);
-		} else if (PLATFORM == LWJGLUtil.PLATFORM_MACOSX) {
+		} else if (PLATFORM == Platform.MACOSX) {
 			buffers = new ByteBuffer[1];
 			buffers[0] = loadInstance(image, 128);
 		} else {
