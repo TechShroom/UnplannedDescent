@@ -8,44 +8,90 @@ boolean isNix() {
     return true
 }
 
-boolean tryDelete(tempFile) {
-    println("Attempting to delete " + tempFile.getAbsolutePath());
-    if (!tempFile.exists())
-        println("  Doesn't exist");
-    else if (!tempFile.canWrite())
-        println("  No write permission");
-    else {
-        if (tempFile.delete())
-            println("  Deleted!");
-        else
-            println("  Delete failed - reason unknown");
+boolean tryDelete(tempFile, logger = false) {
+    if (logger)
+        println("Attempting to delete " + tempFile.getAbsolutePath());
+    tempFile.setWritable(true)
+    if (!tempFile.exists() && logger)
+        println("  Doesn't exist")
+    else if (!tempFile.canWrite() && logger) {
+        //println("  No write permission")
+    } else {
+        if (tempFile.delete() && logger)
+            println("  Deleted!")
+        else if (logger)
+            println("  Delete failed - reason unknown")
     }
 }
 
-// the following gets lwjgl3 into the current directory
-task setupDirectory() {
-    // check for git
-    if (!tryDelete(file(".git")) && file(".git").exists()) {
-        // some reason git won't go away. delete when possible and exit
-        println file(".git")
-        file(".git").deleteOnExit()
+// directories don't delete well. This fixes that at the cost of recursive-ness
+void forceDelete(dirorfile, exclude = []) {
+    if (!dirorfile.isDirectory()) {
+        if (!tryDelete(dirorfile)) {
+            dirorfile.deleteOnExit()
+        }
         return
     }
+    def dir = dirorfile
+    def except = true
+    while (except) {
+        except = false
+        try {
+            dir.eachFileRecurse { f ->
+                if (!(f.getName() in exclude)) {
+                    if (!tryDelete(f)) {
+                        f.deleteOnExit()
+                    } else {
+                        def overf = f
+                        while ((overf = overf.getParentFile()) != dir) {
+                            tryDelete(overf)
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException nothere) {
+            except = true
+        }
+    }
+}
+
+void getFromGit(directory, giturl) {
+    def dfile = file(directory)
+    // ensure it is there
+    dfile.mkdir()
+    def gfile = new File(dfile, ".git")
+    println gfile
+    // check for git
+    if (gfile.exists()) {
+        forceDelete(gfile)
+    }
     exec {
+        workingDir dfile
         commandLine 'git', 'init'
     }
     exec {
-        commandLine 'git', 'remote', 'add', 'origin', 'https://github.com/lwjgl/lwjgl3'
+        workingDir dfile
+        commandLine 'git', 'remote', 'add', 'origin', giturl
     }
     exec {
+        workingDir dfile
         commandLine 'git', 'pull', 'origin', 'master'
     }
 
     // clean up git, makes it not break UD git
-    if (!file(".git").delete()) {
-        file(".git").deleteOnExit()
-        println file(".git")
-    }
+    forceDelete(gfile)
+}
+
+task cleanDirectory() {
+    def thisdir = file('.')
+    def exclude = ['ant-delegate.sh', 'ant-delegate.bat', 'build.gradle']
+    forceDelete(thisdir, exclude)
+}
+
+// the following gets lwjgl3 into the current directory
+task setupDirectory(dependsOn: ['cleanDirectory']) {
+    getFromGit('.', 'https://github.com/LWJGL/lwjgl3')
+    getFromGit('generated', 'https://github.com/kenzierocks/lwjgl3-generated')
 }
 
 task jar(type: Zip, dependsOn: 'buildLWJGL') {
