@@ -88,8 +88,16 @@ task cleanDirectory() {
     forceDelete(thisdir, exclude)
 }
 
+gradle.taskGraph.whenReady {
+    gradle.taskGraph.getAllTasks().last().finalizedBy(cleanDirectory)
+}
+
 // the following gets lwjgl3 into the current directory
 task setupDirectory(dependsOn: ['cleanDirectory']) {
+    if (project._property('travis')) {
+        getFromGit('.', 'https://github.com/TechShroom/lwjgl3-precompiled')
+        return
+    }
     getFromGit('.', 'https://github.com/LWJGL/lwjgl3')
     getFromGit('generated', 'https://github.com/kenzierocks/lwjgl3-generated')
 }
@@ -101,7 +109,7 @@ task jar(type: Zip, dependsOn: 'buildLWJGL') {
 }
 
 task buildLWJGL(type: Exec, dependsOn: ['setupDirectory']) {
-    if (project.travis) {
+    if (project._property('travis')) {
         commandLine 'echo', 'Travis CI cannot build, jar will use precompiled classes.'
         return
     }
