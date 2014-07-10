@@ -1,0 +1,65 @@
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
+boolean isNix() {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        return false
+    }
+    return true
+}
+
+boolean tryDelete(tempFile) {
+    println("Attempting to delete " + tempFile.getAbsolutePath());
+    if (!tempFile.exists())
+        println("  Doesn't exist");
+    else if (!tempFile.canWrite())
+        println("  No write permission");
+    else {
+        if (tempFile.delete())
+            println("  Deleted!");
+        else
+            println("  Delete failed - reason unknown");
+    }
+}
+
+// the following gets lwjgl3 into the current directory
+task setupDirectory() {
+    // check for git
+    if (!tryDelete(file(".git"))) {
+        // some reason git won't go away. delete when possible and exit
+        println file(".git")
+        file(".git").deleteOnExit()
+        return
+    }
+    exec {
+        commandLine 'git', 'init'
+    }
+    exec {
+        commandLine 'git', 'remote', 'add', 'origin', 'https://github.com/lwjgl/lwjgl3'
+    }
+    exec {
+        commandLine 'git', 'pull', 'origin', 'master'
+    }
+
+    // clean up git, makes it not break UD git
+    if (!file(".git").delete()) {
+        file(".git").deleteOnExit()
+        println file(".git")
+    }
+}
+
+task jar(type: Zip, dependsOn: 'buildLWJGL') {
+    archiveName = 'lwjgl3.jar'
+    destinationDir = file('lib')
+    from 'bin/Core'
+}
+
+task buildLWJGL(type: Exec, dependsOn: ['setupDirectory']) {
+    // building is all sorts of weirdness for natives. If you have trouble,
+    // visit https://github.com/LWJGL/lwjgl3/wiki/4.3.-Setup for some help
+    if (isNix()) {
+        commandLine 'ant-delegate.sh'
+    } else {
+        commandLine 'cmd', '/c', 'ant-delegate.bat'
+    }
+}
