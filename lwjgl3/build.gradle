@@ -58,7 +58,7 @@ task buildLWJGL(type: Exec, dependsOn: ['setupDirectory']) {
     // building is all sorts of weirdness for natives. If you have trouble,
     // visit https://github.com/LWJGL/lwjgl3/wiki/4.3.-Setup for some help
     if (isNix()) {
-        commandLine 'ant-delegate.sh'
+        commandLine './ant-delegate.sh'
     } else {
         commandLine 'cmd', '/c', 'ant-delegate.bat'
     }
