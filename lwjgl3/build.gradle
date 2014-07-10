@@ -38,7 +38,11 @@ void forceDelete(dirorfile, exclude = []) {
         except = false
         try {
             dir.eachFileRecurse { f ->
-                if (!(f.getName() in exclude)) {
+                def passes = true
+                exclude.each {
+                    passes = passes && f == new File(dir, it)
+                }
+                if (passes) {
                     if (!tryDelete(f)) {
                         f.deleteOnExit()
                     } else {
@@ -84,7 +88,7 @@ void getFromGit(directory, giturl) {
 
 task cleanDirectory() {
     def thisdir = file('.')
-    def exclude = ['ant-delegate.sh', 'ant-delegate.bat', 'build.gradle']
+    def exclude = ['ant-delegate.sh', 'ant-delegate.bat', 'build.gradle', 'lib/lwjgl3.jar']
     forceDelete(thisdir, exclude)
 }
 
@@ -93,7 +97,8 @@ gradle.taskGraph.whenReady {
 }
 
 // the following gets lwjgl3 into the current directory
-task setupDirectory(dependsOn: ['cleanDirectory']) {
+task setupDirectory(dependsOn: ['cleanDirectory']) << {
+    
     if (project._property('travis')) {
         getFromGit('.', 'https://github.com/TechShroom/lwjgl3-precompiled')
         return
@@ -102,11 +107,17 @@ task setupDirectory(dependsOn: ['cleanDirectory']) {
     getFromGit('generated', 'https://github.com/kenzierocks/lwjgl3-generated')
 }
 
+setupDirectory.onlyIf { !file("lib/lwjgl3.jar").exists() ||
+                        (_hasProperty("rebuild-lwjgl3") && _property("rebuild-lwjgl3").toBoolean()) }
+
 task jar(type: Zip, dependsOn: 'buildLWJGL') {
     archiveName = 'lwjgl3.jar'
     destinationDir = file('lib')
     from 'bin/Core'
 }
+
+jar.onlyIf { !file("lib/lwjgl3.jar").exists() ||
+                        (_hasProperty("rebuild-lwjgl3") && _property("rebuild-lwjgl3").toBoolean()) }
 
 task buildLWJGL(type: Exec, dependsOn: ['setupDirectory']) {
     if (project._property('travis')) {
