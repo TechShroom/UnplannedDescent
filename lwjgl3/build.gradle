@@ -101,6 +101,10 @@ task jar(type: Zip, dependsOn: 'buildLWJGL') {
 }
 
 task buildLWJGL(type: Exec, dependsOn: ['setupDirectory']) {
+    if (project.travis) {
+        commandLine 'echo', 'Travis CI cannot build, jar will use precompiled classes.'
+        return
+    }
     // building is all sorts of weirdness for natives. If you have trouble,
     // visit https://github.com/LWJGL/lwjgl3/wiki/4.3.-Setup for some help
     if (isNix()) {
