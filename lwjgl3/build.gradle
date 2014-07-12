@@ -40,7 +40,7 @@ void forceDelete(dirorfile, exclude = []) {
             dir.eachFileRecurse { f ->
                 def passes = true
                 exclude.each {
-                    passes = passes && f == new File(dir, it)
+                    passes = passes && f != new File(dir, it)
                 }
                 if (passes) {
                     if (!tryDelete(f)) {
@@ -54,6 +54,9 @@ void forceDelete(dirorfile, exclude = []) {
                 }
             }
         } catch (FileNotFoundException nothere) {
+            except = true
+        } catch (Exception e) {
+            e.printStackTrace()
             except = true
         }
     }
