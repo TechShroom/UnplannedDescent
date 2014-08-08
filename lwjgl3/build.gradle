@@ -101,7 +101,6 @@ gradle.taskGraph.whenReady {
 
 // the following gets lwjgl3 into the current directory
 task setupDirectory(dependsOn: ['cleanDirectory']) << {
-    
     if (project._property('travis')) {
         getFromGit('.', 'https://github.com/TechShroom/lwjgl3-precompiled')
         return
