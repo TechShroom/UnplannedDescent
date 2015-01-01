@@ -27,9 +27,6 @@ import javax.sound.midi.MidiDevice.Info;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.GL11;
 
-import com.techshroom.unplanned.modloader.StackTraceInfo;
-import com.techshroom.unplanned.modloader.Strings;
-
 public final class LUtils {
 
 	private LUtils() {

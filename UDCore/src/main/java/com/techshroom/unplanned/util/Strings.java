@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.modloader;
+package com.techshroom.unplanned.util;
 
 public class Strings {
 	/**
