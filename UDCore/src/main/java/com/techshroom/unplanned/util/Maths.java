@@ -222,22 +222,22 @@ public final class Maths {
 			return LUTSinW * (LUTSinB - LUTSinA) + LUTSinA;
 		}
 
-		public static double sin(double Value) {
-			return lookup((int) (Value * conversionFactor));
+		public static double sin(double angle) {
+			return lookup((int) (angle * conversionFactor));
 		}
 
-		public static double cos(double Value) {
-			return lookup((int) (Value * conversionFactor) + 262144);
+		public static double cos(double angle) {
+			return lookup((int) (angle * conversionFactor) + 262144);
 		}
 
-		public static double tan(double Value) {
-			int k = (int) (Value * conversionFactor);
+		public static double tan(double angle) {
+			int k = (int) (angle * conversionFactor);
 			// Central 5000 values use
 			// the 1/x form
 			int wrapped = (((k + 2000) << 13) >> 13);
 			if (wrapped < -258144) { // 262144-5000
 				return tanLeadingCoefficient
-						/ ((4 * Value) % (doubleCircleSize) - circleSize);
+						/ ((4 * angle) % (doubleCircleSize) - circleSize);
 			}
 			return lookup(k) / lookup(k + 262144);
 
