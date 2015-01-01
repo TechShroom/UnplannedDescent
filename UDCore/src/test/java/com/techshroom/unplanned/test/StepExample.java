@@ -74,8 +74,8 @@ public class StepExample {
 		 */
 		public static final class Builder implements
 				StepBuilder<Build, FirstStep> {
-			 int a, b, c, d;
-			 String message;
+			int a, b, c, d;
+			String message;
 
 			@Override
 			public FirstStep start() {
@@ -95,7 +95,7 @@ public class StepExample {
 		public static class FirstStep implements
 				OneArgStep<Build, Integer, SecondStep> {
 			private final Builder b;
-			
+
 			private FirstStep(Builder b) {
 				this.b = b;
 			}
@@ -114,7 +114,7 @@ public class StepExample {
 		public static class SecondStep implements
 				OneArgStep<Build, Integer, ThirdStep> {
 			private final Builder b;
-			
+
 			private SecondStep(Builder b) {
 				this.b = b;
 			}
@@ -133,7 +133,7 @@ public class StepExample {
 		public static class ThirdStep implements
 				OneArgStep<Build, Integer, FourthStep> {
 			private final Builder b;
-			
+
 			private ThirdStep(Builder b) {
 				this.b = b;
 			}
@@ -152,7 +152,7 @@ public class StepExample {
 		public static class FourthStep implements
 				OneArgStep<Build, Integer, FifthStep> {
 			private final Builder b;
-			
+
 			private FourthStep(Builder b) {
 				this.b = b;
 			}
@@ -171,7 +171,7 @@ public class StepExample {
 		public static class FifthStep implements
 				OneArgStep<Build, String, FinalStep<Build>> {
 			private final Builder b;
-			
+
 			private FifthStep(Builder b) {
 				this.b = b;
 			}

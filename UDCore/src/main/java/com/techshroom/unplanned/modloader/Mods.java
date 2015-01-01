@@ -74,7 +74,7 @@ public final class Mods {
 		}
 		return Collections.unmodifiableList(loaded);
 	}
-	
+
 	public static boolean hasLoadedMods() {
 		return loaded_mods;
 	}

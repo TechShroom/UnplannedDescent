@@ -3,14 +3,12 @@ package com.techshroom.unplanned.util;
 import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glGetString;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -25,16 +23,12 @@ import java.util.zip.ZipFile;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDevice.Info;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import org.lwjgl.LWJGLUtil;
-import org.lwjgl.api.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import com.techshroom.unplanned.modloader.StackTraceInfo;
 import com.techshroom.unplanned.modloader.Strings;
-import com.techshroom.unplanned.util.imported.IconLoader;
 
 public final class LUtils {
 
@@ -305,9 +299,6 @@ public final class LUtils {
 				+ debugLevel);
 	}
 
-	// the range between which the "close enough" guesser in getDisplayMode uses
-	private static final int WIDTH_RANGE = 300, HEIGHT_RANGE = 300;
-
 	/**
 	 * Checks for the given OpenGL version (eg. 3.0.2)
 	 * 
@@ -440,132 +431,100 @@ public final class LUtils {
 	 * @param height
 	 * @param fullscreen
 	 * @return
-	 *//*
-	public static DisplayMode getDisplayMode(int width, int height,
-			boolean fullscreen) {
-		ArrayList<DisplayMode> possibleExtras = new ArrayList<DisplayMode>();
-		try {
-			for (DisplayMode m : Display.getAvailableDisplayModes()) {
-				int w = m.getWidth();
-				int h = m.getHeight();
-				if (m.isFullscreenCapable() || !fullscreen) {
-					if (w == width) {
-						if (h == height) {
-							return m;
-						}
-					}
-				}
-				if (m.isFullscreenCapable()
-						&& ((w < (width + WIDTH_RANGE)) && (w > (width - WIDTH_RANGE)))
-						&& ((h < (height + HEIGHT_RANGE)) && (h > (height - HEIGHT_RANGE)))) {
-					possibleExtras.add(m);
-				}
-			}
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-		print("Using non-fullscreen compatible display mode, no default ones found.");
-		if (fullscreen) {
-			print("Fullscreen was requested. Here are some close matches that support fullscreen: "
-					+ possibleExtras);
-		}
-		return new DisplayMode(width, height);
-	}
-
-	/**
-	 * Returns a list of fullscreen capable dimensions
+	 */
+	/*
+	 * public static DisplayMode getDisplayMode(int width, int height, boolean
+	 * fullscreen) { ArrayList<DisplayMode> possibleExtras = new
+	 * ArrayList<DisplayMode>(); try { for (DisplayMode m :
+	 * Display.getAvailableDisplayModes()) { int w = m.getWidth(); int h =
+	 * m.getHeight(); if (m.isFullscreenCapable() || !fullscreen) { if (w ==
+	 * width) { if (h == height) { return m; } } } if (m.isFullscreenCapable()
+	 * && ((w < (width + WIDTH_RANGE)) && (w > (width - WIDTH_RANGE))) && ((h <
+	 * (height + HEIGHT_RANGE)) && (h > (height - HEIGHT_RANGE)))) {
+	 * possibleExtras.add(m); } } } catch (LWJGLException e) {
+	 * e.printStackTrace(); }
+	 * print("Using non-fullscreen compatible display mode, no default ones found."
+	 * ); if (fullscreen) { print(
+	 * "Fullscreen was requested. Here are some close matches that support fullscreen: "
+	 * + possibleExtras); } return new DisplayMode(width, height); }
+	 * 
+	 * /** Returns a list of fullscreen capable dimensions
 	 * 
 	 * @return a list of fullscreen capable dimensions
 	 *//*
-	public static Dimension[] getFullscreenCompatDimensions() {
-		try {
-			ArrayList<Dimension> ret = new ArrayList<Dimension>();
-			for (DisplayMode m : Display.getAvailableDisplayModes()) {
-				if (m.isFullscreenCapable()) {
-					ret.add(new Dimension(m.getWidth(), m.getHeight()));
-				}
-			}
-			return ret.toArray(new Dimension[ret.size()]);
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
-		return new Dimension[0];
-	}
-
-	/**
-	 * Returns a list of all dimensions built into LWJGL
-	 * 
-	 * @return the list of all dimensions built into LWJGL
-	 *//*
-	public static Dimension[] getDimensions() {
-		ArrayList<Dimension> ret = new ArrayList<Dimension>();
-		for (DisplayMode m : Display.getAvailableDisplayModes()) {
-			ret.add(new Dimension(m.getWidth(), m.getHeight()));
-		}
-		return ret.toArray(new Dimension[ret.size()]);
-		return new Dimension[0];
-	}
-
-	/**
-	 * Returns a user friendly version of the fullscreen compatible dimensions
-	 * 
-	 * @return a user friendly version of the fullscreen compatible dimensions
-	 *//*
-	public static String[] getFullscreenCompatDimensionsSimple() {
-		return LUtils.getDimensionsSimple(LUtils
-				.getFullscreenCompatDimensions());
-	}
-
-	/**
-	 * Returns a list of Strings representing the Dimensions given in a user
-	 * friendly form
-	 * 
-	 * @param compat
-	 *            - the Dimensions to format
-	 * @return a list of Strings representing the Dimensions in the form "W x H"
-	 *//*
-	public static String[] getDimensionsSimple(Dimension[] compat) {
-		Dimension[] cmpt = compat;
-		String[] s = new String[cmpt.length];
-		for (int i = 0; i < cmpt.length; i++) {
-			Dimension d = cmpt[i];
-			s[i] = String.format("%s x %s", d.width, d.height);
-		}
-		return s;
-	}
-
-	/**
-	 * Gets a fullscreen compatible dimension from the user
-	 * 
-	 * @return a fullscreen compatible dimension
-	 *//*
-	public static Dimension getDimensionFromUser() {
-		return LUtils.getDimensionFromUser(LUtils
-				.getFullscreenCompatDimensions());
-	}
-
-	/**
-	 * Gets a dimension from the user, using the given list
-	 * 
-	 * @param availabeDimensions
-	 *            - the dimensions to choose from
-	 * @return
-	 *//*
-	public static Dimension getDimensionFromUser(Dimension[] availabeDimensions) {
-		Dimension[] compat = availabeDimensions;
-		String[] compat_s = LUtils.getDimensionsSimple(compat);
-		JFrame toClose = null;
-		String ret_s = (String) JOptionPane.showInputDialog(
-				toClose = new JFrame(), "Avaliable sizes:",
-				"Choose a window size", JOptionPane.DEFAULT_OPTION, null,
-				compat_s, compat_s[0]);
-		toClose.dispose();
-		toClose = null;
-		if (ret_s == null) {
-			return null;
-		}
-		return compat[Arrays.asList(compat_s).indexOf(ret_s)];
-	}*/
+		 * public static Dimension[] getFullscreenCompatDimensions() { try {
+		 * ArrayList<Dimension> ret = new ArrayList<Dimension>(); for
+		 * (DisplayMode m : Display.getAvailableDisplayModes()) { if
+		 * (m.isFullscreenCapable()) { ret.add(new Dimension(m.getWidth(),
+		 * m.getHeight())); } } return ret.toArray(new Dimension[ret.size()]); }
+		 * catch (LWJGLException e) { e.printStackTrace(); } return new
+		 * Dimension[0]; }
+		 * 
+		 * /** Returns a list of all dimensions built into LWJGL
+		 * 
+		 * @return the list of all dimensions built into LWJGL
+		 *//*
+			 * public static Dimension[] getDimensions() { ArrayList<Dimension>
+			 * ret = new ArrayList<Dimension>(); for (DisplayMode m :
+			 * Display.getAvailableDisplayModes()) { ret.add(new
+			 * Dimension(m.getWidth(), m.getHeight())); } return ret.toArray(new
+			 * Dimension[ret.size()]); return new Dimension[0]; }
+			 * 
+			 * /** Returns a user friendly version of the fullscreen compatible
+			 * dimensions
+			 * 
+			 * @return a user friendly version of the fullscreen compatible
+			 * dimensions
+			 *//*
+				 * public static String[] getFullscreenCompatDimensionsSimple()
+				 * { return LUtils.getDimensionsSimple(LUtils
+				 * .getFullscreenCompatDimensions()); }
+				 * 
+				 * /** Returns a list of Strings representing the Dimensions
+				 * given in a user friendly form
+				 * 
+				 * @param compat - the Dimensions to format
+				 * 
+				 * @return a list of Strings representing the Dimensions in the
+				 * form "W x H"
+				 *//*
+					 * public static String[] getDimensionsSimple(Dimension[]
+					 * compat) { Dimension[] cmpt = compat; String[] s = new
+					 * String[cmpt.length]; for (int i = 0; i < cmpt.length;
+					 * i++) { Dimension d = cmpt[i]; s[i] =
+					 * String.format("%s x %s", d.width, d.height); } return s;
+					 * }
+					 * 
+					 * /** Gets a fullscreen compatible dimension from the user
+					 * 
+					 * @return a fullscreen compatible dimension
+					 *//*
+						 * public static Dimension getDimensionFromUser() {
+						 * return LUtils.getDimensionFromUser(LUtils
+						 * .getFullscreenCompatDimensions()); }
+						 * 
+						 * /** Gets a dimension from the user, using the given
+						 * list
+						 * 
+						 * @param availabeDimensions - the dimensions to choose
+						 * from
+						 * 
+						 * @return
+						 *//*
+							 * public static Dimension
+							 * getDimensionFromUser(Dimension[]
+							 * availabeDimensions) { Dimension[] compat =
+							 * availabeDimensions; String[] compat_s =
+							 * LUtils.getDimensionsSimple(compat); JFrame
+							 * toClose = null; String ret_s = (String)
+							 * JOptionPane.showInputDialog( toClose = new
+							 * JFrame(), "Avaliable sizes:",
+							 * "Choose a window size",
+							 * JOptionPane.DEFAULT_OPTION, null, compat_s,
+							 * compat_s[0]); toClose.dispose(); toClose = null;
+							 * if (ret_s == null) { return null; } return
+							 * compat[Arrays.asList(compat_s).indexOf(ret_s)]; }
+							 */
 
 	/**
 	 * Turns a {@link MidiDevice.Info} list into a list of user friendly strings
@@ -581,51 +540,42 @@ public final class LUtils {
 		}
 		return out;
 	}
-/*
-	/**
-	 * Gets a dimension from the args, or, failing that, the user
-	 * 
-	 * @param normalized
-	 *            - 'normalized' argument list, (eg. ["-width", "800",
-	 *            "-height", "600"])
-	 * @return the dimension that was found or requested
-	 *//*
-	public static Dimension getDimensionFromUserAndArgs(String[] normalized) {
-		return LUtils.getDimensionFromUserAndArgs(
-				LUtils.getFullscreenCompatDimensions(), normalized);
-	}*/
-/*
-	/**
-	 * Gets a dimension from the args, or, failing that, the user
-	 * 
-	 * @param dimensions
-	 *            - the array of Dimensions to use
-	 * @param normalized
-	 *            - 'normalized' argument list, (eg. ["-width", "800",
-	 *            "-height", "600"])
-	 * @return the dimension that was found or requested
-	 *//*
-	public static Dimension getDimensionFromUserAndArgs(Dimension[] dimensions,
-			String[] normalized) {
-		if (normalized.length >= 4) {
-			List<String> strs = Arrays.asList(normalized);
-			if (strs.indexOf("-width") == -1 || strs.indexOf("-height") == -1) {
-			} else {
-				String w = strs.get(strs.indexOf("-width") + 1);
-				String h = strs.get(strs.indexOf("-height") + 1);
-				if (LUtils.isInt(w) && LUtils.isInt(h)) {
-					return new Dimension(Integer.parseInt(w),
-							Integer.parseInt(h));
-				}
-			}
-		}
-		Dimension get = LUtils.getDimensionFromUser(dimensions);
-		if (get == null) {
-			get = new Dimension(600, 600);
-		}
 
-		return get;
-	}*/
+	/*
+	 * /** Gets a dimension from the args, or, failing that, the user
+	 * 
+	 * @param normalized - 'normalized' argument list, (eg. ["-width", "800",
+	 * "-height", "600"])
+	 * 
+	 * @return the dimension that was found or requested
+	 *//*
+		 * public static Dimension getDimensionFromUserAndArgs(String[]
+		 * normalized) { return LUtils.getDimensionFromUserAndArgs(
+		 * LUtils.getFullscreenCompatDimensions(), normalized); }
+		 */
+	/*
+	 * /** Gets a dimension from the args, or, failing that, the user
+	 * 
+	 * @param dimensions - the array of Dimensions to use
+	 * 
+	 * @param normalized - 'normalized' argument list, (eg. ["-width", "800",
+	 * "-height", "600"])
+	 * 
+	 * @return the dimension that was found or requested
+	 *//*
+		 * public static Dimension getDimensionFromUserAndArgs(Dimension[]
+		 * dimensions, String[] normalized) { if (normalized.length >= 4) {
+		 * List<String> strs = Arrays.asList(normalized); if
+		 * (strs.indexOf("-width") == -1 || strs.indexOf("-height") == -1) { }
+		 * else { String w = strs.get(strs.indexOf("-width") + 1); String h =
+		 * strs.get(strs.indexOf("-height") + 1); if (LUtils.isInt(w) &&
+		 * LUtils.isInt(h)) { return new Dimension(Integer.parseInt(w),
+		 * Integer.parseInt(h)); } } } Dimension get =
+		 * LUtils.getDimensionFromUser(dimensions); if (get == null) { get = new
+		 * Dimension(600, 600); }
+		 * 
+		 * return get; }
+		 */
 
 	/**
 	 * Check for integer
@@ -766,9 +716,8 @@ public final class LUtils {
 	public static String[] getAccepts() {
 		return ACCEPT.clone();
 	}
-/*
-	public static void setIcon(final InputStream is) {
-		ByteBuffer[] icondata = IconLoader.load(is);
-		Display.setIcon(icondata);
-	}*/
+	/*
+	 * public static void setIcon(final InputStream is) { ByteBuffer[] icondata
+	 * = IconLoader.load(is); Display.setIcon(icondata); }
+	 */
 }
