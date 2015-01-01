@@ -4,24 +4,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public final class Maths {
-
-	public static final double med = calculateMachineEpsilonDouble();
-
-	static {
-		System.err.println("Got MED " + med);
-		System.err.println("Java reports ulp for 1.0 is " + Math.ulp(1.0));
-	}
-
-	private static double calculateMachineEpsilonDouble() {
-		double machEps = 1.0d;
-
-		do
-			machEps /= 2.0d;
-		while ((double) (1.0 + (machEps / 2.0)) != 1.0);
-
-		return machEps;
-	}
-
 	/**
 	 * Provides geometry manipulation, such as axis-normalization and rectangle
 	 * rotations.
