@@ -4,7 +4,7 @@ import com.techshroom.unplanned.modloader.IMod;
 import com.techshroom.unplanned.modloader.SkeletalMod;
 
 /**
- * A to be implemented module system for EL. Used like the mods system, but is
+ * A to be implemented module system for UD. Used like the mods system, but is
  * less of a public API than that. Things in the module system should not be
  * relied upon.
  * 

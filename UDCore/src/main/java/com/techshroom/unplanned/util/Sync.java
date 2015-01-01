@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.modloader;
+package com.techshroom.unplanned.util;
 
 /*
  * Copyright (c) 2002-2012 LWJGL Project
@@ -49,7 +49,7 @@ public class Sync {
 	/** The time to sleep/yield until the next frame */
 	private long nextFrame = 0;
 
-	/** whether the initialisation code has run */
+	/** whether the initialization code has run */
 	private boolean initialised = false;
 
 	/** for calculating the averages the previous sleep/yield times are stored */
@@ -60,22 +60,7 @@ public class Sync {
 		// Starts Windows hack if needed
 		String osName = System.getProperty("os.name");
 
-		// Prevents this class from starting extra thread as
-		// org.lwjgl.opengl.Sync usually does this part.
-		Thread[] t_s = new Thread[Thread.activeCount()];
-		Thread.enumerate(t_s);
-		boolean needsAccuracy = true;
-		for (Thread t : t_s) {
-			if (t == null || t.getName() == null) {
-				continue;
-			}
-			if (t.getName().equals("LWJGL Timer")
-					|| t.getName().equals("KCore Win Fix")) {
-				needsAccuracy = false;
-			}
-		}
-
-		if (osName.startsWith("Win") && needsAccuracy) {
+		if (osName.startsWith("Win")) {
 			// On windows the sleep functions can be highly inaccurate by
 			// over 10ms making in unusable. However it can be forced to
 			// be a bit more accurate by running a separate sleeping daemon

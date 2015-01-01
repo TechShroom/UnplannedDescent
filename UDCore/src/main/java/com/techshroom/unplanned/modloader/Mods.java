@@ -19,7 +19,7 @@ public final class Mods {
 					.println("Already loaded mod system, trying to load again?");
 			return;
 		}
-		System.err.println("EL Mod System starting...");
+		System.err.println("UD Mod System starting...");
 		if (!injectModsFolder()) {
 			System.err
 					.println("[WARNING] Mods folder does not exist or is a file, "
@@ -33,7 +33,7 @@ public final class Mods {
 		loaded = injected;
 		loaded.trimToSize();
 		loaded_mods = true;
-		System.err.println("EL Mod System loaded.");
+		System.err.println("UD Mod System loaded.");
 		ModuleSystem.loadModulesFromMods();
 	}
 
