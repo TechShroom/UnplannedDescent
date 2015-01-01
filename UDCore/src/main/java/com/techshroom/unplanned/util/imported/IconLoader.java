@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.LWJGLUtil.Platform;
 
-/*****************************************************************************
+/**
  * A convenience class for loading icons from images.
  * 
  * Icons loaded from this class are formatted to fit within the required
@@ -28,7 +28,7 @@ import org.lwjgl.LWJGLUtil.Platform;
  * </p>
  * 
  * @author Chris Molini
- *****************************************************************************/
+ */
 public class IconLoader {
 	private static final Platform PLATFORM = LWJGLUtil.getPlatform();
 	static {
