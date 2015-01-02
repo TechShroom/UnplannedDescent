@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.techshroom.unplanned.util.stepbuilder.FinalStep;
-import com.techshroom.unplanned.util.stepbuilder.OneArgStep;
-import com.techshroom.unplanned.util.stepbuilder.StepBuilder;
+import com.techshroom.tscore.util.stepbuilder.FinalStep;
+import com.techshroom.tscore.util.stepbuilder.OneArgStep;
+import com.techshroom.tscore.util.stepbuilder.StepBuilder;
 
 /**
  * A class example for the <code>util.stepbuilder</code> package.
