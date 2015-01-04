@@ -92,28 +92,32 @@ public class Sync {
 		if (fps <= 0) {
 			return;
 		}
-		if (!initialised) {
+		if (!this.initialised) {
 			initialise();
 		}
 
 		try {
 			// sleep until the average sleep time is greater than the time
 			// remaining till nextFrame
-			for (long t0 = getTime(), t1; nextFrame - t0 > sleepDurations.avg(); t0 = t1) {
+			for (long t0 = getTime(), t1; this.nextFrame - t0 > this.sleepDurations
+					.avg(); t0 = t1) {
 				Thread.sleep(1);
-				sleepDurations.add((t1 = getTime()) - t0); // update average
+				// update average
+				this.sleepDurations.add((t1 = getTime()) - t0);
 				// sleep time
 			}
 
 			// slowly dampen sleep average if too high to avoid yielding too
 			// much
-			sleepDurations.dampenForLowResTicker();
+			this.sleepDurations.dampenForLowResTicker();
 
 			// yield until the average yield time is greater than the time
 			// remaining till nextFrame
-			for (long t0 = getTime(), t1; nextFrame - t0 > yieldDurations.avg(); t0 = t1) {
+			for (long t0 = getTime(), t1; this.nextFrame - t0 > this.yieldDurations
+					.avg(); t0 = t1) {
 				Thread.yield();
-				yieldDurations.add((t1 = getTime()) - t0); // update average
+				// update average
+				this.yieldDurations.add((t1 = getTime()) - t0);
 				// yield time
 			}
 		} catch (InterruptedException e) {
@@ -121,7 +125,8 @@ public class Sync {
 		}
 
 		// schedule next frame, drop frame(s) if already too late for next frame
-		nextFrame = Math.max(nextFrame + Sync.NANOS_IN_SECOND / fps, getTime());
+		this.nextFrame = Math.max(this.nextFrame + Sync.NANOS_IN_SECOND / fps,
+				getTime());
 	}
 
 	/**
@@ -131,12 +136,12 @@ public class Sync {
 	 * 
 	 */
 	private void initialise() {
-		initialised = true;
+		this.initialised = true;
 
-		sleepDurations.init(1000 * 1000);
-		yieldDurations.init((int) (-(getTime() - getTime()) * 1.333));
+		this.sleepDurations.init(1000 * 1000);
+		this.yieldDurations.init((int) (-(getTime() - getTime()) * 1.333));
 
-		nextFrame = getTime();
+		this.nextFrame = getTime();
 	}
 
 	/**
@@ -158,33 +163,33 @@ public class Sync {
 		private static final float DAMPEN_FACTOR = 0.9f;
 
 		public RunningAvg(int slotCount) {
-			slots = new long[slotCount];
-			offset = 0;
+			this.slots = new long[slotCount];
+			this.offset = 0;
 		}
 
 		public void init(long value) {
-			while (offset < slots.length) {
-				slots[offset++] = value;
+			while (this.offset < this.slots.length) {
+				this.slots[this.offset++] = value;
 			}
 		}
 
 		public void add(long value) {
-			slots[offset++ % slots.length] = value;
-			offset %= slots.length;
+			this.slots[this.offset++ % this.slots.length] = value;
+			this.offset %= this.slots.length;
 		}
 
 		public long avg() {
 			long sum = 0;
-			for (int i = 0; i < slots.length; i++) {
-				sum += slots[i];
+			for (int i = 0; i < this.slots.length; i++) {
+				sum += this.slots[i];
 			}
-			return sum / slots.length;
+			return sum / this.slots.length;
 		}
 
 		public void dampenForLowResTicker() {
 			if (avg() > RunningAvg.DAMPEN_THRESHOLD) {
-				for (int i = 0; i < slots.length; i++) {
-					slots[i] *= RunningAvg.DAMPEN_FACTOR;
+				for (int i = 0; i < this.slots.length; i++) {
+					this.slots[i] *= RunningAvg.DAMPEN_FACTOR;
 				}
 			}
 		}

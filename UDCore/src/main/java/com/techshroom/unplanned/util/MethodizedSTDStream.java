@@ -23,9 +23,9 @@ public class MethodizedSTDStream extends ByteArrayOutputStream {
 	boolean lastNewline = true, autoFlush = false;
 
 	public MethodizedSTDStream(PrintStream out) {
-		orig = out;
+		this.orig = out;
 		try {
-			autoFlush = ps_autoFlush.getBoolean(out);
+			this.autoFlush = ps_autoFlush.getBoolean(out);
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -40,13 +40,13 @@ public class MethodizedSTDStream extends ByteArrayOutputStream {
 		try {
 			String str = new String(Arrays.copyOfRange(b, off, len));
 			str = replaceAllButLast(str, "\\r?\\n", "$0" + getMethod());
-			if (lastNewline) {
-				data += getMethod() + str;
+			if (this.lastNewline) {
+				this.data += getMethod() + str;
 			} else {
-				data += str;
+				this.data += str;
 			}
-			lastNewline = str.endsWith("\n");
-			if (autoFlush) {
+			this.lastNewline = str.endsWith("\n");
+			if (this.autoFlush) {
 				flush();
 			}
 		} catch (Exception e) {
@@ -90,9 +90,9 @@ public class MethodizedSTDStream extends ByteArrayOutputStream {
 
 	@Override
 	public void flush() throws IOException {
-		orig.write(data.getBytes());
-		orig.flush();
-		data = "";
+		this.orig.write(this.data.getBytes());
+		this.orig.flush();
+		this.data = "";
 	}
 
 }
