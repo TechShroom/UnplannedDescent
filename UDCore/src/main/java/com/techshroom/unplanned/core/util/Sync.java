@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util;
+package com.techshroom.unplanned.core.util;
 
 /*
  * Copyright (c) 2002-2012 LWJGL Project

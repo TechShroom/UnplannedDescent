@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util;
+package com.techshroom.unplanned.core.util;
 
 import static org.lwjgl.opengl.GL11.GL_VERSION;
 import static org.lwjgl.opengl.GL11.glGetString;

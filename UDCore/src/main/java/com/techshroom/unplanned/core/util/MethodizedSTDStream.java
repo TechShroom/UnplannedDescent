@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util;
+package com.techshroom.unplanned.core.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

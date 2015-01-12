@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.techshroom.unplanned.util.LUtils;
-import com.techshroom.unplanned.util.LUtils.LoggingGroup;
+import com.techshroom.unplanned.core.util.LUtils;
+import com.techshroom.unplanned.core.util.LUtils.LoggingGroup;
 
 public class UtilityTest {
 

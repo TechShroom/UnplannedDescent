@@ -1,7 +1,7 @@
-package com.techshroom.unplanned.modloader.modules;
+package com.techshroom.unplanned.core.modloader.modules;
 
-import com.techshroom.unplanned.modloader.IMod;
-import com.techshroom.unplanned.modloader.SkeletalMod;
+import com.techshroom.unplanned.core.modloader.IMod;
+import com.techshroom.unplanned.core.modloader.SkeletalMod;
 
 /**
  * A to be implemented module system for UD. Used like the mods system, but is

@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.techshroom.unplanned.util.BetterArrays;
-import com.techshroom.unplanned.util.Maths.TrigTableLookup;
+import com.techshroom.unplanned.core.util.BetterArrays;
+import com.techshroom.unplanned.core.util.Maths.TrigTableLookup;
 
 public class MathTest {
 
