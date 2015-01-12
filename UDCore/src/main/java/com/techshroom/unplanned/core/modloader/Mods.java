@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.modloader;
+package com.techshroom.unplanned.core.modloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.techshroom.unplanned.modloader.modules.ModuleSystem;
-import com.techshroom.unplanned.util.LUtils;
+import com.techshroom.unplanned.core.modloader.modules.ModuleSystem;
+import com.techshroom.unplanned.core.util.LUtils;
 
 public final class Mods {
 	private static ArrayList<IMod> loaded = new ArrayList<IMod>();

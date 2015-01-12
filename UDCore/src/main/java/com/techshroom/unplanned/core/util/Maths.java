@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util;
+package com.techshroom.unplanned.core.util;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

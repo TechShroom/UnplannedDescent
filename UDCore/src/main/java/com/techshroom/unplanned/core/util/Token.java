@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util;
+package com.techshroom.unplanned.core.util;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;

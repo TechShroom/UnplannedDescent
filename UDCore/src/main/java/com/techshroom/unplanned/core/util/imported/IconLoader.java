@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.util.imported;
+package com.techshroom.unplanned.core.util.imported;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

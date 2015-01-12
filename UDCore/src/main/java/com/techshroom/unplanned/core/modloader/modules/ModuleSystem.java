@@ -1,11 +1,11 @@
-package com.techshroom.unplanned.modloader.modules;
+package com.techshroom.unplanned.core.modloader.modules;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.techshroom.unplanned.modloader.IMod;
-import com.techshroom.unplanned.modloader.Mods;
-import com.techshroom.unplanned.util.BetterArrays;
+import com.techshroom.unplanned.core.modloader.IMod;
+import com.techshroom.unplanned.core.modloader.Mods;
+import com.techshroom.unplanned.core.util.BetterArrays;
 
 public final class ModuleSystem {
 

@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.modloader;
+package com.techshroom.unplanned.core.modloader;
 
 import java.util.ArrayList;
 import java.util.Iterator;
