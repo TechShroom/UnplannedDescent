@@ -6,6 +6,11 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+/**
+ * Hack for injecting things into the classpath.
+ * 
+ * @author Kenzie Togami
+ */
 public class ClassPathHack {
 	private static final Class<?>[] parameters = new Class[] { URL.class };
 
@@ -42,9 +47,10 @@ public class ClassPathHack {
 	 * @throws IOException
 	 *             if there is any problems injecting.
 	 */
+	// The class loader should not be closed
+	@SuppressWarnings("resource")
 	public static void addURL(URL u) throws IOException {
-		URLClassLoader sysloader = (URLClassLoader) ClassLoader
-				.getSystemClassLoader();
+		URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 		Class<?> sysclass = URLClassLoader.class;
 
 		try {
@@ -52,14 +58,10 @@ public class ClassPathHack {
 			method.setAccessible(true);
 			method.invoke(sysloader, new Object[] { u });
 		} catch (Throwable t) {
-			throw new IOException(
-					"Error, could not add URL to system classloader", t);
+			throw new IOException("Error, could not add URL to system classloader", t);
 		}
 
-		System.setProperty("java.class.path",
-				System.getProperty("java.class.path")
-						+ File.pathSeparator
-						+ u.getFile().replace('/', File.separatorChar)
-								.substring(1).replace("%20", " "));
+		System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator
+				+ u.getFile().replace('/', File.separatorChar).substring(1).replace("%20", " "));
 	}
 }
