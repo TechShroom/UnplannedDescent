@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-import com.techshroom.unplanned.core.modloader.modules.ModuleSystem;
+//import com.techshroom.unplanned.core.modloader.modules.ModuleSystem;
 import com.techshroom.unplanned.core.util.LUtils;
 
 /**
@@ -32,16 +32,16 @@ public final class Mods {
 			System.err.println("[WARNING] Mods folder does not exist or is a file, "
 					+ "add it if you want mods to be loaded from there.");
 		}
-		ArrayList<IMod> injected = ModInjector.findAndInject();
+		//ArrayList<IMod> injected = ModInjector.findAndInject();
 		System.err.println("Loaded mods from classpath.");
-		loaded.addAll(injected);
+		//loaded.addAll(injected);
 		// System.err.println("Initializing mods...");
 		// System.err.println("Complete.");
-		loaded = injected;
+		//loaded = injected;
 		loaded.trimToSize();
 		loadedMods = true;
 		System.err.println("UD Mod System loaded.");
-		ModuleSystem.loadModulesFromMods();
+		//ModuleSystem.loadModulesFromMods();
 	}
 
 	private static boolean injectModsFolder() {
@@ -65,11 +65,11 @@ public final class Mods {
 				loadDirectory(f);
 				continue;
 			}
-			try {
-				ClassPathHack.addFile(f);
+			/*try {
+				//ClassPathHack.addFile(f);
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 		return true;
 	}
