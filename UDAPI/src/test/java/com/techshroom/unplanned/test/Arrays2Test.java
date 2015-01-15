@@ -46,20 +46,20 @@ public class Arrays2Test {
 	public void splicesArray() {
 		// check that no in place mods occur
 		int[] test, defensiveCopy = SPL_original.clone();
-		// splice no args: copy
+		// splice [:]: copy
 		test = Arrays2.splice(SPL_original);
 		assertArrayEquals(defensiveCopy, SPL_original);
 		assertArrayEquals(SPL_normalcp, test);
-		// splice 0, -1, -1: reverse copy
-		test = Arrays2.splice(SPL_original, 0, -1, -1);
+		// splice [::-1]: reverse copy
+		test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT, Arrays2.SPLICE_DEFAULT, -1);
 		assertArrayEquals(defensiveCopy, SPL_original);
 		assertArrayEquals(SPL_reversecp, test);
-		// splice 0, -1, 2: every other object
-		test = Arrays2.splice(SPL_original, 0, -1, 2);
+		// splice [::2]: every other object
+		test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT, Arrays2.SPLICE_DEFAULT, 2);
 		assertArrayEquals(defensiveCopy, SPL_original);
 		assertArrayEquals(SPL_bigstepcp, test);
-		// splice 0, -1, -2: reverse every other object
-		test = Arrays2.splice(SPL_original, 0, -1, -2);
+		// splice [::-2]: reverse every other object
+		test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT, Arrays2.SPLICE_DEFAULT, -2);
 		assertArrayEquals(defensiveCopy, SPL_original);
 		assertArrayEquals(SPL_rbigstepcp, test);
 	}
