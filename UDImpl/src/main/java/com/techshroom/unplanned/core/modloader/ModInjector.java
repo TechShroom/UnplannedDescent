@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 final class ModInjector {
-
 	/**
 	 * Scans the classpath and injects any mods it can find into the game. The
 	 * list is used by {@link Mods} to get the initial listings.
