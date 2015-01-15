@@ -1,4 +1,4 @@
-package com.techshroom.unplanned;
+package com.techshroom.unplanned.test;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -26,8 +26,7 @@ public class KeyTest {
 		List<String> keyNames = grabKeyConstantNames();
 		for (String constant : keyNames) {
 			try {
-				assertNotNull("no such key constant " + constant,
-						GLFW.class.getDeclaredField(constant));
+				assertNotNull("no such key constant " + constant, GLFW.class.getDeclaredField(constant));
 			} catch (NoSuchFieldException | SecurityException e) {
 				Throwables.propagate(e);
 			}

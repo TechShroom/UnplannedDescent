@@ -39,22 +39,16 @@ public final class GenerateKeyEnum {
 	/**
 	 * Javadoc for the entire class.
 	 */
-	private static final String KEY_ENUM_JAVADOC = ""
-			+ "Key enum values for the {@link GLFW} class." + "\n\n"
+	private static final String KEY_ENUM_JAVADOC = "" + "Key enum values for the {@link GLFW} class." + "\n\n"
 			+ "@author Kenzie Togami";
 	/**
 	 * Specialized javadoc for each constant.
 	 */
-	private static final String KEY_ENUM_CONSTANT_JAVADOC = ""
-			+ "The value corresponding to the key '%s'.";
-	private static final String GET_GLFWCODE_JAVADOC = ""
-			+ "Gets the corresponding {@code GLFW int code} for the key."
-			+ "\n\n"
-			+ "@return The corresponding {@ode GLFW int code} for the key";
+	private static final String KEY_ENUM_CONSTANT_JAVADOC = "" + "The value corresponding to the key '%s'.";
+	private static final String GET_GLFWCODE_JAVADOC = "" + "Gets the corresponding {@code GLFW int code} for the key."
+			+ "\n\n" + "@return The corresponding {@ode GLFW int code} for the key";
 	private static final ImmutableMap<String, String> KEY_ENUM_CONSTANT_TO_JAVADOC = ImmutableMap
-			.<String, String> builder()
-			.put("UNKNOWN", "The value corresponding to an unknown key.")
-			.build();
+			.<String, String> builder().put("UNKNOWN", "The value corresponding to an unknown key.").build();
 	/**
 	 * Very limited conversion from key names to field names. Pretty much only
 	 * works on numbers.
@@ -93,39 +87,33 @@ public final class GenerateKeyEnum {
 
 	/**
 	 * I'm going to go ahead and assume you're in the project directory, okay?
-	 * That's /UnplannedDescent/UDKeyboard.
+	 * That's /UnplannedDescent/UDAPI.
 	 * 
 	 * @param args
 	 *            - The arguments
 	 */
 	public static void main(String[] args) {
 		Array<List<String>> data = collectKeyConstants(GLFW.class);
-		List<String> keyNames = ImmutableList.copyOf(Lists.transform(
-				data.get(1), CONVERT_TO_JAVA_IDENTIFIERS));
-		try (FileWriter fileWriter = new FileWriter(
-				"./src/main/java/com/techshroom/unplanned/Key.java");
+		List<String> keyNames = ImmutableList.copyOf(Lists.transform(data.get(1), CONVERT_TO_JAVA_IDENTIFIERS));
+		try (FileWriter fileWriter = new FileWriter("./src/main/java/com/techshroom/unplanned/keyboard/Key.java");
 				JavaWriter writer = new JavaWriter(fileWriter);) {
 			writer.setIndent("    ");
-			writer.emitPackage("com.techshroom.unplanned");
+			writer.emitPackage("com.techshroom.unplanned.keyboard");
 			writer.emitImports(GLFW.class);
 			writer.emitEmptyLine();
 			writer.emitJavadoc(KEY_ENUM_JAVADOC);
-			Set<javax.lang.model.element.Modifier> PUBLIC = EnumSet
-					.of(javax.lang.model.element.Modifier.PUBLIC), PRIVATE = EnumSet
+			Set<javax.lang.model.element.Modifier> PUBLIC = EnumSet.of(javax.lang.model.element.Modifier.PUBLIC), PRIVATE = EnumSet
 					.of(javax.lang.model.element.Modifier.PRIVATE);
 			writer.beginType("Key", "enum", PUBLIC);
 			for (int i = 0; i < keyNames.size(); i++) {
 				String name = keyNames.get(i);
 				System.err.println("Inserting key enum value \"" + name + "\"");
 				writer.emitJavadoc(keysToJavadoc(name));
-				writer.emitEnumValue(
-						name + "(GLFW." + data.get(0).get(1) + ")",
-						(i == (keyNames.size() - 1)));
+				writer.emitEnumValue(name + "(GLFW." + data.get(0).get(1) + ")", (i == (keyNames.size() - 1)));
 			}
 			writer.emitEmptyLine();
-			writer.emitField("int", "glfwCode", EnumSet.of(
-					javax.lang.model.element.Modifier.PRIVATE,
-					javax.lang.model.element.Modifier.FINAL));
+			writer.emitField("int", "glfwCode",
+					EnumSet.of(javax.lang.model.element.Modifier.PRIVATE, javax.lang.model.element.Modifier.FINAL));
 			writer.emitEmptyLine();
 			writer.beginConstructor(PRIVATE, "int", "glfwCode");
 			writer.emitStatement("this.glfwCode = glfwCode");
@@ -177,8 +165,7 @@ public final class GenerateKeyEnum {
 	}
 
 	private static Pattern generateKeyNameMatcherForClass(Class<?> target) {
-		return Pattern.compile(String.format(KEY_NAME_PATTERN,
-				target.getSimpleName()));
+		return Pattern.compile(String.format(KEY_NAME_PATTERN, target.getSimpleName()));
 	}
 
 	/**
@@ -194,8 +181,7 @@ public final class GenerateKeyEnum {
 		for (Field field : fields) {
 			int mods = field.getModifiers();
 			// constants are public static final fields
-			if (!Modifier.isPublic(mods) || !Modifier.isStatic(mods)
-					|| !Modifier.isFinal(mods)) {
+			if (!Modifier.isPublic(mods) || !Modifier.isStatic(mods) || !Modifier.isFinal(mods)) {
 				// not constant field
 				constants.remove(field);
 			}
