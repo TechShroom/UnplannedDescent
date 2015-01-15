@@ -63,7 +63,7 @@ public final class Arrays2 {
 			if (start == SPLICE_DEFAULT) {
 				start = 0;
 			} else if (start < 0) {
-				start = Array.getLength(array) - start;
+				start = Array.getLength(array) + start;
 			}
 		}
 		if (slen > 1) {
@@ -71,7 +71,7 @@ public final class Arrays2 {
 			if (end == SPLICE_DEFAULT) {
 				end = Array.getLength(array);
 			} else if (end < 0) {
-				end = Array.getLength(array) - end;
+				end = Array.getLength(array) + end;
 			}
 		}
 		if (slen > 2) {
