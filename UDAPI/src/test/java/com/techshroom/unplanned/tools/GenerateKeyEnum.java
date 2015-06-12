@@ -59,7 +59,7 @@ public final class GenerateKeyEnum {
             ImmutableMap
                     .<String, String> builder()
                     .put("UNKNOWN",
-                            "The value corresponding to an unknown key.")
+                            "The value corresponding to an unknown key.\n")
                     .build();
 
     /**
@@ -116,7 +116,7 @@ public final class GenerateKeyEnum {
             TypeSpec.Builder enumVal =
                     TypeSpec.anonymousClassBuilder("$T.$L", GLFW.class, data
                             .get(0).get(i));
-            // enumVal.addJavadoc(keysToJavadoc(name));
+            enumVal.addJavadoc(keysToJavadoc(name));
             spec.addEnumConstant(name, enumVal.build());
         }
         spec.addField(int.class, "glfwCode", Modifier.PRIVATE, Modifier.FINAL);
