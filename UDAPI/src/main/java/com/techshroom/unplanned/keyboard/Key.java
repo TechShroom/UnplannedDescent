@@ -14,32 +14,32 @@ public enum Key {
     UNKNOWN(GLFW.GLFW_KEY_UNKNOWN),
 
     /**
-     * The value corresponding to the key 'SPACE'.
+     * The value corresponding to the key 'Space'.
      */
     SPACE(GLFW.GLFW_KEY_SPACE),
 
     /**
-     * The value corresponding to the key 'APOSTROPHE'.
+     * The value corresponding to the key 'Apostrophe'.
      */
     APOSTROPHE(GLFW.GLFW_KEY_APOSTROPHE),
 
     /**
-     * The value corresponding to the key 'COMMA'.
+     * The value corresponding to the key 'Comma'.
      */
     COMMA(GLFW.GLFW_KEY_COMMA),
 
     /**
-     * The value corresponding to the key 'MINUS'.
+     * The value corresponding to the key 'Minus'.
      */
     MINUS(GLFW.GLFW_KEY_MINUS),
 
     /**
-     * The value corresponding to the key 'PERIOD'.
+     * The value corresponding to the key 'Period'.
      */
     PERIOD(GLFW.GLFW_KEY_PERIOD),
 
     /**
-     * The value corresponding to the key 'SLASH'.
+     * The value corresponding to the key 'Slash'.
      */
     SLASH(GLFW.GLFW_KEY_SLASH),
 
@@ -94,12 +94,12 @@ public enum Key {
     NUM_9(GLFW.GLFW_KEY_9),
 
     /**
-     * The value corresponding to the key 'SEMICOLON'.
+     * The value corresponding to the key 'Semicolon'.
      */
     SEMICOLON(GLFW.GLFW_KEY_SEMICOLON),
 
     /**
-     * The value corresponding to the key 'EQUAL'.
+     * The value corresponding to the key 'Equal'.
      */
     EQUAL(GLFW.GLFW_KEY_EQUAL),
 
@@ -234,252 +234,252 @@ public enum Key {
     Z(GLFW.GLFW_KEY_Z),
 
     /**
-     * The value corresponding to the key 'Left BRACKET'.
+     * The value corresponding to the key 'Left Bracket'.
      */
     LEFT_BRACKET(GLFW.GLFW_KEY_LEFT_BRACKET),
 
     /**
-     * The value corresponding to the key 'BACKSLASH'.
+     * The value corresponding to the key 'Backslash'.
      */
     BACKSLASH(GLFW.GLFW_KEY_BACKSLASH),
 
     /**
-     * The value corresponding to the key 'Right BRACKET'.
+     * The value corresponding to the key 'Right Bracket'.
      */
     RIGHT_BRACKET(GLFW.GLFW_KEY_RIGHT_BRACKET),
 
     /**
-     * The value corresponding to the key 'GRAVE_ACCENT'.
+     * The value corresponding to the key 'Grave Accent'.
      */
     GRAVE_ACCENT(GLFW.GLFW_KEY_GRAVE_ACCENT),
 
     /**
-     * The value corresponding to the key 'WORLD_1'.
+     * The value corresponding to the key 'World 1'.
      */
     WORLD_1(GLFW.GLFW_KEY_WORLD_1),
 
     /**
-     * The value corresponding to the key 'WORLD_2'.
+     * The value corresponding to the key 'World 2'.
      */
     WORLD_2(GLFW.GLFW_KEY_WORLD_2),
 
     /**
-     * The value corresponding to the key 'ESCAPE'.
+     * The value corresponding to the key 'Escape'.
      */
     ESCAPE(GLFW.GLFW_KEY_ESCAPE),
 
     /**
-     * The value corresponding to the key 'ENTER'.
+     * The value corresponding to the key 'Enter'.
      */
     ENTER(GLFW.GLFW_KEY_ENTER),
 
     /**
-     * The value corresponding to the key 'TAB'.
+     * The value corresponding to the key 'Tab'.
      */
     TAB(GLFW.GLFW_KEY_TAB),
 
     /**
-     * The value corresponding to the key 'BACKSPACE'.
+     * The value corresponding to the key 'Backspace'.
      */
     BACKSPACE(GLFW.GLFW_KEY_BACKSPACE),
 
     /**
-     * The value corresponding to the key 'INSERT'.
+     * The value corresponding to the key 'Insert'.
      */
     INSERT(GLFW.GLFW_KEY_INSERT),
 
     /**
-     * The value corresponding to the key 'DELETE'.
+     * The value corresponding to the key 'Delete'.
      */
     DELETE(GLFW.GLFW_KEY_DELETE),
 
     /**
-     * The value corresponding to the key 'RIGHT'.
+     * The value corresponding to the key 'Right'.
      */
     RIGHT(GLFW.GLFW_KEY_RIGHT),
 
     /**
-     * The value corresponding to the key 'LEFT'.
+     * The value corresponding to the key 'Left'.
      */
     LEFT(GLFW.GLFW_KEY_LEFT),
 
     /**
-     * The value corresponding to the key 'DOWN'.
+     * The value corresponding to the key 'Down'.
      */
     DOWN(GLFW.GLFW_KEY_DOWN),
 
     /**
-     * The value corresponding to the key 'UP'.
+     * The value corresponding to the key 'Up'.
      */
     UP(GLFW.GLFW_KEY_UP),
 
     /**
-     * The value corresponding to the key 'PAGE_UP'.
+     * The value corresponding to the key 'Page Up'.
      */
     PAGE_UP(GLFW.GLFW_KEY_PAGE_UP),
 
     /**
-     * The value corresponding to the key 'PAGE_DOWN'.
+     * The value corresponding to the key 'Page Down'.
      */
     PAGE_DOWN(GLFW.GLFW_KEY_PAGE_DOWN),
 
     /**
-     * The value corresponding to the key 'HOME'.
+     * The value corresponding to the key 'Home'.
      */
     HOME(GLFW.GLFW_KEY_HOME),
 
     /**
-     * The value corresponding to the key 'END'.
+     * The value corresponding to the key 'End'.
      */
     END(GLFW.GLFW_KEY_END),
 
     /**
-     * The value corresponding to the key 'CAPS_LOCK'.
+     * The value corresponding to the key 'Caps Lock'.
      */
     CAPS_LOCK(GLFW.GLFW_KEY_CAPS_LOCK),
 
     /**
-     * The value corresponding to the key 'SCROLL_LOCK'.
+     * The value corresponding to the key 'Scroll Lock'.
      */
     SCROLL_LOCK(GLFW.GLFW_KEY_SCROLL_LOCK),
 
     /**
-     * The value corresponding to the key 'LOCK'.
+     * The value corresponding to the key 'Lock'.
      */
     NUM_LOCK(GLFW.GLFW_KEY_NUM_LOCK),
 
     /**
-     * The value corresponding to the key 'PRINT_SCREEN'.
+     * The value corresponding to the key 'Print Screen'.
      */
     PRINT_SCREEN(GLFW.GLFW_KEY_PRINT_SCREEN),
 
     /**
-     * The value corresponding to the key 'PAUSE'.
+     * The value corresponding to the key 'Pause'.
      */
     PAUSE(GLFW.GLFW_KEY_PAUSE),
 
     /**
-     * The value corresponding to the key 'F1'.
+     * The value corresponding to the key 'Function 1'.
      */
     F1(GLFW.GLFW_KEY_F1),
 
     /**
-     * The value corresponding to the key 'F2'.
+     * The value corresponding to the key 'Function 2'.
      */
     F2(GLFW.GLFW_KEY_F2),
 
     /**
-     * The value corresponding to the key 'F3'.
+     * The value corresponding to the key 'Function 3'.
      */
     F3(GLFW.GLFW_KEY_F3),
 
     /**
-     * The value corresponding to the key 'F4'.
+     * The value corresponding to the key 'Function 4'.
      */
     F4(GLFW.GLFW_KEY_F4),
 
     /**
-     * The value corresponding to the key 'F5'.
+     * The value corresponding to the key 'Function 5'.
      */
     F5(GLFW.GLFW_KEY_F5),
 
     /**
-     * The value corresponding to the key 'F6'.
+     * The value corresponding to the key 'Function 6'.
      */
     F6(GLFW.GLFW_KEY_F6),
 
     /**
-     * The value corresponding to the key 'F7'.
+     * The value corresponding to the key 'Function 7'.
      */
     F7(GLFW.GLFW_KEY_F7),
 
     /**
-     * The value corresponding to the key 'F8'.
+     * The value corresponding to the key 'Function 8'.
      */
     F8(GLFW.GLFW_KEY_F8),
 
     /**
-     * The value corresponding to the key 'F9'.
+     * The value corresponding to the key 'Function 9'.
      */
     F9(GLFW.GLFW_KEY_F9),
 
     /**
-     * The value corresponding to the key 'F10'.
+     * The value corresponding to the key 'Function 10'.
      */
     F10(GLFW.GLFW_KEY_F10),
 
     /**
-     * The value corresponding to the key 'F11'.
+     * The value corresponding to the key 'Function 11'.
      */
     F11(GLFW.GLFW_KEY_F11),
 
     /**
-     * The value corresponding to the key 'F12'.
+     * The value corresponding to the key 'Function 12'.
      */
     F12(GLFW.GLFW_KEY_F12),
 
     /**
-     * The value corresponding to the key 'F13'.
+     * The value corresponding to the key 'Function 13'.
      */
     F13(GLFW.GLFW_KEY_F13),
 
     /**
-     * The value corresponding to the key 'F14'.
+     * The value corresponding to the key 'Function 14'.
      */
     F14(GLFW.GLFW_KEY_F14),
 
     /**
-     * The value corresponding to the key 'F15'.
+     * The value corresponding to the key 'Function 15'.
      */
     F15(GLFW.GLFW_KEY_F15),
 
     /**
-     * The value corresponding to the key 'F16'.
+     * The value corresponding to the key 'Function 16'.
      */
     F16(GLFW.GLFW_KEY_F16),
 
     /**
-     * The value corresponding to the key 'F17'.
+     * The value corresponding to the key 'Function 17'.
      */
     F17(GLFW.GLFW_KEY_F17),
 
     /**
-     * The value corresponding to the key 'F18'.
+     * The value corresponding to the key 'Function 18'.
      */
     F18(GLFW.GLFW_KEY_F18),
 
     /**
-     * The value corresponding to the key 'F19'.
+     * The value corresponding to the key 'Function 19'.
      */
     F19(GLFW.GLFW_KEY_F19),
 
     /**
-     * The value corresponding to the key 'F20'.
+     * The value corresponding to the key 'Function 20'.
      */
     F20(GLFW.GLFW_KEY_F20),
 
     /**
-     * The value corresponding to the key 'F21'.
+     * The value corresponding to the key 'Function 21'.
      */
     F21(GLFW.GLFW_KEY_F21),
 
     /**
-     * The value corresponding to the key 'F22'.
+     * The value corresponding to the key 'Function 22'.
      */
     F22(GLFW.GLFW_KEY_F22),
 
     /**
-     * The value corresponding to the key 'F23'.
+     * The value corresponding to the key 'Function 23'.
      */
     F23(GLFW.GLFW_KEY_F23),
 
     /**
-     * The value corresponding to the key 'F24'.
+     * The value corresponding to the key 'Function 24'.
      */
     F24(GLFW.GLFW_KEY_F24),
 
     /**
-     * The value corresponding to the key 'F25'.
+     * The value corresponding to the key 'Function 25'.
      */
     F25(GLFW.GLFW_KEY_F25),
 
@@ -534,87 +534,87 @@ public enum Key {
     KP_9(GLFW.GLFW_KEY_KP_9),
 
     /**
-     * The value corresponding to the key 'Keypad DECIMAL'.
+     * The value corresponding to the key 'Keypad Decimal'.
      */
     KP_DECIMAL(GLFW.GLFW_KEY_KP_DECIMAL),
 
     /**
-     * The value corresponding to the key 'Keypad DIVIDE'.
+     * The value corresponding to the key 'Keypad Divide'.
      */
     KP_DIVIDE(GLFW.GLFW_KEY_KP_DIVIDE),
 
     /**
-     * The value corresponding to the key 'Keypad MULTIPLY'.
+     * The value corresponding to the key 'Keypad Multiply'.
      */
     KP_MULTIPLY(GLFW.GLFW_KEY_KP_MULTIPLY),
 
     /**
-     * The value corresponding to the key 'Keypad SUBTRACT'.
+     * The value corresponding to the key 'Keypad Subtract'.
      */
     KP_SUBTRACT(GLFW.GLFW_KEY_KP_SUBTRACT),
 
     /**
-     * The value corresponding to the key 'Keypad ADD'.
+     * The value corresponding to the key 'Keypad Add'.
      */
     KP_ADD(GLFW.GLFW_KEY_KP_ADD),
 
     /**
-     * The value corresponding to the key 'Keypad ENTER'.
+     * The value corresponding to the key 'Keypad Enter'.
      */
     KP_ENTER(GLFW.GLFW_KEY_KP_ENTER),
 
     /**
-     * The value corresponding to the key 'Keypad EQUAL'.
+     * The value corresponding to the key 'Keypad Equal'.
      */
     KP_EQUAL(GLFW.GLFW_KEY_KP_EQUAL),
 
     /**
-     * The value corresponding to the key 'Left SHIFT'.
+     * The value corresponding to the key 'Left Shift'.
      */
     LEFT_SHIFT(GLFW.GLFW_KEY_LEFT_SHIFT),
 
     /**
-     * The value corresponding to the key 'Left CONTROL'.
+     * The value corresponding to the key 'Left Control'.
      */
     LEFT_CONTROL(GLFW.GLFW_KEY_LEFT_CONTROL),
 
     /**
-     * The value corresponding to the key 'Left ALT'.
+     * The value corresponding to the key 'Left Alt'.
      */
     LEFT_ALT(GLFW.GLFW_KEY_LEFT_ALT),
 
     /**
-     * The value corresponding to the key 'Left SUPER'.
+     * The value corresponding to the key 'Left Super'.
      */
     LEFT_SUPER(GLFW.GLFW_KEY_LEFT_SUPER),
 
     /**
-     * The value corresponding to the key 'Right SHIFT'.
+     * The value corresponding to the key 'Right Shift'.
      */
     RIGHT_SHIFT(GLFW.GLFW_KEY_RIGHT_SHIFT),
 
     /**
-     * The value corresponding to the key 'Right CONTROL'.
+     * The value corresponding to the key 'Right Control'.
      */
     RIGHT_CONTROL(GLFW.GLFW_KEY_RIGHT_CONTROL),
 
     /**
-     * The value corresponding to the key 'Right ALT'.
+     * The value corresponding to the key 'Right Alt'.
      */
     RIGHT_ALT(GLFW.GLFW_KEY_RIGHT_ALT),
 
     /**
-     * The value corresponding to the key 'Right SUPER'.
+     * The value corresponding to the key 'Right Super'.
      */
     RIGHT_SUPER(GLFW.GLFW_KEY_RIGHT_SUPER),
 
     /**
-     * The value corresponding to the key 'MENU'.
+     * The value corresponding to the key 'Menu'.
      */
     MENU(GLFW.GLFW_KEY_MENU),
 
     /**
-     * The value corresponding to the key 'LAST'.
+     * The value corresponding to the key 'Last'.
      */
     LAST(GLFW.GLFW_KEY_LAST);
 
