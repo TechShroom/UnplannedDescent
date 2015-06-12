@@ -86,12 +86,23 @@ public final class GenerateKeyEnum {
         if (input.startsWith("NUM_")) {
             validated = input.substring(4);
         } else if (input.startsWith("KP_")) {
-            validated = input.replaceFirst("KP_", "Keypad ");
-        } else if (input.startsWith("LEFT_")) {
-            validated = input.replaceFirst("LEFT_", "Left ");
-        } else if (input.startsWith("RIGHT_")) {
-            validated = input.replaceFirst("RIGHT_", "Right ");
+            validated = input.replaceFirst("KP", "Keypad");
+        } else if (input.length() > 1 && input.startsWith("F")) {
+            validated = input.replaceFirst("F", "Function ");
         }
+        StringBuilder val = new StringBuilder(validated.length());
+        char[] chars = validated.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (i != 0 && chars[i - 1] != '_' && ch != '_') {
+                val.append(Character.toLowerCase(ch));
+            } else if (ch == '_') {
+                val.append(' ');
+            } else {
+                val.append(ch);
+            }
+        }
+        validated = val.toString();
         return String.format(KEY_ENUM_CONSTANT_JAVADOC, validated);
     }
 
@@ -112,7 +123,6 @@ public final class GenerateKeyEnum {
         spec.addJavadoc(KEY_ENUM_JAVADOC);
         for (int i = 0; i < keyNames.size(); i++) {
             String name = keyNames.get(i);
-            System.err.println("Inserting key enum value \"" + name + "\"");
             TypeSpec.Builder enumVal =
                     TypeSpec.anonymousClassBuilder("$T.$L", GLFW.class, data
                             .get(0).get(i));
