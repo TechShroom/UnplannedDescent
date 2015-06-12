@@ -7,5 +7,5 @@ package com.techshroom.unplanned.core.modloader;
  * @author Kenzie Togami
  */
 public interface IMod {
-	// nothing here yet
+    // nothing here yet
 }

@@ -14,280 +14,288 @@ import org.lwjgl.Pointer;
  * @author Kenzie Togami
  */
 public interface Window {
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnCloseCallback {
-		/**
-		 * Called when {@code window} is closed.
-		 * 
-		 * @param window
-		 *            - window reference
-		 */
-		public void onWindowClose(Window window);
-	}
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnMoveCallback {
-		/**
-		 * Called when {@code window} is moved.
-		 * 
-		 * @param window
-		 *            - window reference
-		 * @param newX
-		 *            - new window X
-		 * @param newY
-		 *            - new window Y
-		 */
-		public void onWindowMove(Window window, int newX, int newY);
-	}
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnCloseCallback {
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnResizeCallback {
-		/**
-		 * Called when {@code window} is resized.
-		 * 
-		 * @param window
-		 *            - window reference
-		 * @param newWidth
-		 *            - new window width
-		 * @param newHeight
-		 *            - new window height
-		 */
-		public void onWindowResize(Window window, int newWidth, int newHeight);
-	}
+        /**
+         * Called when {@code window} is closed.
+         * 
+         * @param window
+         *            - window reference
+         */
+        public void onWindowClose(Window window);
+    }
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnResizeFramebufferCallback {
-		/**
-		 * Called when {@code window}'s framebuffer is resized.
-		 * 
-		 * @param window
-		 *            - window reference
-		 * @param newWidth
-		 *            - new framebuffer width
-		 * @param newHeight
-		 *            - new framebuffer height
-		 */
-		public void onWindowFramebufferResize(Window window, int newWidth,
-				int newHeight);
-	}
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnMoveCallback {
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnFocusCallback {
-		/**
-		 * Called when {@code window}'s focus status changes.
-		 * 
-		 * @param window
-		 *            - window reference
-		 * @param focused
-		 *            - The window's focus status
-		 */
-		public void onWindowFocusChange(Window window, boolean focused);
-	}
+        /**
+         * Called when {@code window} is moved.
+         * 
+         * @param window
+         *            - window reference
+         * @param newX
+         *            - new window X
+         * @param newY
+         *            - new window Y
+         */
+        public void onWindowMove(Window window, int newX, int newY);
+    }
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnMinimizeChangeCallback {
-		/**
-		 * Called when {@code window}'s minimize status changes.
-		 * 
-		 * @param window
-		 *            - window reference
-		 * @param minimized
-		 *            - The window's minimize status
-		 */
-		public void onWindowMinimizeChange(Window window, boolean minimized);
-	}
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnResizeCallback {
 
-	/**
-	 * Window callback interface.
-	 * 
-	 * @author Kenzie Togami
-	 */
-	static interface OnRefreshRequestedCallback {
-		/**
-		 * Called when {@code window} needs to be refreshed.
-		 * 
-		 * @param window
-		 *            - window reference
-		 */
-		public void onWindowRefreshRequested(Window window);
-	}
+        /**
+         * Called when {@code window} is resized.
+         * 
+         * @param window
+         *            - window reference
+         * @param newWidth
+         *            - new window width
+         * @param newHeight
+         *            - new window height
+         */
+        public void onWindowResize(Window window, int newWidth, int newHeight);
+    }
 
-	static enum InputMode {
-		CURSOR(GLFW_CURSOR), STICKY_KEYS(GLFW_STICKY_KEYS), STICKY_MOUSE_BUTTONS(
-				GLFW_STICKY_MOUSE_BUTTONS);
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnResizeFramebufferCallback {
 
-		private final int glfwMode;
+        /**
+         * Called when {@code window}'s framebuffer is resized.
+         * 
+         * @param window
+         *            - window reference
+         * @param newWidth
+         *            - new framebuffer width
+         * @param newHeight
+         *            - new framebuffer height
+         */
+        public void onWindowFramebufferResize(Window window, int newWidth,
+                int newHeight);
+    }
 
-		private InputMode(int glfwMode) {
-			this.glfwMode = glfwMode;
-		}
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnFocusCallback {
 
-		public int asGLFWConstant() {
-			return this.glfwMode;
-		}
+        /**
+         * Called when {@code window}'s focus status changes.
+         * 
+         * @param window
+         *            - window reference
+         * @param focused
+         *            - The window's focus status
+         */
+        public void onWindowFocusChange(Window window, boolean focused);
+    }
 
-		@Override
-		public String toString() {
-			return "GLFW_" + name();
-		}
-	}
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnMinimizeChangeCallback {
 
-	int getWidth();
+        /**
+         * Called when {@code window}'s minimize status changes.
+         * 
+         * @param window
+         *            - window reference
+         * @param minimized
+         *            - The window's minimize status
+         */
+        public void onWindowMinimizeChange(Window window, boolean minimized);
+    }
 
-	int getHeight();
+    /**
+     * Window callback interface.
+     * 
+     * @author Kenzie Togami
+     */
+    static interface OnRefreshRequestedCallback {
 
-	int getFramebufferWidth();
+        /**
+         * Called when {@code window} needs to be refreshed.
+         * 
+         * @param window
+         *            - window reference
+         */
+        public void onWindowRefreshRequested(Window window);
+    }
 
-	int getFramebufferHeight();
+    static enum InputMode {
+        CURSOR(GLFW_CURSOR), STICKY_KEYS(GLFW_STICKY_KEYS),
+        STICKY_MOUSE_BUTTONS(GLFW_STICKY_MOUSE_BUTTONS);
 
-	int getX();
+        private final int glfwMode;
 
-	int getY();
+        private InputMode(int glfwMode) {
+            this.glfwMode = glfwMode;
+        }
 
-	int getCursorX();
+        public int asGLFWConstant() {
+            return this.glfwMode;
+        }
 
-	int getCursorY();
+        @Override
+        public String toString() {
+            return "GLFW_" + name();
+        }
+    }
 
-	int getInputMode(InputMode mode);
+    int getWidth();
 
-	ByteBuffer getGammaRamp();
+    int getHeight();
 
-	String getTitle();
+    int getFramebufferWidth();
 
-	// TODO: return monitor interface
-	Object getMonitor();
+    int getFramebufferHeight();
 
-	String getClipboardContents();
+    int getX();
 
-	boolean isContextCurrent();
+    int getY();
 
-	boolean isVsyncOn();
+    int getCursorX();
 
-	boolean isCloseRequested();
+    int getCursorY();
 
-	boolean isVisible();
+    int getInputMode(InputMode mode);
 
-	/**
-	 * Gets an attribute value.
-	 * 
-	 * @param attr
-	 *            - The attribute to get
-	 * @return The attribute value
-	 * @deprecated Use only for unsupported attribute access
-	 */
-	@Deprecated
-	int getAttribute(int attr);
+    ByteBuffer getGammaRamp();
 
-	/**
-	 * Please be careful with this window pointer. Certain methods are only kept
-	 * up-to-date via the provider setters in this class and will become
-	 * out-of-date if the values are changed elsewhere.
-	 * 
-	 * <p>
-	 * It is recommended to only use this pointer for unsupported features.
-	 * </p>
-	 * 
-	 * @return a {@link Pointer} wrapper for the window pointer
-	 */
-	Pointer getWindowPointer();
+    String getTitle();
 
-	void setSize(int width, int height);
+    // TODO: return monitor interface
+    Object getMonitor();
 
-	void setVsyncOn(boolean on);
+    String getClipboardContents();
 
-	void setCloseRequested(boolean requested);
+    boolean isContextCurrent();
 
-	void setMinimized(boolean minimized);
+    boolean isVsyncOn();
 
-	void setVisible(boolean visible);
+    boolean isCloseRequested();
 
-	void setTitle(String title);
+    boolean isVisible();
 
-	void destroy();
+    /**
+     * Gets an attribute value.
+     * 
+     * @param attr
+     *            - The attribute to get
+     * @return The attribute value
+     * @deprecated Use only for unsupported attribute access
+     */
+    @Deprecated
+    int getAttribute(int attr);
 
-	void swapBuffers();
+    /**
+     * Please be careful with this window pointer. Certain methods are only kept
+     * up-to-date via the provider setters in this class and will become
+     * out-of-date if the values are changed elsewhere.
+     * 
+     * <p>
+     * It is recommended to only use this pointer for unsupported features.
+     * </p>
+     * 
+     * @return a {@link Pointer} wrapper for the window pointer
+     */
+    Pointer getWindowPointer();
 
-	void processEvents();
+    void setSize(int width, int height);
 
-	void waitForEvents();
+    void setVsyncOn(boolean on);
 
-	/**
-	 * Add a callback for when the Window closes.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onClose(OnCloseCallback callback);
+    void setCloseRequested(boolean requested);
 
-	/**
-	 * Add a callback for when the Window moves.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onMove(OnMoveCallback callback);
+    void setMinimized(boolean minimized);
 
-	/**
-	 * Add a callback for when the Window resizes.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onResize(OnResizeCallback callback);
+    void setVisible(boolean visible);
 
-	/**
-	 * Add a callback for when the Window framebuffer resizes.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onResizeFramebuffer(OnResizeFramebufferCallback callback);
+    void setTitle(String title);
 
-	/**
-	 * Add a callback for when the Window's focus status changes.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onFocusChange(OnFocusCallback callback);
+    void destroy();
 
-	/**
-	 * Add a callback for when the Window's minimize status changes.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onMinimizeChange(OnMinimizeChangeCallback callback);
+    void swapBuffers();
 
-	/**
-	 * Add a callback for when the Window is told to refresh.
-	 * 
-	 * @param callback
-	 *            - the callback
-	 */
-	void onRefreshRequested(OnRefreshRequestedCallback callback);
+    void processEvents();
+
+    void waitForEvents();
+
+    /**
+     * Add a callback for when the Window closes.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onClose(OnCloseCallback callback);
+
+    /**
+     * Add a callback for when the Window moves.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onMove(OnMoveCallback callback);
+
+    /**
+     * Add a callback for when the Window resizes.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onResize(OnResizeCallback callback);
+
+    /**
+     * Add a callback for when the Window framebuffer resizes.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onResizeFramebuffer(OnResizeFramebufferCallback callback);
+
+    /**
+     * Add a callback for when the Window's focus status changes.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onFocusChange(OnFocusCallback callback);
+
+    /**
+     * Add a callback for when the Window's minimize status changes.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onMinimizeChange(OnMinimizeChangeCallback callback);
+
+    /**
+     * Add a callback for when the Window is told to refresh.
+     * 
+     * @param callback
+     *            - the callback
+     */
+    void onRefreshRequested(OnRefreshRequestedCallback callback);
 }
