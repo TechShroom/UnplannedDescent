@@ -29,6 +29,7 @@ public interface Window {
          *            - window reference
          */
         public void onWindowClose(Window window);
+
     }
 
     /**
@@ -49,6 +50,7 @@ public interface Window {
          *            - new window Y
          */
         public void onWindowMove(Window window, int newX, int newY);
+
     }
 
     /**
@@ -69,6 +71,7 @@ public interface Window {
          *            - new window height
          */
         public void onWindowResize(Window window, int newWidth, int newHeight);
+
     }
 
     /**
@@ -90,6 +93,7 @@ public interface Window {
          */
         public void onWindowFramebufferResize(Window window, int newWidth,
                 int newHeight);
+
     }
 
     /**
@@ -108,6 +112,7 @@ public interface Window {
          *            - The window's focus status
          */
         public void onWindowFocusChange(Window window, boolean focused);
+
     }
 
     /**
@@ -126,6 +131,7 @@ public interface Window {
          *            - The window's minimize status
          */
         public void onWindowMinimizeChange(Window window, boolean minimized);
+
     }
 
     /**
@@ -142,9 +148,11 @@ public interface Window {
          *            - window reference
          */
         public void onWindowRefreshRequested(Window window);
+
     }
 
     static enum InputMode {
+
         CURSOR(GLFW_CURSOR), STICKY_KEYS(GLFW_STICKY_KEYS),
         STICKY_MOUSE_BUTTONS(GLFW_STICKY_MOUSE_BUTTONS);
 
@@ -162,6 +170,7 @@ public interface Window {
         public String toString() {
             return "GLFW_" + name();
         }
+
     }
 
     int getWidth();
@@ -298,4 +307,5 @@ public interface Window {
      *            - the callback
      */
     void onRefreshRequested(OnRefreshRequestedCallback callback);
+
 }
