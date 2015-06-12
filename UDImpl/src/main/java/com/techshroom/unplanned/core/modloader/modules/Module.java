@@ -11,5 +11,5 @@ import com.techshroom.unplanned.core.modloader.SkeletalMod;
  * @author Kenzie Togami
  */
 public abstract class Module extends SkeletalMod implements IMod {
-	// nothing here yet
+    // nothing here yet
 }

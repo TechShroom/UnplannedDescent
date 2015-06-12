@@ -10,17 +10,18 @@ import java.io.Closeable;
  * @author Kenzie Togami
  */
 public interface TryWithGL extends Closeable {
-	/**
-	 * Gets the name for the function that is called when this TWGL is made.
-	 * 
-	 * @return the name of the start function
-	 */
-	String getStartFunctionName();
 
-	/**
-	 * Gets the name for the function that is called when this TWGL is closed.
-	 * 
-	 * @return the name of the start function
-	 */
-	String getEndFunctionName();
+    /**
+     * Gets the name for the function that is called when this TWGL is made.
+     * 
+     * @return the name of the start function
+     */
+    String getStartFunctionName();
+
+    /**
+     * Gets the name for the function that is called when this TWGL is closed.
+     * 
+     * @return the name of the start function
+     */
+    String getEndFunctionName();
 }

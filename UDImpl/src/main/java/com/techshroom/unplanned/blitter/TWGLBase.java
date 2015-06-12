@@ -16,53 +16,57 @@ import com.google.common.base.Optional;
  */
 @SuppressWarnings("javadoc")
 abstract class TWGLBase implements TryWithGL {
-	protected final Optional<Runnable> endFuncRef, startFuncRef;
-	protected final String startFuncName;
-	protected final String endFuncName;
 
-	TWGLBase(String startFunc, String endFunc) {
-		this(startFunc, endFunc, null, null);
-	}
+    protected final Optional<Runnable> endFuncRef, startFuncRef;
+    protected final String startFuncName;
+    protected final String endFuncName;
 
-	TWGLBase(String startFunc, String endFunc, Runnable startFuncRef, Runnable endFuncRef) {
-		this.startFuncName = checkNotNull(startFunc, "startFunc");
-		this.endFuncName = checkNotNull(endFunc, "endFunc");
-		this.startFuncRef = Optional.fromNullable(startFuncRef);
-		this.endFuncRef = Optional.fromNullable(endFuncRef);
-		callStartFunction();
-	}
+    TWGLBase(String startFunc, String endFunc) {
+        this(startFunc, endFunc, null, null);
+    }
 
-	@Override
-	public void close() throws IOException {
-		callEndFunction();
-	}
+    TWGLBase(String startFunc, String endFunc, Runnable startFuncRef,
+            Runnable endFuncRef) {
+        this.startFuncName = checkNotNull(startFunc, "startFunc");
+        this.endFuncName = checkNotNull(endFunc, "endFunc");
+        this.startFuncRef = Optional.fromNullable(startFuncRef);
+        this.endFuncRef = Optional.fromNullable(endFuncRef);
+        callStartFunction();
+    }
 
-	protected void callStartFunction() {
-		if (this.startFuncRef.isPresent()) {
-			this.startFuncRef.get().run();
-		} else {
-			throw new UnsupportedOperationException("subclass did not provide the start function to run"
-					+ " and should have overriden callStartFunction");
-		}
-	}
+    @Override
+    public void close() throws IOException {
+        callEndFunction();
+    }
 
-	protected void callEndFunction() {
-		if (this.endFuncRef.isPresent()) {
-			this.endFuncRef.get().run();
-		} else {
-			throw new UnsupportedOperationException("subclass did not provide the end function to run"
-					+ " and should have overriden callEndFunction");
-		}
-	}
+    protected void callStartFunction() {
+        if (this.startFuncRef.isPresent()) {
+            this.startFuncRef.get().run();
+        } else {
+            throw new UnsupportedOperationException(
+                    "subclass did not provide the start function to run"
+                            + " and should have overriden callStartFunction");
+        }
+    }
 
-	@Override
-	public String getStartFunctionName() {
-		return this.startFuncName;
-	}
+    protected void callEndFunction() {
+        if (this.endFuncRef.isPresent()) {
+            this.endFuncRef.get().run();
+        } else {
+            throw new UnsupportedOperationException(
+                    "subclass did not provide the end function to run"
+                            + " and should have overriden callEndFunction");
+        }
+    }
 
-	@Override
-	public String getEndFunctionName() {
-		return this.endFuncName;
-	}
+    @Override
+    public String getStartFunctionName() {
+        return this.startFuncName;
+    }
+
+    @Override
+    public String getEndFunctionName() {
+        return this.endFuncName;
+    }
 
 }
