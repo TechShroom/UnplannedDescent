@@ -96,10 +96,8 @@ public final class Maths {
         double dp =
                 dotProductAngles(magnitude, thetaLineToProject, 1, thetaSurface);
         if (!getY) {
-            System.out.println(dp);
             return dp * Math.cos(Math.toRadians(thetaSurface));
         } else {
-            System.out.println(dp);
             return dp * Math.sin(Math.toRadians(thetaSurface));
         }
 
@@ -111,10 +109,8 @@ public final class Maths {
                 dotProduct(xLine, yLine, Maths.normalizeX(xSurface, ySurface),
                         Maths.normalizeY(xSurface, ySurface));
         if (!DoY) {
-            System.out.println(dp);
             return dp * xSurface;
         } else {
-            System.out.println(dp);
             return dp * ySurface;
         }
 
