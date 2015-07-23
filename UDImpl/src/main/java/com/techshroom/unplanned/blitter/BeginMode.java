@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 /**
  * Modes for {@link GL11#glBegin(int)}. Below, {@code n} is an integer count
  * starting at one, and {@code N} is the total number of vertices specified.
- * 
+ *
  * @author Kenzie Togami
  */
 public enum BeginMode {
@@ -94,7 +94,7 @@ public enum BeginMode {
 
     /**
      * Converts this mode to a OpenGL constant value.
-     * 
+     *
      * @return the corresponding {@code int} value
      */
     public int asGLConstant() {

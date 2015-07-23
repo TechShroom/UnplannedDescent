@@ -2,10 +2,7 @@ package com.techshroom.unplanned.core.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.io.PrintStream;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Random;
 
 public final class Arrays2 {
 
