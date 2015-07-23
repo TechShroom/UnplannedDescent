@@ -1,12 +1,10 @@
 package com.techshroom.unplanned.core.modloader;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-//import com.techshroom.unplanned.core.modloader.modules.ModuleSystem;
 import com.techshroom.unplanned.core.util.LUtils;
 
 /**
