@@ -24,17 +24,7 @@ public final class GL {
      * @return the try-with-resources object
      */
     public static TryWithGL begin(final BeginMode mode) {
-        return new TWGLBase("glBegin", "glEnd") {
-
-            @Override
-            protected void callStartFunction() {
-                glBegin(mode.asGLConstant());
-            }
-
-            @Override
-            protected void callEndFunction() {
-                glEnd();
-            }
-        };
+        return new TWGLBase("glBegin", "glEnd",
+                () -> glBegin(mode.asGLConstant()), () -> glEnd());
     }
 }
