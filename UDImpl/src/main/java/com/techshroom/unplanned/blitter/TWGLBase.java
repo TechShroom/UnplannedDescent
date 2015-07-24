@@ -3,8 +3,7 @@ package com.techshroom.unplanned.blitter;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * Base class for a TryWithGL implementation. This takes care of most of the
@@ -15,7 +14,7 @@ import com.google.common.base.Optional;
  * @author Kenzie Togami
  */
 @SuppressWarnings("javadoc")
-abstract class TWGLBase implements TryWithGL {
+class TWGLBase implements TryWithGL {
 
     protected final Optional<Runnable> endFuncRef, startFuncRef;
     protected final String startFuncName;
@@ -29,8 +28,8 @@ abstract class TWGLBase implements TryWithGL {
             Runnable endFuncRef) {
         this.startFuncName = checkNotNull(startFunc, "startFunc");
         this.endFuncName = checkNotNull(endFunc, "endFunc");
-        this.startFuncRef = Optional.fromNullable(startFuncRef);
-        this.endFuncRef = Optional.fromNullable(endFuncRef);
+        this.startFuncRef = Optional.ofNullable(startFuncRef);
+        this.endFuncRef = Optional.ofNullable(endFuncRef);
         callStartFunction();
     }
 
@@ -40,23 +39,19 @@ abstract class TWGLBase implements TryWithGL {
     }
 
     protected void callStartFunction() {
-        if (this.startFuncRef.isPresent()) {
-            this.startFuncRef.get().run();
-        } else {
-            throw new UnsupportedOperationException(
-                    "subclass did not provide the start function to run"
-                            + " and should have overriden callStartFunction");
-        }
+        this.startFuncRef
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "subclass did not provide the start function to run"
+                                + " and should have overriden callStartFunction"))
+                .run();
     }
 
     protected void callEndFunction() {
-        if (this.endFuncRef.isPresent()) {
-            this.endFuncRef.get().run();
-        } else {
-            throw new UnsupportedOperationException(
-                    "subclass did not provide the end function to run"
-                            + " and should have overriden callEndFunction");
-        }
+        this.endFuncRef
+                .orElseThrow(() -> new UnsupportedOperationException(
+                        "subclass did not provide the end function to run"
+                                + " and should have overriden callEndFunction"))
+                .run();
     }
 
     @Override

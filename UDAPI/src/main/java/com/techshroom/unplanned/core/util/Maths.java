@@ -29,24 +29,24 @@ public final class Maths {
          */
         public static Rectangle2D rotateRect(Rectangle2D r, double theta) {
             // store data
-            double x = r.getX(), y = r.getY(), w = r.getWidth(), h =
-                    r.getHeight();
+            double x = r.getX(), y = r.getY(), w = r.getWidth(),
+                    h = r.getHeight();
             // clear rect
             r.setRect(0, 0, 0, 0);
             // get points
-            Point2D[] points =
-                    new Point2D[] { new Point2D.Double(x, y),
-                            new Point2D.Double(w + x, h + y) };
+            Point2D[] points = new Point2D[] { new Point2D.Double(x, y),
+                    new Point2D.Double(w + x, h + y) };
             // calc cos/sin
-            double s = TrigTableLookup.sin(theta), c =
-                    TrigTableLookup.cos(theta);
+            double s = TrigTableLookup.sin(theta),
+                    c = TrigTableLookup.cos(theta);
             // expand rect to fit
             for (Point2D p : points) {
-                p.setLocation((p.getX() * c) - (p.getY() * s), (p.getX() * s)
-                        + (p.getY() * c));
+                p.setLocation((p.getX() * c) - (p.getY() * s),
+                        (p.getX() * s) + (p.getY() * c));
             }
-            r.setRect(points[0].getX(), points[0].getY(), points[1].getX()
-                    - points[0].getX(), points[1].getY() - points[0].getY());
+            r.setRect(points[0].getX(), points[0].getY(),
+                    points[1].getX() - points[0].getX(),
+                    points[1].getY() - points[0].getY());
             return r;
         }
 
@@ -93,8 +93,8 @@ public final class Maths {
      */
     public static double projectLineAlongSurface(double thetaSurface,
             double thetaLineToProject, double magnitude, boolean getY) {
-        double dp =
-                dotProductAngles(magnitude, thetaLineToProject, 1, thetaSurface);
+        double dp = dotProductAngles(magnitude, thetaLineToProject, 1,
+                thetaSurface);
         if (!getY) {
             return dp * Math.cos(Math.toRadians(thetaSurface));
         } else {
@@ -126,7 +126,8 @@ public final class Maths {
         return y / len_v;
     }
 
-    public static double dotProduct(double ax, double ay, double bx, double by) {
+    public static double dotProduct(double ax, double ay, double bx,
+            double by) {
         return ax * ay + bx * by;
     }
 
@@ -197,48 +198,61 @@ public final class Maths {
      * imat.m11 = (float) sy; imat.m22 = (float) sz; return imat; }
      */
 
-    public static final class TrigTableLookup {
+    public static double fastSin(double deg) {
+        return TrigTableLookup.sin(deg);
+    }
+
+    public static double fastCos(double deg) {
+        return TrigTableLookup.cos(deg);
+    }
+
+    public static double fastTan(double deg) {
+        return TrigTableLookup.tan(deg);
+    }
+
+    private static final class TrigTableLookup {
 
         // Set to Math.PI*2 if you want radians, or 360d for degrees
-        private static final double circleSize = 360d;
-        private static final double doubleCircleSize = circleSize * 2;
-        private static final int virtualSize = 1048576;
-        private static final double conversionFactor =
-                (virtualSize / circleSize);
-        private static final double tanLeadingCoefficient = (-circleSize
-                / Math.PI * 2);
-        private static final double[] SinTable = new double[16384];
+        private static final double CIRCLE_SIZE = 360d;
+        private static final double CIRCLE_SIZE_X2 = CIRCLE_SIZE * 2;
+        private static final int VIRTUAL_SIZE = 1048576;
+        private static final double CONVERSION_FACTOR =
+                (VIRTUAL_SIZE / CIRCLE_SIZE);
+        private static final double TAN_COEFF = -CIRCLE_SIZE / Math.PI * 2;
+        private static final int TABLE_SIZE = 16384;
+        private static final int TABLE_SIZE_MIN_1 = TABLE_SIZE - 1;
+        private static final double[] SIN_TABLE = new double[TABLE_SIZE];
 
         static {
             for (int i = 0; i < 16384; i++) {
-                SinTable[i] = Math.sin(i * Math.PI * 2 / 16384);
+                SIN_TABLE[i] = Math.sin(i * Math.PI * 2 / TABLE_SIZE);
             }
         }
 
         private static double lookup(int val) {
             int index = val / 64;
-            double LUTSinA = SinTable[index & 16383];
-            double LUTSinB = SinTable[(index + 1) & 16383];
+            double LUTSinA = SIN_TABLE[index & TABLE_SIZE_MIN_1];
+            double LUTSinB = SIN_TABLE[(index + 1) & TABLE_SIZE_MIN_1];
             double LUTSinW = (val & 63) / 63d;
             return LUTSinW * (LUTSinB - LUTSinA) + LUTSinA;
         }
 
         public static double sin(double angle) {
-            return lookup((int) (angle * conversionFactor));
+            return lookup((int) (angle * CONVERSION_FACTOR));
         }
 
         public static double cos(double angle) {
-            return lookup((int) (angle * conversionFactor) + 262144);
+            return lookup((int) (angle * CONVERSION_FACTOR) + 262144);
         }
 
         public static double tan(double angle) {
-            int k = (int) (angle * conversionFactor);
+            int k = (int) (angle * CONVERSION_FACTOR);
             // Central 5000 values use
             // the 1/x form
             int wrapped = (((k + 2000) << 13) >> 13);
-            if (wrapped < -258144) { // 262144-5000
-                return tanLeadingCoefficient
-                        / ((4 * angle) % (doubleCircleSize) - circleSize);
+            if (wrapped < -258144) { // 5000-262144
+                return TAN_COEFF
+                        / ((4 * angle) % (CIRCLE_SIZE_X2) - CIRCLE_SIZE);
             }
             return lookup(k) / lookup(k + 262144);
 
