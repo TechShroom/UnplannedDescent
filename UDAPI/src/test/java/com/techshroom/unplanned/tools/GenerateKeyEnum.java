@@ -124,7 +124,7 @@ public final class GenerateKeyEnum {
         spec.addMethod(MethodSpec.methodBuilder("getGLFWName")
                 .addModifiers(Modifier.PUBLIC).returns(String.class)
                 .addCode(CodeBlock.builder()
-                        .addStatement("return $S + name().replace($S, $S)",
+                        .addStatement("return $S + name().replaceAll($S, $S)",
                                 "GLFW_KEY_", "NUM_(\\d)", "$1")
                         .build())
                 .build());

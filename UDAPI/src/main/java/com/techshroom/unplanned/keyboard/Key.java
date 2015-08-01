@@ -617,6 +617,6 @@ public enum Key {
     LAST;
 
     public String getGLFWName() {
-        return "GLFW_KEY_" + name().replace("NUM_(\\d)", "$1");
+        return "GLFW_KEY_" + name().replaceAll("NUM_(\\d)", "$1");
     }
 }
