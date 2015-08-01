@@ -2,10 +2,7 @@ package com.techshroom.unplanned.core.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.io.PrintStream;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Random;
 
 public final class Arrays2 {
 
@@ -120,7 +117,7 @@ public final class Arrays2 {
     }
 
     /**
-     * Creates a new primitive array, avoiding the scary unchecked cast.
+     * Creates a new primitive array, avoiding the unchecked cast.
      * 
      * @param component
      *            - primitive component type
@@ -136,7 +133,7 @@ public final class Arrays2 {
     }
 
     /**
-     * Creates a new array, avoiding the scary unchecked cast.
+     * Creates a new array, avoiding the unchecked cast.
      * 
      * @param component
      *            - component type

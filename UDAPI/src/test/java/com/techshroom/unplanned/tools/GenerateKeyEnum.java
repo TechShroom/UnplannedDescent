@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 /**
@@ -43,18 +42,13 @@ public final class GenerateKeyEnum {
     /**
      * Javadoc for the entire class.
      */
-    private static final String KEY_ENUM_JAVADOC = ""
-            + "Key enum values for the {@link GLFW} class." + "\n\n"
+    private static final String KEY_ENUM_JAVADOC = "Key enum values.\n\n"
             + "@author Kenzie Togami\n";
     /**
      * Specialized javadoc for each constant.
      */
     private static final String KEY_ENUM_CONSTANT_JAVADOC = ""
             + "The value corresponding to the key '%s'.\n";
-    private static final String GET_GLFWCODE_JAVADOC = ""
-            + "Gets the corresponding {@code GLFW int code} for the key."
-            + "\n\n"
-            + "@return The corresponding {@code GLFW int code} for the key\n";
     private static final ImmutableMap<String, String> KEY_ENUM_CONSTANT_TO_JAVADOC =
             ImmutableMap
                     .<String, String> builder()
@@ -123,28 +117,10 @@ public final class GenerateKeyEnum {
         spec.addJavadoc(KEY_ENUM_JAVADOC);
         for (int i = 0; i < keyNames.size(); i++) {
             String name = keyNames.get(i);
-            TypeSpec.Builder enumVal =
-                    TypeSpec.anonymousClassBuilder("$T.$L", GLFW.class, data
-                            .get(0).get(i));
+            TypeSpec.Builder enumVal = TypeSpec.anonymousClassBuilder("");
             enumVal.addJavadoc(keysToJavadoc(name));
             spec.addEnumConstant(name, enumVal.build());
         }
-        spec.addField(int.class, "glfwCode", Modifier.PRIVATE, Modifier.FINAL);
-        spec.addMethod(MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
-                .addParameter(int.class, "glfwCode")
-                .addStatement("this.$L = $L", "glfwCode", "glfwCode").build());
-        spec.addMethod(MethodSpec.methodBuilder("getGLFWCode")
-                .addJavadoc(GET_GLFWCODE_JAVADOC).addModifiers(Modifier.PUBLIC)
-                .returns(int.class).addStatement("return this.$L", "glfwCode")
-                .build());
-        spec.addMethod(MethodSpec
-                .methodBuilder("toString")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(String.class)
-                .addStatement("return $S + name().replaceFirst($S, $S)",
-                        "GLFW_KEY_", "NUM_(\\d)", "\\1").build());
         try {
             JavaFile.builder(PACKAGE, spec.build()).skipJavaLangImports(true)
                     .indent("    ").build().writeTo(Paths.get("src/main/java"));

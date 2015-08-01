@@ -1,12 +1,10 @@
 package com.techshroom.unplanned.window;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
-import static org.lwjgl.glfw.GLFW.GLFW_STICKY_KEYS;
-import static org.lwjgl.glfw.GLFW.GLFW_STICKY_MOUSE_BUTTONS;
-
-import java.nio.ByteBuffer;
-
 import org.lwjgl.Pointer;
+
+import com.techshroom.unplanned.monitor.Monitor;
+import com.techshroom.unplanned.value.Dimension;
+import com.techshroom.unplanned.value.Point;
 
 /**
  * Window object for a more object oriented GLFW.
@@ -20,7 +18,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnCloseCallback {
+    interface OnCloseCallback {
 
         /**
          * Called when {@code window} is closed.
@@ -28,7 +26,7 @@ public interface Window {
          * @param window
          *            - window reference
          */
-        public void onWindowClose(Window window);
+        void onWindowClose(Window window);
 
     }
 
@@ -37,7 +35,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnMoveCallback {
+    interface OnMoveCallback {
 
         /**
          * Called when {@code window} is moved.
@@ -49,7 +47,7 @@ public interface Window {
          * @param newY
          *            - new window Y
          */
-        public void onWindowMove(Window window, int newX, int newY);
+        void onWindowMove(Window window, int newX, int newY);
 
     }
 
@@ -58,7 +56,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnResizeCallback {
+    interface OnResizeCallback {
 
         /**
          * Called when {@code window} is resized.
@@ -70,7 +68,7 @@ public interface Window {
          * @param newHeight
          *            - new window height
          */
-        public void onWindowResize(Window window, int newWidth, int newHeight);
+        void onWindowResize(Window window, int newWidth, int newHeight);
 
     }
 
@@ -79,7 +77,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnResizeFramebufferCallback {
+    interface OnResizeFramebufferCallback {
 
         /**
          * Called when {@code window}'s framebuffer is resized.
@@ -91,7 +89,7 @@ public interface Window {
          * @param newHeight
          *            - new framebuffer height
          */
-        public void onWindowFramebufferResize(Window window, int newWidth,
+        void onWindowFramebufferResize(Window window, int newWidth,
                 int newHeight);
 
     }
@@ -101,7 +99,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnFocusCallback {
+    interface OnFocusCallback {
 
         /**
          * Called when {@code window}'s focus status changes.
@@ -111,7 +109,7 @@ public interface Window {
          * @param focused
          *            - The window's focus status
          */
-        public void onWindowFocusChange(Window window, boolean focused);
+        void onWindowFocusChange(Window window, boolean focused);
 
     }
 
@@ -120,7 +118,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnMinimizeChangeCallback {
+    interface OnMinimizeChangeCallback {
 
         /**
          * Called when {@code window}'s minimize status changes.
@@ -130,7 +128,7 @@ public interface Window {
          * @param minimized
          *            - The window's minimize status
          */
-        public void onWindowMinimizeChange(Window window, boolean minimized);
+        void onWindowMinimizeChange(Window window, boolean minimized);
 
     }
 
@@ -139,7 +137,7 @@ public interface Window {
      * 
      * @author Kenzie Togami
      */
-    static interface OnRefreshRequestedCallback {
+    interface OnRefreshRequestedCallback {
 
         /**
          * Called when {@code window} needs to be refreshed.
@@ -147,60 +145,23 @@ public interface Window {
          * @param window
          *            - window reference
          */
-        public void onWindowRefreshRequested(Window window);
+        void onWindowRefreshRequested(Window window);
 
     }
 
-    static enum InputMode {
+    Dimension getSize();
 
-        CURSOR(GLFW_CURSOR), STICKY_KEYS(GLFW_STICKY_KEYS),
-        STICKY_MOUSE_BUTTONS(GLFW_STICKY_MOUSE_BUTTONS);
+    Dimension getFramebufferSize();
 
-        private final int glfwMode;
+    Point getLocation();
 
-        private InputMode(int glfwMode) {
-            this.glfwMode = glfwMode;
-        }
-
-        public int asGLFWConstant() {
-            return this.glfwMode;
-        }
-
-        @Override
-        public String toString() {
-            return "GLFW_" + name();
-        }
-
-    }
-
-    int getWidth();
-
-    int getHeight();
-
-    int getFramebufferWidth();
-
-    int getFramebufferHeight();
-
-    int getX();
-
-    int getY();
-
-    int getCursorX();
-
-    int getCursorY();
-
-    int getInputMode(InputMode mode);
-
-    ByteBuffer getGammaRamp();
+    Point getCursorLocation();
 
     String getTitle();
 
-    // TODO: return monitor interface
-    Object getMonitor();
+    Monitor getMonitor();
 
     String getClipboardContents();
-
-    boolean isContextCurrent();
 
     boolean isVsyncOn();
 
@@ -232,7 +193,7 @@ public interface Window {
      */
     Pointer getWindowPointer();
 
-    void setSize(int width, int height);
+    void setSize(Dimension size);
 
     void setVsyncOn(boolean on);
 
