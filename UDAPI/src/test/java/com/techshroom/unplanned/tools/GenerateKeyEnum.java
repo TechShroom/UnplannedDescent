@@ -19,7 +19,9 @@ import org.lwjgl.glfw.GLFW;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 /**
@@ -42,16 +44,15 @@ public final class GenerateKeyEnum {
     /**
      * Javadoc for the entire class.
      */
-    private static final String KEY_ENUM_JAVADOC = "Key enum values.\n\n"
-            + "@author Kenzie Togami\n";
+    private static final String KEY_ENUM_JAVADOC =
+            "Key enum values.\n\n" + "@author Kenzie Togami\n";
     /**
      * Specialized javadoc for each constant.
      */
-    private static final String KEY_ENUM_CONSTANT_JAVADOC = ""
-            + "The value corresponding to the key '%s'.\n";
+    private static final String KEY_ENUM_CONSTANT_JAVADOC =
+            "" + "The value corresponding to the key '%s'.\n";
     private static final ImmutableMap<String, String> KEY_ENUM_CONSTANT_TO_JAVADOC =
-            ImmutableMap
-                    .<String, String> builder()
+            ImmutableMap.<String, String> builder()
                     .put("UNKNOWN",
                             "The value corresponding to an unknown key.\n")
                     .build();
@@ -109,9 +110,8 @@ public final class GenerateKeyEnum {
      */
     public static void main(String[] args) {
         List<List<String>> data = collectKeyConstants(GLFW.class);
-        List<String> keyNames =
-                ImmutableList.copyOf(data.get(1).stream()
-                        .map(GenerateKeyEnum::convertKeyName)::iterator);
+        List<String> keyNames = ImmutableList.copyOf(data.get(1).stream()
+                .map(GenerateKeyEnum::convertKeyName)::iterator);
         TypeSpec.Builder spec =
                 TypeSpec.enumBuilder("Key").addModifiers(Modifier.PUBLIC);
         spec.addJavadoc(KEY_ENUM_JAVADOC);
@@ -121,6 +121,13 @@ public final class GenerateKeyEnum {
             enumVal.addJavadoc(keysToJavadoc(name));
             spec.addEnumConstant(name, enumVal.build());
         }
+        spec.addMethod(MethodSpec.methodBuilder("getGLFWName")
+                .addModifiers(Modifier.PUBLIC).returns(String.class)
+                .addCode(CodeBlock.builder()
+                        .addStatement("return $S + name().replace($S, $S)",
+                                "GLFW_KEY_", "NUM_(\\d)", "$1")
+                        .build())
+                .build());
         try {
             JavaFile.builder(PACKAGE, spec.build()).skipJavaLangImports(true)
                     .indent("    ").build().writeTo(Paths.get("src/main/java"));
@@ -159,8 +166,8 @@ public final class GenerateKeyEnum {
     }
 
     private static Pattern generateKeyNameMatcherForClass(Class<?> target) {
-        return Pattern.compile(String.format(KEY_NAME_PATTERN,
-                target.getSimpleName()));
+        return Pattern.compile(
+                String.format(KEY_NAME_PATTERN, target.getSimpleName()));
     }
 
     /**

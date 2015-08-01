@@ -181,8 +181,8 @@ public interface Window {
     int getAttribute(int attr);
 
     /**
-     * Please be careful with this window pointer. Certain methods are only kept
-     * up-to-date via the provider setters in this class and will become
+     * Please be careful with this window pointer. Certain properties are only kept
+     * up-to-date via the provided setters in this class and will become
      * out-of-date if the values are changed elsewhere.
      * 
      * <p>

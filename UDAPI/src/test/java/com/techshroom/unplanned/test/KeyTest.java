@@ -3,11 +3,11 @@ package com.techshroom.unplanned.test;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.lwjgl.glfw.GLFW;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.keyboard.Key;
 
@@ -26,20 +26,17 @@ public class KeyTest {
     public void ensureKeyNamesExist() {
         List<String> keyNames = grabKeyConstantNames();
         for (String constant : keyNames) {
+            Object constVal = null;
             try {
-                assertNotNull("no such key constant " + constant,
-                        GLFW.class.getDeclaredField(constant));
+                constVal = GLFW.class.getDeclaredField(constant);
             } catch (NoSuchFieldException | SecurityException e) {
-                Throwables.propagate(e);
             }
+            assertNotNull("no such key constant " + constant, constVal);
         }
     }
 
     private List<String> grabKeyConstantNames() {
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
-        for (Key k : Key.values()) {
-            builder.add(k.toString());
-        }
-        return builder.build();
+        return ImmutableList.copyOf(
+                Stream.of(Key.values()).map(Key::getGLFWName)::iterator);
     }
 }
