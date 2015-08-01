@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
-//import com.techshroom.unplanned.core.modloader.modules.ModuleSystem;
 import com.techshroom.unplanned.core.util.LUtils;
 
 /**
