@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.core.modloader;
+package com.techshroom.unplanned.core.util;
 
 import java.io.File;
 import java.io.IOException;
