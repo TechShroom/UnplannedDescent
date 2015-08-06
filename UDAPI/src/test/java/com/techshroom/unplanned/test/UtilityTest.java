@@ -6,6 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -29,7 +31,12 @@ public class UtilityTest {
             LoggingGroup g = itr.next();
             LUtils.setValidGroups(g);
             LUtils.print("YES", g);
-            LUtils.print("NO", getRandomNotProvided(LoggingGroup.ALL, g));
+            Set<LoggingGroup> groups = LoggingGroup.ALL.stream()
+                    .filter(Predicate.isEqual(g).negate())
+                    .collect(Collectors.toSet());
+            for (LoggingGroup nonGroup : groups) {
+                LUtils.print("NO", nonGroup);
+            }
         }
         // ensure all written
         System.err.flush();
@@ -38,15 +45,4 @@ public class UtilityTest {
         assertEquals("Logged wrong group: ", str, str.replace("NO", ""));
     }
 
-    private <T> T getRandomNotProvided(Set<T> all, T g) {
-        Iterator<T> itr = all.iterator();
-        if (!itr.hasNext()) {
-            return null;
-        }
-        T first = itr.next();
-        if (g == first) {
-            return itr.hasNext() ? itr.next() : null;
-        }
-        return first;
-    }
 }
