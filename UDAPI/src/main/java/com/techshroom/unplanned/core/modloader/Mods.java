@@ -1,10 +1,11 @@
 package com.techshroom.unplanned.core.modloader;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.techshroom.unplanned.core.util.ClassPathHack;
 import com.techshroom.unplanned.core.util.LUtils;
 
 /**
@@ -14,7 +15,7 @@ import com.techshroom.unplanned.core.util.LUtils;
  */
 public final class Mods {
 
-    private static ArrayList<IMod> loaded = new ArrayList<IMod>();
+    private static List<IMod> loaded;
     private static boolean loadedMods = false;
 
     /**
@@ -23,26 +24,22 @@ public final class Mods {
      */
     public static void findAndLoad() {
         if (hasLoadedMods()) {
-            System.err
-                    .println("Already loaded mod system, trying to load again?");
-            return;
+            throw new IllegalStateException(
+                    "Mods already loaded, cannot reload");
         }
         System.err.println("UD Mod System starting...");
         if (!injectModsFolder()) {
-            System.err
-                    .println("[WARNING] Mods folder does not exist or is a file, "
+            System.err.println(
+                    "[WARNING] Mods folder does not exist or is a file, "
                             + "add it if you want mods to be loaded from there.");
         }
-        // ArrayList<IMod> injected = ModInjector.findAndInject();
+        List<IMod> injected = ModLoader.loadModsFromClasspath();
         System.err.println("Loaded mods from classpath.");
-        // loaded.addAll(injected);
-        // System.err.println("Initializing mods...");
-        // System.err.println("Complete.");
-        // loaded = injected;
-        loaded.trimToSize();
+        loaded = ImmutableList.copyOf(injected);
+        System.err.println("Initializing mods...");
+        System.err.println("Complete.");
         loadedMods = true;
         System.err.println("UD Mod System loaded.");
-        // ModuleSystem.loadModulesFromMods();
     }
 
     private static boolean injectModsFolder() {
@@ -51,7 +48,7 @@ public final class Mods {
         if (!loadDirectory(mods)) {
             return false;
         }
-        System.err.println("Injected '" + mods + "' into classpath.");
+        System.err.println("Injected '" + mods + "/**' into classpath.");
         return true;
     }
 
@@ -66,10 +63,13 @@ public final class Mods {
                 loadDirectory(f);
                 continue;
             }
-            /*
-             * try { //ClassPathHack.addFile(f); } catch (IOException e) {
-             * e.printStackTrace(); }
-             */
+
+            try {
+                ClassPathHack.addFile(f);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         return true;
     }
