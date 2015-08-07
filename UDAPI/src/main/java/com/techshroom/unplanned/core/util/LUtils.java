@@ -11,9 +11,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,15 +19,10 @@ import java.util.logging.SimpleFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiDevice.Info;
-
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.GL11;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableSet;
-
-import com.google.common.collect.Sets;
+import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
 public final class LUtils {
 
@@ -50,77 +43,8 @@ public final class LUtils {
     public static final String LOWER_LIB_NAME = LIB_NAME.toLowerCase().intern(),
             LOWER_SHORT_LIB_NAME = SHORT_LIB_NAME.toLowerCase().intern();
 
-    /**
-     * <p>
-     * These logging groups are used to filter certain information. The default
-     * logging combo is INFO + WARNING + ERROR.
-     * </p>
-     * 
-     * Logging groups from lowest to highest: INFO, WARNING, DEBUG, JUNK.<br>
-     * <br>
-     * 
-     * Recommended usages:
-     * <dl>
-     * <dt>INFO</dt>
-     * <dd>- STDOUT</dd>
-     * <dt>WARNING</dt>
-     * <dd>- warnings like non-fatal OpenGL errors</dd>
-     * <dt>ERROR</dt>
-     * <dd>- STDERR</dd>
-     * <dt>DEBUG</dt>
-     * <dd>- debug info for developing</dd>
-     * <dt>JUNK</dt>
-     * <dd>- for batch-dumping information</dd>
-     * </dl>
-     */
-    public static enum LoggingGroup {
-        /**
-         * Standard output for users; etc.
-         */
-        INFO,
-        /**
-         * Non-fatal errors or suggestions for performance
-         */
-        WARNING,
-        /**
-         * Fatal errors
-         */
-        ERROR,
-        /**
-         * Debug output for developing
-         */
-        DEBUG,
-        /**
-         * Dump group for unloading tons of data
-         */
-        JUNK;
-
-        public static final Set<LoggingGroup> ALL = Sets
-                .immutableEnumSet(EnumSet.allOf(LoggingGroup.class));
-    }
-
-    private static Set<LoggingGroup> logGroups = Sets.immutableEnumSet(
-            LoggingGroup.INFO, LoggingGroup.WARNING, LoggingGroup.ERROR);
-
-    public static Set<LoggingGroup> getValidGroups() {
-        return Sets.immutableEnumSet(logGroups);
-    }
-
-    public static Set<LoggingGroup> setValidGroups(Set<LoggingGroup> groups) {
-        logGroups = Sets.immutableEnumSet(groups);
-        return getValidGroups();
-    }
-
-    public static Set<LoggingGroup> setValidGroups(LoggingGroup... groups) {
-        return setValidGroups(ImmutableSet.copyOf(groups));
-    }
-
-    public static boolean isValidGroup(LoggingGroup g) {
-        return getValidGroups().contains(g);
-    }
-
-    private static final Logger bkupLog = Logger.getLogger(SHORT_LIB_NAME
-            + " backup log");
+    private static final Logger bkupLog =
+            Logger.getLogger(SHORT_LIB_NAME + " backup log");
     private static final Logger log = Logger.getLogger(LIB_NAME);
 
     static {
@@ -147,12 +71,6 @@ public final class LUtils {
     }
 
     /**
-     * What packages are accepted for EL
-     */
-    private static final String[] ACCEPT = { "com.techshroom."
-            + LOWER_SHORT_LIB_NAME + ".*" };
-
-    /**
      * The default system streams, before overload.
      */
     public static PrintStream sysout = System.out, syserr = System.err;
@@ -174,43 +92,16 @@ public final class LUtils {
         }
     }
 
-    public static final String libPrintPrefix = String.format("[%s-%s]",
-            LIB_NAME, LUtils.VERSION);
-
-    /**
-     * 
-     * @deprecated Specify your group with {@link #print(String, LoggingGroup)}.
-     */
-    @Deprecated
-    public static void print(String msg) {
-        print(msg, LoggingGroup.INFO);
-    }
-
-    public static void print(String msg, LoggingGroup group) {
-        if (!logGroups.contains(group)) {
-            return;
-        }
-        try {
-            checkAccessor(ACCEPT, StackTraceInfo.getInvokingClassName());
-        } catch (Exception e) {
-            throw new RuntimeException(new IllegalAccessException("Not "
-                    + SHORT_LIB_NAME + " trusted class"));
-        }
-        System.err.println("[" + group + "] " + libPrintPrefix + " " + msg);
-    }
-
     private static void injectNatives() {
-        String natives =
-                LUtils.getUDTop() + File.separator + "res" + File.separator
-                        + "libs" + File.separator + "natives" + File.separator
-                        + PLATFORM_NAME;
+        String natives = String.join(File.separator, RESOURCE_ROOT, "res", "libs",
+                "natives", PLATFORM_NAME);
         System.setProperty("org.lwjgl.librarypath", natives);
         try {
             addLibraryPath(natives);
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        print("Natives injected.", LoggingGroup.DEBUG);
+        Logging.log("Natives injected.", LoggingGroup.DEBUG);
     }
 
     /**
@@ -241,8 +132,9 @@ public final class LUtils {
         usrPathsField.set(null, newPaths);
     }
 
+    @SuppressWarnings("resource")
     private static void overrideStandardStreams() {
-        System.err.println("Replacing streams with methodized...");
+        System.err.println("Adding tracing to standard streams...");
         MethodizedSTDStream sysout = new MethodizedSTDStream(System.out);
         System.setOut(new PrintStream(sysout));
         MethodizedSTDStream syserr = new MethodizedSTDStream(System.err);
@@ -250,57 +142,44 @@ public final class LUtils {
         syserr.orig.println("Finished.");
     }
 
-    /**
-     * The top level of the game/tool
-     */
-    public static String TOP_LEVEL = null;
+    public static final String ROOT;
+
     static {
+        String tmp = "";
         try {
             // reuse KCore's data
-            LUtils.TOP_LEVEL =
-                    new File("").getAbsolutePath()
-                            .replace(File.separatorChar, '/')
-                            .replaceFirst("/$", "");
-            LUtils.print("Using TOP_LEVEL " + TOP_LEVEL, LoggingGroup.DEBUG);
+            tmp = new File("").getAbsolutePath()
+                    .replace(File.separatorChar, '/').replaceFirst("/$", "");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
+        ROOT = tmp;
+        Logging.log("Fake root at " + ROOT, LoggingGroup.DEBUG);
     }
 
-    /**
-     * The top level of emergency landing, used to load our shaders.
-     */
-    private static String UD_TOP = null;
+    private static final String RESOURCE_ROOT;
+
     static {
         String tempName = LUtils.class.getPackage().getName();
         int levels = Strings.count(tempName, '.') + 2;
         tempName = LUtils.class.getResource("LUtils.class").getFile()
-        // .replace('/', File.separatorChar)// .substring(1)
                 .replace("%20", " ");
         for (int i = 0; i < levels; i++) {
             tempName = tempName.substring(0, tempName.lastIndexOf("/"));
         }
         if (tempName.endsWith("!")) {
-            // jar files: natives are in TOP_LEVEL
-            LUtils.print("Assumed JAR launch.", LoggingGroup.WARNING);
-            UD_TOP = TOP_LEVEL;
+            // jar files: same as root
+            tempName = ROOT;
         } else {
-            UD_TOP =
-                    ((tempName.startsWith("/") ? "" : "/") + tempName).replace(
-                            "/C:/", "C:/").replace("\\C:\\", "C:\\");
+            // non-jar: inside bin|build/classes|etc.
+            tempName = ((tempName.startsWith("/") ? "" : "/") + tempName)
+                    .replace("/C:/", "C:/").replace("\\C:\\", "C:\\");
         }
-        LUtils.print("Using UD_TOP " + UD_TOP, LoggingGroup.DEBUG);
+        RESOURCE_ROOT = tempName;
+        Logging.log("Fake root for resources at " + RESOURCE_ROOT, LoggingGroup.DEBUG);
 
         injectNatives();
-    }
-
-    public static final int debugLevel = Integer.parseInt(System.getProperty(
-            LOWER_SHORT_LIB_NAME + ".debug.level", "0"));
-
-    static {
-        print(LOWER_SHORT_LIB_NAME + ".debug.level" + ": " + debugLevel,
-                LoggingGroup.DEBUG);
     }
 
     /**
@@ -316,38 +195,18 @@ public final class LUtils {
         if (cver.indexOf(' ') > -1) {
             cver = cver.substring(0, cver.indexOf(' '));
         }
-        LUtils.print("Comparing " + cver + " to " + vers);
         String[] cver_sep = cver.split("\\.", 3);
         String[] vers_sep = vers.split("\\.", 3);
         int[] cver_sepi = new int[3];
         int[] vers_sepi = new int[3];
-        int min = LUtils.minAll(cver_sep.length, vers_sep.length, 3);
+        int min = Maths.min(cver_sep.length, vers_sep.length, 3);
         for (int i = 0; i < min; i++) {
             cver_sepi[i] = Integer.parseInt(cver_sep[i]);
             vers_sepi[i] = Integer.parseInt(vers_sep[i]);
         }
-        boolean ret =
-                cver_sepi[0] >= vers_sepi[0] && cver_sepi[1] >= vers_sepi[1]
-                        && cver_sepi[2] >= vers_sepi[2];
-        LUtils.print("Returning " + ret);
+        boolean ret = cver_sepi[0] >= vers_sepi[0]
+                && cver_sepi[1] >= vers_sepi[1] && cver_sepi[2] >= vers_sepi[2];
         return ret;
-    }
-
-    /**
-     * Gets the smallest of all the given ints
-     * 
-     * @param ints
-     *            - the set of ints to use
-     * @return the smallest int from ints
-     */
-    public static int minAll(int... ints) {
-        int min = Integer.MAX_VALUE;
-        for (int i : ints) {
-            // System.out.println("Comparing " + i + " and " + min);
-            min = Math.min(min, i);
-        }
-        // System.out.println("Result is " + min);
-        return min;
     }
 
     /**
@@ -429,171 +288,6 @@ public final class LUtils {
     }
 
     /**
-     * Attempts to get a fullscreen compatible {@link DisplayMode} for the width
-     * and height given
-     * 
-     * @param width
-     * @param height
-     * @param fullscreen
-     * @return
-     */
-    /*
-     * public static DisplayMode getDisplayMode(int width, int height, boolean
-     * fullscreen) { ArrayList<DisplayMode> possibleExtras = new
-     * ArrayList<DisplayMode>(); try { for (DisplayMode m :
-     * Display.getAvailableDisplayModes()) { int w = m.getWidth(); int h =
-     * m.getHeight(); if (m.isFullscreenCapable() || !fullscreen) { if (w ==
-     * width) { if (h == height) { return m; } } } if (m.isFullscreenCapable()
-     * && ((w < (width + WIDTH_RANGE)) && (w > (width - WIDTH_RANGE))) && ((h <
-     * (height + HEIGHT_RANGE)) && (h > (height - HEIGHT_RANGE)))) {
-     * possibleExtras.add(m); } } } catch (LWJGLException e) {
-     * e.printStackTrace(); }
-     * print("Using non-fullscreen compatible display mode, no default ones found."
-     * ); if (fullscreen) { print(
-     * "Fullscreen was requested. Here are some close matches that support fullscreen: "
-     * + possibleExtras); } return new DisplayMode(width, height); }
-     * 
-     * /** Returns a list of fullscreen capable dimensions
-     * 
-     * @return a list of fullscreen capable dimensions
-     *//*
-        * public static Dimension[] getFullscreenCompatDimensions() { try {
-        * ArrayList<Dimension> ret = new ArrayList<Dimension>(); for
-        * (DisplayMode m : Display.getAvailableDisplayModes()) { if
-        * (m.isFullscreenCapable()) { ret.add(new Dimension(m.getWidth(),
-        * m.getHeight())); } } return ret.toArray(new Dimension[ret.size()]); }
-        * catch (LWJGLException e) { e.printStackTrace(); } return new
-        * Dimension[0]; }
-        * 
-        * /** Returns a list of all dimensions built into LWJGL
-        * 
-        * @return the list of all dimensions built into LWJGL
-        *//*
-           * public static Dimension[] getDimensions() { ArrayList<Dimension>
-           * ret = new ArrayList<Dimension>(); for (DisplayMode m :
-           * Display.getAvailableDisplayModes()) { ret.add(new
-           * Dimension(m.getWidth(), m.getHeight())); } return ret.toArray(new
-           * Dimension[ret.size()]); return new Dimension[0]; }
-           * 
-           * /** Returns a user friendly version of the fullscreen compatible
-           * dimensions
-           * 
-           * @return a user friendly version of the fullscreen compatible
-           * dimensions
-           *//*
-              * public static String[] getFullscreenCompatDimensionsSimple() {
-              * return LUtils.getDimensionsSimple(LUtils
-              * .getFullscreenCompatDimensions()); }
-              * 
-              * /** Returns a list of Strings representing the Dimensions given
-              * in a user friendly form
-              * 
-              * @param compat - the Dimensions to format
-              * 
-              * @return a list of Strings representing the Dimensions in the
-              * form "W x H"
-              *//*
-                 * public static String[] getDimensionsSimple(Dimension[]
-                 * compat) { Dimension[] cmpt = compat; String[] s = new
-                 * String[cmpt.length]; for (int i = 0; i < cmpt.length; i++) {
-                 * Dimension d = cmpt[i]; s[i] = String.format("%s x %s",
-                 * d.width, d.height); } return s; }
-                 * 
-                 * /** Gets a fullscreen compatible dimension from the user
-                 * 
-                 * @return a fullscreen compatible dimension
-                 *//*
-                    * public static Dimension getDimensionFromUser() { return
-                    * LUtils.getDimensionFromUser(LUtils
-                    * .getFullscreenCompatDimensions()); }
-                    * 
-                    * /** Gets a dimension from the user, using the given list
-                    * 
-                    * @param availabeDimensions - the dimensions to choose from
-                    * 
-                    * @return
-                    *//*
-                       * public static Dimension
-                       * getDimensionFromUser(Dimension[] availabeDimensions) {
-                       * Dimension[] compat = availabeDimensions; String[]
-                       * compat_s = LUtils.getDimensionsSimple(compat); JFrame
-                       * toClose = null; String ret_s = (String)
-                       * JOptionPane.showInputDialog( toClose = new JFrame(),
-                       * "Avaliable sizes:", "Choose a window size",
-                       * JOptionPane.DEFAULT_OPTION, null, compat_s,
-                       * compat_s[0]); toClose.dispose(); toClose = null; if
-                       * (ret_s == null) { return null; } return
-                       * compat[Arrays.asList(compat_s).indexOf(ret_s)]; }
-                       */
-
-    /**
-     * Turns a {@link MidiDevice.Info} list into a list of user friendly strings
-     * 
-     * @param info
-     *            - the list of MidiDevice.Infos to use
-     * @return a list of Strings representing the given Infos
-     */
-    public static List<String> getInfoAsString(Info[] info) {
-        List<String> out = new ArrayList<String>();
-        for (Info i : info) {
-            out.add(i + "" + i.getClass().getName());
-        }
-        return out;
-    }
-
-    /*
-     * /** Gets a dimension from the args, or, failing that, the user
-     * 
-     * @param normalized - 'normalized' argument list, (eg. ["-width", "800",
-     * "-height", "600"])
-     * 
-     * @return the dimension that was found or requested
-     *//*
-        * public static Dimension getDimensionFromUserAndArgs(String[]
-        * normalized) { return LUtils.getDimensionFromUserAndArgs(
-        * LUtils.getFullscreenCompatDimensions(), normalized); }
-        */
-    /*
-     * /** Gets a dimension from the args, or, failing that, the user
-     * 
-     * @param dimensions - the array of Dimensions to use
-     * 
-     * @param normalized - 'normalized' argument list, (eg. ["-width", "800",
-     * "-height", "600"])
-     * 
-     * @return the dimension that was found or requested
-     *//*
-        * public static Dimension getDimensionFromUserAndArgs(Dimension[]
-        * dimensions, String[] normalized) { if (normalized.length >= 4) {
-        * List<String> strs = Arrays.asList(normalized); if
-        * (strs.indexOf("-width") == -1 || strs.indexOf("-height") == -1) { }
-        * else { String w = strs.get(strs.indexOf("-width") + 1); String h =
-        * strs.get(strs.indexOf("-height") + 1); if (LUtils.isInt(w) &&
-        * LUtils.isInt(h)) { return new Dimension(Integer.parseInt(w),
-        * Integer.parseInt(h)); } } } Dimension get =
-        * LUtils.getDimensionFromUser(dimensions); if (get == null) { get = new
-        * Dimension(600, 600); }
-        * 
-        * return get; }
-        */
-
-    /**
-     * Check for integer
-     * 
-     * @param test
-     *            - the String to check for integer
-     * @return if the String represents an integer
-     */
-    public static boolean isInt(String test) {
-        try {
-            Integer.parseInt(test);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
      * Gets the current OpenGL version
      * 
      * @return {@link GL11#GL_VERSION}
@@ -632,30 +326,29 @@ public final class LUtils {
      * @throws IOException
      *             if there are I/O errors
      */
+    @SuppressWarnings("resource")
     public static InputStream getInputStream(String path) throws IOException {
         // Normalize to UNIX style
         path = path.replace(File.separatorChar, '/');
 
         InputStream result = null;
 
-        int isType = 0; // undefined=-1;fileis=0;zipis=1;jaris=1
+        int streamType = 0; // file=0;zip=1;nested-zip=2
         List<String> pathparts = Arrays.asList(path.split("/"));
         for (String part : pathparts) {
             if (part.endsWith(".zip") || part.endsWith("jar")
                     && !(pathparts.indexOf(part) == pathparts.size() - 1)) {
-                if (isType == 1) {
-                    isType = 2;
-                    break;
+                if (streamType < 2) {
+                    streamType++;
                 } else {
-                    isType = 1;
                     break;
                 }
             }
         }
 
-        if (isType == 0) {
+        if (streamType == 0) {
             result = new FileInputStream(path);
-        } else if (isType == 1 || isType == 2) {
+        } else if (streamType == 1 || streamType == 2) {
             ArrayList<Integer> indexes = new ArrayList<Integer>();
             for (int i = 0; i < pathparts.size(); i++) {
                 if (pathparts.get(i).endsWith(".zip")
@@ -692,24 +385,4 @@ public final class LUtils {
         return result;
     }
 
-    /**
-     * Protected method to access UD's top level
-     */
-    public static String getUDTop() {
-        try {
-            checkAccessor(ACCEPT, StackTraceInfo.getInvokingClassName());
-        } catch (Exception e) {
-            throw new RuntimeException(new IllegalAccessException("Not "
-                    + SHORT_LIB_NAME + " trusted class"));
-        }
-        return UD_TOP;
-    }
-
-    public static String[] getAccepts() {
-        return ACCEPT.clone();
-    }
-    /*
-     * public static void setIcon(final InputStream is) { ByteBuffer[] icondata
-     * = IconLoader.load(is); Display.setIcon(icondata); }
-     */
 }
