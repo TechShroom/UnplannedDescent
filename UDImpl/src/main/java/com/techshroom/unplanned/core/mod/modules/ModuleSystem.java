@@ -1,10 +1,10 @@
-package com.techshroom.unplanned.core.modloader.modules;
+package com.techshroom.unplanned.core.mod.modules;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.techshroom.unplanned.core.modloader.IMod;
-import com.techshroom.unplanned.core.modloader.Mods;
+import com.techshroom.unplanned.core.mod.IMod;
+import com.techshroom.unplanned.core.mod.Mods;
 import com.techshroom.unplanned.core.util.Arrays2;
 
 /**

@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.core.modloader;
+package com.techshroom.unplanned.core.mod;
 
 import java.util.List;
 import java.util.ServiceLoader;
