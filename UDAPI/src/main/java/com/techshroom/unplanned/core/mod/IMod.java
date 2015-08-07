@@ -1,4 +1,4 @@
-package com.techshroom.unplanned.core.modloader;
+package com.techshroom.unplanned.core.mod;
 
 /**
  * The mod interface. Implementing this allows for discovery of a mod's entry
