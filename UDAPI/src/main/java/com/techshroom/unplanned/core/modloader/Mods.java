@@ -43,7 +43,7 @@ public final class Mods {
     }
 
     private static boolean injectModsFolder() {
-        String topLevel = LUtils.TOP_LEVEL;
+        String topLevel = LUtils.ROOT;
         File mods = new File(topLevel, "mods");
         if (!loadDirectory(mods)) {
             return false;

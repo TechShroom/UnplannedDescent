@@ -12,30 +12,31 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import com.techshroom.unplanned.core.util.LUtils;
-import com.techshroom.unplanned.core.util.LUtils.LoggingGroup;
+import com.techshroom.unplanned.core.util.Logging;
+import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
-public class UtilityTest {
+public class LoggingTest {
 
     /**
-     * LUtils can limit the printing to certain groups.
+     * Logging can limit the printing to certain groups.
      */
     @Test
     public void limitsGroups() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        // fool it into replacing the wrong streams so our life is easy.
+        // fool LUtils into replacing the wrong streams so our life is easy.
         LUtils.init();
         PrintStream original = System.err;
         System.setErr(new PrintStream(out));
         for (Iterator<LoggingGroup> itr = LoggingGroup.ALL.iterator(); itr
                 .hasNext();) {
             LoggingGroup g = itr.next();
-            LUtils.setValidGroups(g);
-            LUtils.print("YES", g);
+            Logging.setValidGroups(g);
+            Logging.log("YES", g);
             Set<LoggingGroup> groups = LoggingGroup.ALL.stream()
                     .filter(Predicate.isEqual(g).negate())
                     .collect(Collectors.toSet());
             for (LoggingGroup nonGroup : groups) {
-                LUtils.print("NO", nonGroup);
+                Logging.log("NO", nonGroup);
             }
         }
         // ensure all written

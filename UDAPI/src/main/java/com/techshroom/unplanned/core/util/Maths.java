@@ -2,6 +2,7 @@ package com.techshroom.unplanned.core.util;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.stream.IntStream;
 
 public final class Maths {
 
@@ -261,5 +262,42 @@ public final class Maths {
 
     public static boolean isPowerOfTwo(int x) {
         return x != 0 && (x & (x - 1)) == 0;
-    };
+    }
+
+    /**
+     * Gets the smallest of all the given ints.
+     * 
+     * @return the smallest int from ints
+     */
+    public static int min(int first, int... rest) {
+        return IntStream.concat(IntStream.of(first), IntStream.of(rest)).min()
+                .getAsInt();
+    }
+
+    /**
+     * Gets the largest of all the given ints.
+     * 
+     * @return the largest int from ints
+     */
+    public static int max(int first, int... rest) {
+        return IntStream.concat(IntStream.of(first), IntStream.of(rest)).max()
+                .getAsInt();
+    }
+
+    /**
+     * Check for integer
+     * 
+     * @param test
+     *            - the String to check for integer
+     * @return if the String represents an integer
+     */
+    public static boolean isInt(String test) {
+        try {
+            Integer.parseInt(test);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
