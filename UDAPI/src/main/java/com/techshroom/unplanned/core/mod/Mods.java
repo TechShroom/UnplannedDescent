@@ -1,12 +1,25 @@
 package com.techshroom.unplanned.core.mod;
 
+import static com.techshroom.unplanned.core.util.Functional.printErrors;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.techshroom.unplanned.core.util.ClassPathHack;
+import com.techshroom.unplanned.core.util.CompileGeneric;
 import com.techshroom.unplanned.core.util.LUtils;
+import com.techshroom.unplanned.core.util.Logging;
+import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
 /**
  * Access point for mods. This is the class that handles all loading for mods.
@@ -15,7 +28,10 @@ import com.techshroom.unplanned.core.util.LUtils;
  */
 public final class Mods {
 
-    private static List<IMod> loaded;
+    private static final Mod NULL_MOD = new Mod() {
+        // does nothing!
+    };
+    private static Multimap<ModProvider, Mod> providers;
     private static boolean loadedMods = false;
 
     /**
@@ -24,22 +40,54 @@ public final class Mods {
      */
     public static void findAndLoad() {
         if (hasLoadedMods()) {
-            throw new IllegalStateException(
-                    "Mods already loaded, cannot reload");
+            Logging.log("Reloading mods, may cause troubles",
+                    LoggingGroup.WARNING);
+            providers.values().forEach(Mod::unload);
+            providers.clear();
         }
-        System.err.println("UD Mod System starting...");
+        Logging.log("UD Mod System starting...", LoggingGroup.DEBUG);
         if (!injectModsFolder()) {
-            System.err.println(
-                    "[WARNING] Mods folder does not exist or is a file, "
-                            + "add it if you want mods to be loaded from there.");
+            Logging.log(
+                    "Not searching "
+                            + new File(LUtils.ROOT, "mods").getAbsolutePath()
+                            + " because it doesn't exist or is not a directory.",
+                    LoggingGroup.WARNING);
         }
-        List<IMod> injected = ModLoader.loadModsFromClasspath();
-        System.err.println("Loaded mods from classpath.");
-        loaded = ImmutableList.copyOf(injected);
-        System.err.println("Initializing mods...");
-        System.err.println("Complete.");
+        List<ModProvider> providerList = ModLoader.loadModsFromClasspath();
+        Logging.log("Loaded mod providers from classpath.", LoggingGroup.DEBUG);
+        Logging.log("Creating mods via providers...", LoggingGroup.DEBUG);
+        Multimap<String, ModMetadata> ids = ArrayListMultimap.create();
+        providerList.forEach(
+                p -> ids.put(p.getMetadata().getId(), p.getMetadata()));
+        if (ids.keySet().stream().map(ids::get).anyMatch(x -> x.size() > 1)) {
+            ids.asMap().entrySet().stream().filter(e -> e.getValue().size() < 2)
+                    .map(Entry::getKey).collect(Collectors.toSet())
+                    .forEach(ids::removeAll);
+            Logging.log("ID Conflicts detected, load failed",
+                    LoggingGroup.ERROR);
+            throw new ModIDConflictException(ids);
+        }
+        Logging.log("Loaded provider list, dumping", LoggingGroup.JUNK);
+        providerList
+                .forEach(x -> Logging.log("PROVIDER: " + x, LoggingGroup.JUNK));
+        providers =
+                HashMultimap
+                        .create(Multimaps
+                                .forMap(providerList.stream()
+                                        .collect(Collectors.toMap(
+                                                Function.identity(),
+                                                printErrors(
+                                                        p -> p.getModCreator()
+                                                                .call(),
+                                                        () -> NULL_MOD)))));
+        providers.asMap().entrySet().stream()
+                .filter(e -> e.getValue() == NULL_MOD).map(Entry::getKey)
+                .forEach(providers::removeAll);
+        Logging.log("Loading mods...", LoggingGroup.DEBUG);
+        providers.values().stream().forEach(printErrors(Mod::load,
+                CompileGeneric.<Consumer<Mod>> specify(Consumer.class)));
         loadedMods = true;
-        System.err.println("UD Mod System loaded.");
+        Logging.log("UD Mod System loaded.", LoggingGroup.DEBUG);
     }
 
     private static boolean injectModsFolder() {
@@ -65,7 +113,9 @@ public final class Mods {
             }
 
             try {
-                ClassPathHack.addFile(f);
+                if (!ClassPathHack.hasFile(f)) {
+                    ClassPathHack.addFile(f);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -82,12 +132,12 @@ public final class Mods {
      *             If {@link #findAndLoad()} has not been called yet, and there
      *             are no mods loaded
      */
-    public static List<IMod> getLoadedMods() {
+    public static List<Mod> getLoadedMods() {
         if (!hasLoadedMods()) {
             throw new IllegalStateException(
                     "Getting loaded mods list before loading mods!");
         }
-        return ImmutableList.copyOf(loaded);
+        return ImmutableList.copyOf(providers.values());
     }
 
     /**

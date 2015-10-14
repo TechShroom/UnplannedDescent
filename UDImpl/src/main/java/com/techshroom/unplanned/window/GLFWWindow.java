@@ -1,13 +1,6 @@
 package com.techshroom.unplanned.window;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.glfw.GLFW.GLFWFramebufferSizeCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowCloseCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowFocusCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowIconifyCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowPosCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowRefreshCallback;
-import static org.lwjgl.glfw.GLFW.GLFWWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetClipboardString;
@@ -27,12 +20,19 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwWaitEvents;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
-import org.lwjgl.Pointer;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWWindowCloseCallback;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
+import org.lwjgl.glfw.GLFWWindowIconifyCallback;
+import org.lwjgl.glfw.GLFWWindowPosCallback;
+import org.lwjgl.glfw.GLFWWindowRefreshCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL11;
 
 import com.techshroom.unplanned.core.util.GLFWUtil;
 import com.techshroom.unplanned.monitor.GLFWMonitor;
 import com.techshroom.unplanned.monitor.Monitor;
+import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.Dimension;
 import com.techshroom.unplanned.value.Point;
 
@@ -94,13 +94,13 @@ public class GLFWWindow implements Window {
 
     @Override
     public Monitor getMonitor() {
-        return GLFWMonitor.getMonitor(glfwGetWindowMonitor(this.windowPtr
-                .getPointer()));
+        return GLFWMonitor
+                .getMonitor(glfwGetWindowMonitor(this.windowPtr.address()));
     }
 
     @Override
     public String getClipboardContents() {
-        return glfwGetClipboardString(this.windowPtr.getPointer());
+        return glfwGetClipboardString(this.windowPtr.address());
     }
 
     @Override
@@ -110,7 +110,7 @@ public class GLFWWindow implements Window {
 
     @Override
     public boolean isCloseRequested() {
-        return glfwWindowShouldClose(this.windowPtr.getPointer()) == GL11.GL_TRUE;
+        return glfwWindowShouldClose(this.windowPtr.address()) == GL11.GL_TRUE;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class GLFWWindow implements Window {
 
     @Override
     public int getAttribute(int attr) {
-        return glfwGetWindowAttrib(this.windowPtr.getPointer(), attr);
+        return glfwGetWindowAttrib(this.windowPtr.address(), attr);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GLFWWindow implements Window {
 
     @Override
     public void setSize(Dimension size) {
-        glfwSetWindowSize(this.windowPtr.getPointer(), size.getWidth(),
+        glfwSetWindowSize(this.windowPtr.address(), size.getWidth(),
                 size.getHeight());
     }
 
@@ -163,17 +163,17 @@ public class GLFWWindow implements Window {
     @Override
     public void setTitle(String title) {
         this.title = title;
-        glfwSetWindowTitle(this.windowPtr.getPointer(), title);
+        glfwSetWindowTitle(this.windowPtr.address(), title);
     }
 
     @Override
     public void destroy() {
-        glfwDestroyWindow(this.windowPtr.getPointer());
+        glfwDestroyWindow(this.windowPtr.address());
     }
 
     @Override
     public void swapBuffers() {
-        glfwSwapBuffers(this.windowPtr.getPointer());
+        glfwSwapBuffers(this.windowPtr.address());
     }
 
     @Override
@@ -187,13 +187,13 @@ public class GLFWWindow implements Window {
     }
 
     private void checkWindow(long window) {
-        checkState(window == this.windowPtr.getPointer(), "incorrect window");
+        checkState(window == this.windowPtr.address(), "incorrect window");
     }
 
     @Override
     public void onClose(OnCloseCallback callback) {
-        glfwSetWindowCloseCallback(this.windowPtr.getPointer(),
-                GLFWWindowCloseCallback(window -> {
+        glfwSetWindowCloseCallback(this.windowPtr.address(),
+                GLFWWindowCloseCallback.create(window -> {
                     checkWindow(window);
                     callback.onWindowClose(this);
                 }));
@@ -201,8 +201,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onMove(OnMoveCallback callback) {
-        glfwSetWindowPosCallback(this.windowPtr.getPointer(),
-                GLFWWindowPosCallback((window, x, y) -> {
+        glfwSetWindowPosCallback(this.windowPtr.address(),
+                GLFWWindowPosCallback.create((window, x, y) -> {
                     checkWindow(window);
                     callback.onWindowMove(this, x, y);
                 }));
@@ -210,8 +210,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onResize(OnResizeCallback callback) {
-        glfwSetWindowSizeCallback(this.windowPtr.getPointer(),
-                GLFWWindowSizeCallback((window, width, height) -> {
+        glfwSetWindowSizeCallback(this.windowPtr.address(),
+                GLFWWindowSizeCallback.create((window, width, height) -> {
                     checkWindow(window);
                     callback.onWindowResize(this, width, height);
                 }));
@@ -219,8 +219,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onResizeFramebuffer(OnResizeFramebufferCallback callback) {
-        glfwSetFramebufferSizeCallback(this.windowPtr.getPointer(),
-                GLFWFramebufferSizeCallback((window, width, height) -> {
+        glfwSetFramebufferSizeCallback(this.windowPtr.address(),
+                GLFWFramebufferSizeCallback.create((window, width, height) -> {
                     checkWindow(window);
                     callback.onWindowFramebufferResize(this, width, height);
                 }));
@@ -228,9 +228,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onFocusChange(OnFocusCallback callback) {
-        glfwSetWindowFocusCallback(
-                this.windowPtr.getPointer(),
-                GLFWWindowFocusCallback((window, focused) -> {
+        glfwSetWindowFocusCallback(this.windowPtr.address(),
+                GLFWWindowFocusCallback.create((window, focused) -> {
                     checkWindow(window);
                     callback.onWindowFocusChange(this, focused == GL11.GL_TRUE);
                 }));
@@ -238,8 +237,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onMinimizeChange(OnMinimizeChangeCallback callback) {
-        glfwSetWindowIconifyCallback(this.windowPtr.getPointer(),
-                GLFWWindowIconifyCallback((window, minimized) -> {
+        glfwSetWindowIconifyCallback(this.windowPtr.address(),
+                GLFWWindowIconifyCallback.create((window, minimized) -> {
                     checkWindow(window);
                     callback.onWindowMinimizeChange(this,
                             minimized == GL11.GL_TRUE);
@@ -248,8 +247,8 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onRefreshRequested(OnRefreshRequestedCallback callback) {
-        glfwSetWindowRefreshCallback(this.windowPtr.getPointer(),
-                GLFWWindowRefreshCallback((window) -> {
+        glfwSetWindowRefreshCallback(this.windowPtr.address(),
+                GLFWWindowRefreshCallback.create((window) -> {
                     checkWindow(window);
                     callback.onWindowRefreshRequested(this);
                 }));

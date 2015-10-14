@@ -1,6 +1,6 @@
 package com.techshroom.unplanned.core.mod.modules;
 
-import com.techshroom.unplanned.core.mod.IMod;
+import com.techshroom.unplanned.core.mod.Mod;
 import com.techshroom.unplanned.core.mod.SkeletalMod;
 
 /**
@@ -10,6 +10,6 @@ import com.techshroom.unplanned.core.mod.SkeletalMod;
  * 
  * @author Kenzie Togami
  */
-public abstract class Module extends SkeletalMod implements IMod {
+public abstract class Module extends SkeletalMod implements Mod {
     // nothing here yet
 }

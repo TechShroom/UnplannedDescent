@@ -1,9 +1,7 @@
 package com.techshroom.unplanned.core.util;
 
-import static org.lwjgl.glfw.GLFW.GLFWErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 
-import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 public enum GLFWErrorHandler implements GLFWErrorCallback.SAM {
@@ -15,12 +13,12 @@ public enum GLFWErrorHandler implements GLFWErrorCallback.SAM {
     public static GLFWErrorHandler setAsErrorCallback() {
         if (!isSet) {
             isSet = true;
-            glfwSetErrorCallback(GLFWErrorCallback(HANDLER));
+            glfwSetErrorCallback(GLFWErrorCallback.create(HANDLER));
         }
         return HANDLER;
     }
 
-    private final GLFWErrorCallback delegate = Callbacks.errorCallbackPrint();
+    private final GLFWErrorCallback delegate = GLFWErrorCallback.createPrint();
 
     @Override
     public void invoke(int error, long description) {

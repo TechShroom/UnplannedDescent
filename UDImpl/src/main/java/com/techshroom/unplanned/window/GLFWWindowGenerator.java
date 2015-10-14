@@ -18,10 +18,12 @@ public class GLFWWindowGenerator implements WindowGenerator {
     @Override
     public Window generateWindow(Dimension size, String title, Monitor monitor,
             Window share) {
-        return new GLFWWindow(PointerImpl.wrap((GLFW.glfwCreateWindow(size
-                .getWidth(), size.getHeight(), title, monitor
-                .getMonitorPointer().getPointer(), share.getWindowPointer()
-                .getPointer()))));
+        return new GLFWWindow(PointerImpl.wrap(
+                (GLFW.glfwCreateWindow(size.getWidth(), size.getHeight(), title,
+                        monitor == null ? 0
+                                : monitor.getMonitorPointer().address(),
+                        share == null ? 0
+                                : share.getWindowPointer().address()))));
     }
 
 }

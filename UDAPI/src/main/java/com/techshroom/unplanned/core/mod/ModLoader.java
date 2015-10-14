@@ -13,7 +13,7 @@ final class ModLoader {
      * 
      * @return a list of the loaded mods
      */
-    static List<IMod> loadModsFromClasspath() {
-        return ImmutableList.copyOf(ServiceLoader.load(IMod.class));
+    static List<ModProvider> loadModsFromClasspath() {
+        return ImmutableList.copyOf(ServiceLoader.load(ModProvider.class));
     }
 }

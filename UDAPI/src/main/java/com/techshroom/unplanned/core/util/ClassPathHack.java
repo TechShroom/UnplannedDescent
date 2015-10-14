@@ -3,8 +3,11 @@ package com.techshroom.unplanned.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Hack for injecting things into the classpath.
@@ -65,9 +68,28 @@ public class ClassPathHack {
         }
 
         System.setProperty("java.class.path",
-                System.getProperty("java.class.path")
-                        + File.pathSeparator
+                System.getProperty("java.class.path") + File.pathSeparator
                         + u.getFile().replace('/', File.separatorChar)
                                 .substring(1).replace("%20", " "));
     }
+    
+    public static boolean hasFile(String file) {
+        return hasFile(new File(file));
+    }
+    
+    public static boolean hasFile(File file) {
+        try {
+            return hasURL(file.toURI().toURL());
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+
+    @SuppressWarnings("resource")
+    public static boolean hasURL(URL u) {
+        URLClassLoader sysloader =
+                (URLClassLoader) ClassLoader.getSystemClassLoader();
+        return ImmutableList.of(sysloader.getURLs()).contains(u);
+    }
+
 }

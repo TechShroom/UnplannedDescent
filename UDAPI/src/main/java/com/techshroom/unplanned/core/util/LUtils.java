@@ -33,7 +33,7 @@ public final class LUtils {
      * A dummy method to load this class. Does nothing.
      */
     public static void init() {
-
+        // no-op
     }
 
     public static String VERSION = "1.0.0";

@@ -1,8 +1,7 @@
 package com.techshroom.unplanned.window;
 
-import org.lwjgl.Pointer;
-
 import com.techshroom.unplanned.monitor.Monitor;
+import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.Dimension;
 import com.techshroom.unplanned.value.Point;
 
@@ -178,11 +177,11 @@ public interface Window {
      * @deprecated Use only for unsupported attribute access
      */
     @Deprecated
-    int getAttribute(int attr);
+            int getAttribute(int attr);
 
     /**
-     * Please be careful with this window pointer. Certain properties are only kept
-     * up-to-date via the provided setters in this class and will become
+     * Please be careful with this window pointer. Certain properties are only
+     * kept up-to-date via the provided setters in this class and will become
      * out-of-date if the values are changed elsewhere.
      * 
      * <p>
