@@ -30,6 +30,7 @@ public class KeyTest {
             try {
                 constVal = GLFW.class.getDeclaredField(constant);
             } catch (NoSuchFieldException | SecurityException e) {
+                // rip.
             }
             assertNotNull("no such key constant " + constant, constVal);
         }

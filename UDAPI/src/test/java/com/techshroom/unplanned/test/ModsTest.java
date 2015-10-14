@@ -33,6 +33,8 @@ public class ModsTest {
                             .getLocation().toURI())
                     .resolve(
                             "META-INF/services/" + ModProvider.class.getName());
+            Files.createDirectories(tmp.getParent());
+            Files.createFile(tmp);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,7 +93,7 @@ public class ModsTest {
     }
 
     public static class TestMod implements Mod {
-
+        // nothing to impl.
     }
 
 }
