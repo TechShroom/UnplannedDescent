@@ -2,18 +2,36 @@ package com.techshroom.unplanned.value;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Arrays;
+
 import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class GammaRamp {
 
+    public static final class Channel {
+
+        public final int[] data;
+
+        private Channel(int[] data) {
+            this.data = data.clone();
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(this.data);
+        }
+
+    }
+
     public static final GammaRamp of(int[] red, int[] green, int[] blue,
             int size) {
         checkState(red.length == size, "red array was not of size %s", size);
-        checkState(green.length == size, "green array was not of size %s", size);
+        checkState(green.length == size, "green array was not of size %s",
+                size);
         checkState(blue.length == size, "blue array was not of size %s", size);
-        return new AutoValue_GammaRamp(red.clone(), green.clone(),
-                blue.clone(), size);
+        return new AutoValue_GammaRamp(new Channel(red), new Channel(green),
+                new Channel(blue), size);
     }
 
     public static final GammaRamp of(float exponent) {
@@ -38,11 +56,11 @@ public abstract class GammaRamp {
         return of(values, values, values, values.length);
     }
 
-    public abstract int[] getRedChannel();
+    public abstract Channel getRedChannel();
 
-    public abstract int[] getGreenChannel();
+    public abstract Channel getGreenChannel();
 
-    public abstract int[] getBlueChannel();
+    public abstract Channel getBlueChannel();
 
     public abstract int getSize();
 

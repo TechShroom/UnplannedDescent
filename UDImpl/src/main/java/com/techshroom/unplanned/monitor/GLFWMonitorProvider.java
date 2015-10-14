@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.lwjgl.PointerBuffer;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.core.util.GLFWUtil;
 
+@AutoService(MonitorProvider.class)
 public class GLFWMonitorProvider implements MonitorProvider {
 
     static {

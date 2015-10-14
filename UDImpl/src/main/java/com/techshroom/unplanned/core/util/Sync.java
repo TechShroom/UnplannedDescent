@@ -52,7 +52,9 @@ public class Sync {
     /** whether the initialization code has run */
     private boolean initialised = false;
 
-    /** for calculating the averages the previous sleep/yield times are stored */
+    /**
+     * for calculating the averages the previous sleep/yield times are stored
+     */
     private RunningAvg sleepDurations = new RunningAvg(10);
     private RunningAvg yieldDurations = new RunningAvg(10);
 
@@ -69,9 +71,12 @@ public class Sync {
 
                 @Override
                 public void run() {
-                    try {
-                        Thread.sleep(Long.MAX_VALUE);
-                    } catch (Exception e) {
+                    while (true) {
+                        try {
+                            Thread.sleep(Long.MAX_VALUE);
+                        } catch (Exception e) {
+                            // whatever, restart
+                        }
                     }
                 }
             });
@@ -100,8 +105,8 @@ public class Sync {
         try {
             // sleep until the average sleep time is greater than the time
             // remaining till nextFrame
-            for (long t0 = getTime(), t1; this.nextFrame - t0 > this.sleepDurations
-                    .avg(); t0 = t1) {
+            for (long t0 = getTime(), t1; this.nextFrame
+                    - t0 > this.sleepDurations.avg(); t0 = t1) {
                 Thread.sleep(1);
                 // update average
                 this.sleepDurations.add((t1 = getTime()) - t0);
@@ -114,20 +119,20 @@ public class Sync {
 
             // yield until the average yield time is greater than the time
             // remaining till nextFrame
-            for (long t0 = getTime(), t1; this.nextFrame - t0 > this.yieldDurations
-                    .avg(); t0 = t1) {
+            for (long t0 = getTime(), t1; this.nextFrame
+                    - t0 > this.yieldDurations.avg(); t0 = t1) {
                 Thread.yield();
                 // update average
                 this.yieldDurations.add((t1 = getTime()) - t0);
                 // yield time
             }
         } catch (InterruptedException e) {
-
+            // ignore interruptions
         }
 
         // schedule next frame, drop frame(s) if already too late for next frame
-        this.nextFrame =
-                Math.max(this.nextFrame + Sync.NANOS_IN_SECOND / fps, getTime());
+        this.nextFrame = Math.max(this.nextFrame + Sync.NANOS_IN_SECOND / fps,
+                getTime());
     }
 
     /**

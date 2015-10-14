@@ -14,8 +14,8 @@ import com.techshroom.unplanned.value.Dimension;
 @AutoValue
 public abstract class WindowSettings {
 
-    private static final WindowGenerator WINDOW_GENERATOR = ServiceLoader
-            .load(WindowGenerator.class).iterator().next();
+    private static final WindowGenerator WINDOW_GENERATOR =
+            ServiceLoader.load(WindowGenerator.class).iterator().next();
 
     public static final Builder builder() {
         return new AutoValue_WindowSettings.Builder().monitorRaw(null)
@@ -51,8 +51,9 @@ public abstract class WindowSettings {
 
         public WindowSettings build() {
             WindowSettings settings = autoBuild();
-            checkState(!settings.isFullScreen()
-                    || settings.getMonitor().isPresent(),
+            checkState(
+                    !settings.isFullScreen()
+                            || settings.getMonitor().isPresent(),
                     "settings must have a monitor for fullscreen");
             return settings;
         }
@@ -78,8 +79,12 @@ public abstract class WindowSettings {
 
     public final Window createWindow() {
         return WINDOW_GENERATOR.generateWindow(getScreenSize(), getTitle(),
-                isFullScreen() ? getMonitor().get() : null, getSharedWindow()
-                        .orElse(null));
+                isFullScreen()
+                        ? getMonitor()
+                                .orElseThrow(() -> new IllegalStateException(
+                                        "Need a monitor for fullscreen"))
+                        : null,
+                getSharedWindow().orElse(null));
     }
 
 }

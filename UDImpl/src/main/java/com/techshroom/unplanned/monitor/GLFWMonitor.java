@@ -1,7 +1,6 @@
 package com.techshroom.unplanned.monitor;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.glfw.GLFW.GLFWMonitorCallback;
 import static org.lwjgl.glfw.GLFW.GLFW_CONNECTED;
 import static org.lwjgl.glfw.GLFW.GLFW_DISCONNECTED;
 import static org.lwjgl.glfw.GLFW.glfwGetGammaRamp;
@@ -21,14 +20,14 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.Pointer;
+import org.lwjgl.glfw.GLFWGammaRamp;
 import org.lwjgl.glfw.GLFWMonitorCallback;
-import org.lwjgl.glfw.GLFWgammaramp;
-import org.lwjgl.glfw.GLFWvidmode;
+import org.lwjgl.glfw.GLFWVidMode;
 
 import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.core.util.GLFWUtil;
-import com.techshroom.unplanned.pointer.PointerImpl;
+import com.techshroom.unplanned.pointer.DualPointer;
+import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.GammaRamp;
 import com.techshroom.unplanned.value.Point;
 import com.techshroom.unplanned.value.VideoMode;
@@ -56,16 +55,17 @@ public class GLFWMonitor implements Monitor {
 
     static {
         GLFWUtil.ensureInitialized();
-        glfwSetMonitorCallback(GLFWMonitorCallback(CallbackHandler.INSTANCE));
+        glfwSetMonitorCallback(
+                GLFWMonitorCallback.create(CallbackHandler.INSTANCE));
     }
 
-    private static final VideoMode convertVidMode(GLFWvidmode mode) {
+    private static final VideoMode convertVidMode(GLFWVidMode mode) {
         return VideoMode.create(mode.getWidth(), mode.getHeight(),
                 mode.getRedBits(), mode.getGreenBits(), mode.getBlueBits(),
                 mode.getRefreshRate());
     }
 
-    private static final GammaRamp convertGammaramp(GLFWgammaramp ramp) {
+    private static final GammaRamp convertGammaramp(GLFWGammaRamp ramp) {
         int size = ramp.getSize();
         ShortBuffer tmp;
         short[] tmpShorts = new short[size];
@@ -99,19 +99,19 @@ public class GLFWMonitor implements Monitor {
         return out;
     }
 
-    private static final ByteBuffer convertGammaRamp(GammaRamp ramp) {
-        GLFWgammaramp tmp = new GLFWgammaramp();
+    private static final GLFWGammaRamp convertGammaRamp(GammaRamp ramp) {
+        GLFWGammaRamp tmp = GLFWGammaRamp.create();
         tmp.setSize(ramp.getSize());
         ByteBuffer red = BufferUtils.createByteBuffer(ramp.getSize());
-        red.asShortBuffer().put(resignShorts(ramp.getRedChannel()));
+        red.asShortBuffer().put(resignShorts(ramp.getRedChannel().data));
         tmp.setRed(red);
         ByteBuffer green = BufferUtils.createByteBuffer(ramp.getSize());
-        green.asShortBuffer().put(resignShorts(ramp.getGreenChannel()));
+        green.asShortBuffer().put(resignShorts(ramp.getGreenChannel().data));
         tmp.setGreen(green);
         ByteBuffer blue = BufferUtils.createByteBuffer(ramp.getSize());
-        blue.asShortBuffer().put(resignShorts(ramp.getBlueChannel()));
+        blue.asShortBuffer().put(resignShorts(ramp.getBlueChannel().data));
         tmp.setBlue(blue);
-        return tmp.buffer();
+        return tmp;
     }
 
     /**
@@ -127,70 +127,62 @@ public class GLFWMonitor implements Monitor {
     }
 
     private final Pointer monitorPointer;
-    private final IntBuffer supportedVideoModesCount = BufferUtils
-            .createIntBuffer(1);
     private final IntBuffer locationX = BufferUtils.createIntBuffer(1);
     private final IntBuffer locationY = BufferUtils.createIntBuffer(1);
 
     private GLFWMonitor(long monitorPointer) {
-        this.monitorPointer = PointerImpl.wrap(monitorPointer);
+        this.monitorPointer = DualPointer.wrap(monitorPointer);
     }
 
     @Override
     public List<VideoMode> getSupportedVideoModes() {
-        ByteBuffer videoModes =
-                glfwGetVideoModes(this.monitorPointer.getPointer(),
-                        this.supportedVideoModesCount);
-        int count = this.supportedVideoModesCount.get(0);
+        GLFWVidMode.Buffer videoModes =
+                glfwGetVideoModes(this.monitorPointer.address());
+        int count = videoModes.capacity();
         checkState(count != 0, "error");
-        GLFWvidmode mode = new GLFWvidmode(videoModes);
         ImmutableList.Builder<VideoMode> list = ImmutableList.builder();
         for (int j = 0; j < count; j++) {
-            videoModes.position(j * GLFWvidmode.SIZEOF);
-            list.add(convertVidMode(mode));
+            list.add(convertVidMode(videoModes.get()));
         }
         return list.build();
     }
 
     @Override
     public VideoMode getVideoMode() {
-        return convertVidMode(new GLFWvidmode(
-                glfwGetVideoMode(this.monitorPointer.getPointer())));
+        return convertVidMode(glfwGetVideoMode(this.monitorPointer.address()));
     }
 
     @Override
     public String getTitle() {
-        return glfwGetMonitorName(this.monitorPointer.getPointer());
+        return glfwGetMonitorName(this.monitorPointer.address());
     }
 
     @Override
     public Point getLocation() {
-        glfwGetMonitorPos(this.monitorPointer.getPointer(), this.locationX,
+        glfwGetMonitorPos(this.monitorPointer.address(), this.locationX,
                 this.locationY);
         return Point.of(this.locationX.get(0), this.locationY.get(0));
     }
 
     @Override
     public GammaRamp getGammaRamp() {
-        return convertGammaramp(new GLFWgammaramp(
-                glfwGetGammaRamp(this.monitorPointer.getPointer())));
+        return convertGammaramp(
+                glfwGetGammaRamp(this.monitorPointer.address()));
     }
 
     @Override
     public void setGammaRamp(GammaRamp ramp) {
-        glfwSetGammaRamp(this.monitorPointer.getPointer(),
-                convertGammaRamp(ramp));
+        glfwSetGammaRamp(this.monitorPointer.address(), convertGammaRamp(ramp));
     }
 
     @Override
     public void setMonitorCallback(BiConsumer<Monitor, Event> callback) {
         CallbackHandler.INSTANCE.actualCallback =
-                GLFWMonitorCallback((monitorPtr, event) -> {
-                    checkState(monitorPtr == this.monitorPointer.getPointer(),
+                GLFWMonitorCallback.create((monitorPtr, event) -> {
+                    checkState(monitorPtr == this.monitorPointer.address(),
                             "wrong window?");
-                    callback.accept(this,
-                            event == GLFW_CONNECTED ? Event.CONNECTED
-                                    : Event.DISCONNECTED);
+                    callback.accept(this, event == GLFW_CONNECTED
+                            ? Event.CONNECTED : Event.DISCONNECTED);
                 });
     }
 

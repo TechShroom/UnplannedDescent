@@ -3,7 +3,7 @@ package com.techshroom.unplanned.core.mod.modules;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.techshroom.unplanned.core.mod.IMod;
+import com.techshroom.unplanned.core.mod.Mod;
 import com.techshroom.unplanned.core.mod.Mods;
 import com.techshroom.unplanned.core.util.Arrays2;
 
@@ -30,8 +30,8 @@ public final class ModuleSystem {
         if (!Mods.hasLoadedMods()) {
             Mods.findAndLoad();
         }
-        List<IMod> loaded = Mods.getLoadedMods();
-        for (IMod m : loaded) {
+        List<Mod> loaded = Mods.getLoadedMods();
+        for (Mod m : loaded) {
             if (m instanceof Module) {
                 Module im = (Module) m;
                 modules.add(im);
