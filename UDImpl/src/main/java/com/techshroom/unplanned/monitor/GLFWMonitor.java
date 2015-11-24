@@ -44,11 +44,11 @@ public class GLFWMonitor implements Monitor {
 
         @Override
         public void invoke(long monitor, int event) {
-            this.actualCallback.invoke(monitor, event);
             if (event == GLFW_DISCONNECTED) {
                 // clear from cache
                 monitorCache.remove(monitor);
             }
+            this.actualCallback.invoke(monitor, event);
         }
 
     }
