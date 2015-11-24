@@ -8,8 +8,8 @@ import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.LWJGLUtil.Platform;
+import org.lwjgl.system.Platform;
+
 
 /**
  * A convenience class for loading icons from images.
@@ -31,7 +31,7 @@ import org.lwjgl.LWJGLUtil.Platform;
  */
 public class IconLoader {
 
-    private static final Platform PLATFORM = LWJGLUtil.getPlatform();
+    private static final Platform PLATFORM = Platform.get();
     static {
         System.err.println("Assuming platform " + PLATFORM.getName());
     }

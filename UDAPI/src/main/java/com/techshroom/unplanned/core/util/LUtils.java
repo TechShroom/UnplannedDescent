@@ -19,8 +19,8 @@ import java.util.logging.SimpleFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.Platform;
 
 import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
@@ -77,11 +77,7 @@ public final class LUtils {
     public static String PLATFORM_NAME = "unknown";
 
     static {
-        /*
-         * If you need to change LWJGLUtil's system properties, do it before
-         * this comment!
-         */
-        PLATFORM_NAME = LWJGLUtil.getPlatformName();
+        PLATFORM_NAME = Platform.get().getName();
         String osName = System.getProperty("os.name");
         if (osName.startsWith("SunOS")) {
             PLATFORM_NAME = "solaris";
@@ -93,8 +89,8 @@ public final class LUtils {
     }
 
     private static void injectNatives() {
-        String natives = String.join(File.separator, RESOURCE_ROOT, "res", "libs",
-                "natives", PLATFORM_NAME);
+        String natives = String.join(File.separator, RESOURCE_ROOT, "res",
+                "libs", "natives", PLATFORM_NAME);
         System.setProperty("org.lwjgl.librarypath", natives);
         try {
             addLibraryPath(natives);
@@ -177,7 +173,8 @@ public final class LUtils {
                     .replace("/C:/", "C:/").replace("\\C:\\", "C:\\");
         }
         RESOURCE_ROOT = tempName;
-        Logging.log("Fake root for resources at " + RESOURCE_ROOT, LoggingGroup.DEBUG);
+        Logging.log("Fake root for resources at " + RESOURCE_ROOT,
+                LoggingGroup.DEBUG);
 
         injectNatives();
     }
