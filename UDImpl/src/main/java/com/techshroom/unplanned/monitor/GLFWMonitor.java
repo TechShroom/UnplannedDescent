@@ -11,7 +11,6 @@ import static org.lwjgl.glfw.GLFW.glfwGetVideoModes;
 import static org.lwjgl.glfw.GLFW.glfwSetGammaRamp;
 import static org.lwjgl.glfw.GLFW.glfwSetMonitorCallback;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
@@ -60,22 +59,21 @@ public class GLFWMonitor implements Monitor {
     }
 
     private static final VideoMode convertVidMode(GLFWVidMode mode) {
-        return VideoMode.create(mode.getWidth(), mode.getHeight(),
-                mode.getRedBits(), mode.getGreenBits(), mode.getBlueBits(),
-                mode.getRefreshRate());
+        return VideoMode.create(mode.width(), mode.height(), mode.redBits(),
+                mode.greenBits(), mode.blueBits(), mode.refreshRate());
     }
 
     private static final GammaRamp convertGammaramp(GLFWGammaRamp ramp) {
-        int size = ramp.getSize();
+        int size = ramp.size();
         ShortBuffer tmp;
         short[] tmpShorts = new short[size];
-        tmp = ramp.getRed(size).asShortBuffer();
+        tmp = ramp.red(size);
         tmp.get(tmpShorts);
         int[] red = unsignShorts(tmpShorts);
-        tmp = ramp.getGreen(size).asShortBuffer();
+        tmp = ramp.green(size);
         tmp.get(tmpShorts);
         int[] green = unsignShorts(tmpShorts);
-        tmp = ramp.getBlue(size).asShortBuffer();
+        tmp = ramp.blue(size);
         tmp.get(tmpShorts);
         int[] blue = unsignShorts(tmpShorts);
         return GammaRamp.of(red, green, blue, size);
@@ -101,16 +99,16 @@ public class GLFWMonitor implements Monitor {
 
     private static final GLFWGammaRamp convertGammaRamp(GammaRamp ramp) {
         GLFWGammaRamp tmp = GLFWGammaRamp.create();
-        tmp.setSize(ramp.getSize());
-        ByteBuffer red = BufferUtils.createByteBuffer(ramp.getSize());
-        red.asShortBuffer().put(resignShorts(ramp.getRedChannel().data));
-        tmp.setRed(red);
-        ByteBuffer green = BufferUtils.createByteBuffer(ramp.getSize());
-        green.asShortBuffer().put(resignShorts(ramp.getGreenChannel().data));
-        tmp.setGreen(green);
-        ByteBuffer blue = BufferUtils.createByteBuffer(ramp.getSize());
-        blue.asShortBuffer().put(resignShorts(ramp.getBlueChannel().data));
-        tmp.setBlue(blue);
+        tmp.size(ramp.getSize());
+        ShortBuffer red = BufferUtils.createShortBuffer(ramp.getSize());
+        red.put(resignShorts(ramp.getRedChannel().data));
+        tmp.red(red);
+        ShortBuffer green = BufferUtils.createShortBuffer(ramp.getSize());
+        green.put(resignShorts(ramp.getGreenChannel().data));
+        tmp.green(green);
+        ShortBuffer blue = BufferUtils.createShortBuffer(ramp.getSize());
+        blue.put(resignShorts(ramp.getBlueChannel().data));
+        tmp.blue(blue);
         return tmp;
     }
 
