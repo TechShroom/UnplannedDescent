@@ -28,8 +28,10 @@ import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
  */
 public final class Mods {
 
-    private static final Mod NULL_MOD = new Mod() {
-        // does nothing!
+    private static final Mod NULL_MOD = new SkeletalMod(
+            ModMetadata.builder().idAndName("null").version("0.0.0")
+                    .buildNumber(0).targetGameVersion("any").build()) {
+        // Nothing to implement.
     };
     private static Multimap<ModProvider, Mod> providers;
     private static boolean loadedMods = false;

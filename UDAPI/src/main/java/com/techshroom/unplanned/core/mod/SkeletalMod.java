@@ -6,5 +6,16 @@ package com.techshroom.unplanned.core.mod;
  * @author Kenzie Togami
  */
 public abstract class SkeletalMod implements Mod {
-    // nothing here yet
+    
+    protected final ModMetadata data;
+    
+    protected SkeletalMod(ModMetadata data) {
+        this.data = data;
+    }
+    
+    @Override
+    public ModMetadata getMetadata() {
+        return this.data;
+    }
+    
 }

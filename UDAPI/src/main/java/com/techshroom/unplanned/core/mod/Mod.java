@@ -6,6 +6,8 @@ package com.techshroom.unplanned.core.mod;
  * @author Kenzie Togami
  */
 public interface Mod {
+    
+    ModMetadata getMetadata();
 
     default void load() {
         // do nothing
