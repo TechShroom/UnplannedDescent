@@ -130,7 +130,8 @@ public final class GenerateKeyEnum {
                 .build());
         try {
             JavaFile.builder(PACKAGE, spec.build()).skipJavaLangImports(true)
-                    .indent("    ").build().writeTo(Paths.get("src/main/java"));
+                    .indent("    ").build()
+                    .writeTo(Paths.get("../UDAPI/src/main/java"));
         } catch (IOException e) {
             e.printStackTrace();
         }
