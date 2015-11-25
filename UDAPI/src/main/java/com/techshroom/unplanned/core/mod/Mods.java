@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,14 +58,14 @@ public final class Mods {
         }
         List<ModProvider> providerList = ModLoader.loadModsFromClasspath();
         Logging.log("Loaded mod providers from classpath.", LoggingGroup.DEBUG);
-        Logging.log("Creating mods via providers...", LoggingGroup.DEBUG);
         Multimap<String, ModMetadata> ids = ArrayListMultimap.create();
         providerList.forEach(
                 p -> ids.put(p.getMetadata().getId(), p.getMetadata()));
         if (ids.keySet().stream().map(ids::get).anyMatch(x -> x.size() > 1)) {
-            ids.asMap().entrySet().stream().filter(e -> e.getValue().size() < 2)
-                    .map(Entry::getKey).collect(Collectors.toSet())
-                    .forEach(ids::removeAll);
+            Set<String> toRemove = ids.asMap().entrySet().stream()
+                    .filter(e -> e.getValue().size() < 2).map(Entry::getKey)
+                    .collect(Collectors.toSet());
+            toRemove.forEach(ids::removeAll);
             Logging.log("ID Conflicts detected, load failed",
                     LoggingGroup.ERROR);
             throw new ModIDConflictException(ids);
@@ -72,6 +73,7 @@ public final class Mods {
         Logging.log("Loaded provider list, dumping", LoggingGroup.JUNK);
         providerList
                 .forEach(x -> Logging.log("PROVIDER: " + x, LoggingGroup.JUNK));
+        Logging.log("Creating mods via providers...", LoggingGroup.DEBUG);
         providers =
                 HashMultimap
                         .create(Multimaps

@@ -57,6 +57,27 @@ public final class Strings {
         return (byte) (c - '0');
     }
 
+    public static <X> String prettyJoinAnd(Iterable<X> items) {
+        return prettyJoin(",", "and", items);
+    }
+
+    public static String prettyJoinAnd(Object... items) {
+        return prettyJoinAnd(() -> Iterators.forArray(items));
+    }
+
+    public static <X> String prettyJoinOr(Iterable<X> items) {
+        return prettyJoin(",", "or", items);
+    }
+
+    public static String prettyJoinOr(Object... items) {
+        return prettyJoinOr(() -> Iterators.forArray(items));
+    }
+
+    public static String prettyJoin(String join, String lastPrefix,
+            Object... items) {
+        return prettyJoin(join, lastPrefix, () -> Iterators.forArray(items));
+    }
+
     /**
      * Joins {@code items} by {@code join} if there is more than two, prefixing
      * the last item with {@code " " + lastPrefix} if there is more than one,
@@ -95,7 +116,6 @@ public final class Strings {
         StringBuilder b = new StringBuilder(iter.next());
         if (iter.hasNext()) {
             iter = Iterators.transform(iter, e -> " " + e);
-            // 2+ items mode, use lastPrefix
             CharSequence item2 = iter.next();
             if (iter.hasNext()) {
                 // 3+ items mode, use join
@@ -109,32 +129,11 @@ public final class Strings {
                     b.append(next);
                 }
             } else {
-                // 2 items
+                // 2+ items mode, use lastPrefix
                 b.append(" ").append(lastPrefix).append(item2);
             }
         }
         return b.toString();
-    }
-
-    public static <X> String prettyJoinAnd(Iterable<X> items) {
-        return prettyJoin(",", "and", items);
-    }
-
-    public static <X> String prettyJoinOr(Iterable<X> items) {
-        return prettyJoin(",", "or", items);
-    }
-
-    public static String prettyJoin(String join, String lastPrefix,
-            Object... items) {
-        return prettyJoin(join, lastPrefix, () -> Iterators.forArray(items));
-    }
-
-    public static String prettyJoinAnd(Object... items) {
-        return prettyJoinAnd(() -> Iterators.forArray(items));
-    }
-
-    public static String prettyJoinOr(Object... items) {
-        return prettyJoinOr(() -> Iterators.forArray(items));
     }
 
 }
