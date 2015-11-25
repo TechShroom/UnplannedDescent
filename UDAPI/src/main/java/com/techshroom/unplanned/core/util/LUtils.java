@@ -158,7 +158,7 @@ public final class LUtils {
 
     static {
         String tempName = LUtils.class.getPackage().getName();
-        int levels = Strings.count(tempName, '.') + 2;
+        int levels = UDStrings.count(tempName, '.') + 2;
         tempName = LUtils.class.getResource("LUtils.class").getFile()
                 .replace("%20", " ");
         for (int i = 0; i < levels; i++) {

@@ -3,7 +3,7 @@ package com.techshroom.unplanned.core.mod;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Multimap;
-import com.techshroom.unplanned.core.util.Strings;
+import com.techshroom.unplanned.core.util.UDStrings;
 
 /**
  * Thrown when two or more mods have the same ID.
@@ -15,7 +15,7 @@ public class ModIDConflictException extends RuntimeException {
     private static String
             generateConflictMessage(Multimap<String, ModMetadata> conflicts) {
         return conflicts.asMap().values().stream()
-                .map(v -> "Mods " + Strings.prettyJoinAnd(v))
+                .map(v -> "Mods " + UDStrings.prettyJoinAnd(v))
                 .collect(Collectors.joining(", ", "Conflicts: ", ""));
     }
 

@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.google.common.collect.Iterators;
 
-public final class Strings {
+public final class UDStrings {
 
     /**
      * Returns the amount of <tt>c</tt>'s in <tt>s</tt>
