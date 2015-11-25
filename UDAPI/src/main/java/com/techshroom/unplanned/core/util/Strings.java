@@ -17,14 +17,8 @@ public final class Strings {
      * @return the number of <tt>c</tt>'s in <tt>s</tt>
      */
     public static int count(String s, char c) {
-        char[] ca = s.toCharArray();
-        int cnt = 0;
-        for (char x : ca) {
-            if (x == c) {
-                cnt++;
-            }
-        }
-        return cnt;
+        // int cast is okay because string is never longer than int
+        return (int) s.chars().filter(sc -> sc == c).count();
     }
 
     /**
