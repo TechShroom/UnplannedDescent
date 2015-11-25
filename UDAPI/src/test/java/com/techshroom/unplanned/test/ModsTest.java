@@ -7,8 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,10 +43,18 @@ public class ModsTest {
         }
         SERVICE = tmp;
     }
+    
+    private static Set<LoggingGroup> previousLoggingGroup;
 
     @BeforeClass
     public static void logAllGroups() {
+        previousLoggingGroup = Logging.getValidGroups();
         Logging.setValidGroups(LoggingGroup.ALL);
+    }
+    
+    @AfterClass
+    public static void restorePreviousLoggingGroups() {
+        Logging.setValidGroups(previousLoggingGroup);
     }
 
     @Test
