@@ -18,6 +18,7 @@ import com.techshroom.unplanned.core.mod.ModIDConflictException;
 import com.techshroom.unplanned.core.mod.ModMetadata;
 import com.techshroom.unplanned.core.mod.ModProvider;
 import com.techshroom.unplanned.core.mod.Mods;
+import com.techshroom.unplanned.core.mod.SkeletalMod;
 import com.techshroom.unplanned.core.util.Logging;
 import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
@@ -72,7 +73,7 @@ public class ModsTest {
 
         @Override
         public Callable<Mod> getModCreator() {
-            return TestMod::new;
+            return () -> new TestMod(getMetadata());
         }
 
     }
@@ -87,13 +88,17 @@ public class ModsTest {
 
         @Override
         public Callable<Mod> getModCreator() {
-            return TestMod::new;
+            return () -> new TestMod(getMetadata());
         }
 
     }
 
-    public static class TestMod implements Mod {
-        // nothing to impl.
+    public static class TestMod extends SkeletalMod {
+
+        protected TestMod(ModMetadata data) {
+            super(data);
+        }
+
     }
 
 }
