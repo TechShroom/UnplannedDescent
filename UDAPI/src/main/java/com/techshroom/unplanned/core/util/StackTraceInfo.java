@@ -45,15 +45,14 @@ public class StackTraceInfo {
      * Makes the offset zero for the method that called the method that called
      * the current method, by adding the required offset
      */
-    public static final int DUAL_INVOKING_METHOD_ZERO = INVOKING_METHOD_ZERO
-            + INVOKING_METHOD_ZERO;
+    public static final int DUAL_INVOKING_METHOD_ZERO =
+            INVOKING_METHOD_ZERO + INVOKING_METHOD_ZERO;
     private static Method m;
 
     static {
         try {
-            m =
-                    Throwable.class.getDeclaredMethod("getStackTraceElement",
-                            int.class);
+            m = Throwable.class.getDeclaredMethod("getStackTraceElement",
+                    int.class);
             m.setAccessible(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,9 +67,8 @@ public class StackTraceInfo {
         Throwable here = new Throwable();
         StackTraceElement ste = null;
         try {
-            ste =
-                    (StackTraceElement) m.invoke(here, CLIENT_CODE_STACK_INDEX
-                            + offset);
+            ste = (StackTraceElement) m.invoke(here,
+                    CLIENT_CODE_STACK_INDEX + offset);
         } catch (Exception e) {
             ste = here.getStackTrace()[CLIENT_CODE_STACK_INDEX + offset];
         }
@@ -85,9 +83,8 @@ public class StackTraceInfo {
         Throwable here = new Throwable();
         StackTraceElement ste = null;
         try {
-            ste =
-                    (StackTraceElement) m.invoke(here, CLIENT_CODE_STACK_INDEX
-                            + offset);
+            ste = (StackTraceElement) m.invoke(here,
+                    CLIENT_CODE_STACK_INDEX + offset);
         } catch (Exception e) {
             ste = here.getStackTrace()[CLIENT_CODE_STACK_INDEX + offset];
         }
@@ -103,9 +100,8 @@ public class StackTraceInfo {
         Throwable here = new Throwable();
         StackTraceElement ste = null;
         try {
-            ste =
-                    (StackTraceElement) m.invoke(here, CLIENT_CODE_STACK_INDEX
-                            + offset);
+            ste = (StackTraceElement) m.invoke(here,
+                    CLIENT_CODE_STACK_INDEX + offset);
         } catch (Exception e) {
             ste = here.getStackTrace()[CLIENT_CODE_STACK_INDEX + offset];
         }
@@ -176,9 +172,8 @@ public class StackTraceInfo {
     }
 
     public static String getInvokingFileNameFqn() {
-        String invokingMethodNameFqn =
-                StackTraceInfo
-                        .getInvokingMethodNameFqn(DUAL_INVOKING_METHOD_ZERO);
+        String invokingMethodNameFqn = StackTraceInfo
+                .getInvokingMethodNameFqn(DUAL_INVOKING_METHOD_ZERO);
         String invokingFileName =
                 StackTraceInfo.getInvokingFileName(DUAL_INVOKING_METHOD_ZERO);
 

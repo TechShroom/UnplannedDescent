@@ -46,8 +46,8 @@ public final class ModuleSystem {
      *            - the module class
      * @return an array of {@link Module}s that extend <tt>moduleClass</tt>
      */
-    public static <T extends Module> T[] getRegisteredModules(
-            Class<T> moduleClass) {
+    public static <T extends Module> T[]
+            getRegisteredModules(Class<T> moduleClass) {
         T[] array = Arrays2.newArray(moduleClass, 0);
         if (moduleClass == null) {
             throw new IllegalArgumentException("Module class cannot be null");

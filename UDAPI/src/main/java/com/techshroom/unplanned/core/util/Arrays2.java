@@ -160,8 +160,8 @@ public final class Arrays2 {
      * @return the wanted boolean argument value, or the default value
      */
     public static boolean getArgB(String[] args, int index, boolean def) {
-        return Boolean.parseBoolean(getArgS(args, index, Boolean.valueOf(def)
-                .toString()));
+        return Boolean.parseBoolean(
+                getArgS(args, index, Boolean.valueOf(def).toString()));
     }
 
     /**
@@ -176,8 +176,8 @@ public final class Arrays2 {
      * @return the wanted integer argument value, or the default value
      */
     public static int getArgI(String[] args, int index, int def) {
-        return Integer.parseInt(getArgS(args, index, Integer.valueOf(def)
-                .toString()));
+        return Integer.parseInt(
+                getArgS(args, index, Integer.valueOf(def).toString()));
     }
 
     /**
@@ -192,8 +192,8 @@ public final class Arrays2 {
      * @return the wanted float argument value, or the default value
      */
     public static float getArgF(String[] args, int index, float def) {
-        return Float.parseFloat(getArgS(args, index, Float.valueOf(def)
-                .toString()));
+        return Float.parseFloat(
+                getArgS(args, index, Float.valueOf(def).toString()));
     }
 
     /**
@@ -208,8 +208,8 @@ public final class Arrays2 {
      * @return the wanted double argument value, or the default value
      */
     public static double getArgD(String[] args, int index, double def) {
-        return Double.parseDouble(getArgS(args, index, Double.valueOf(def)
-                .toString()));
+        return Double.parseDouble(
+                getArgS(args, index, Double.valueOf(def).toString()));
     }
 
     /**
@@ -242,7 +242,7 @@ public final class Arrays2 {
         if (args == null) {
             return def;
         }
-        return args.length <= index ? def : args[index] == null ? def
-                : args[index];
+        return args.length <= index ? def
+                : args[index] == null ? def : args[index];
     }
 }
