@@ -39,6 +39,9 @@ public final class Strings {
         if (number > 9) {
             throw new IndexOutOfBoundsException("number > 9");
         }
+        if (number < 0) {
+            throw new IndexOutOfBoundsException("number < 0");
+        }
         return (char) (number + '0');
     }
 
