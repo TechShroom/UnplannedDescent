@@ -54,8 +54,11 @@ public final class Strings {
      * @return the char that matches
      */
     public static byte getNumForChar(char c) {
-        if (c < '0' || c > '9') {
-            throw new IndexOutOfBoundsException("not 0-9");
+        if (c > '9') {
+            throw new IndexOutOfBoundsException("c > '9'");
+        }
+        if (c < '0') {
+            throw new IndexOutOfBoundsException("c < '0'");
         }
         return (byte) (c - '0');
     }
