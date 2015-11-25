@@ -54,21 +54,18 @@ public class Arrays2Test {
         assertArrayEquals(defensiveCopy, SPL_original);
         assertArrayEquals(SPL_normalcp, test);
         // splice [::-1]: reverse copy
-        test =
-                Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
-                        Arrays2.SPLICE_DEFAULT, -1);
+        test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
+                Arrays2.SPLICE_DEFAULT, -1);
         assertArrayEquals(defensiveCopy, SPL_original);
         assertArrayEquals(SPL_reversecp, test);
         // splice [::2]: every other object
-        test =
-                Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
-                        Arrays2.SPLICE_DEFAULT, 2);
+        test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
+                Arrays2.SPLICE_DEFAULT, 2);
         assertArrayEquals(defensiveCopy, SPL_original);
         assertArrayEquals(SPL_bigstepcp, test);
         // splice [::-2]: reverse every other object
-        test =
-                Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
-                        Arrays2.SPLICE_DEFAULT, -2);
+        test = Arrays2.splice(SPL_original, Arrays2.SPLICE_DEFAULT,
+                Arrays2.SPLICE_DEFAULT, -2);
         assertArrayEquals(defensiveCopy, SPL_original);
         assertArrayEquals(SPL_rbigstepcp, test);
     }

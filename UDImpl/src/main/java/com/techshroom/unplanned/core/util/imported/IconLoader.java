@@ -31,6 +31,7 @@ import org.lwjgl.system.Platform;
 public class IconLoader {
 
     private static final Platform PLATFORM = Platform.get();
+
     static {
         System.err.println("Assuming platform " + PLATFORM.getName());
     }
@@ -77,9 +78,8 @@ public class IconLoader {
      * @return A ByteBuffer of pixel data at the indicated size.
      *************************************************************************/
     private static ByteBuffer loadInstance(BufferedImage image, int dimension) {
-        BufferedImage scaledIcon =
-                new BufferedImage(dimension, dimension,
-                        BufferedImage.TYPE_INT_ARGB_PRE);
+        BufferedImage scaledIcon = new BufferedImage(dimension, dimension,
+                BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g = scaledIcon.createGraphics();
         double ratio = getIconRatio(image, scaledIcon);
         double width = image.getWidth() * ratio;

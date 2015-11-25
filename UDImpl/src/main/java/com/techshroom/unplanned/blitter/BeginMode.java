@@ -26,16 +26,16 @@ public enum BeginMode {
      */
     POINTS(GL_POINTS),
     /**
-     * Treats each pair of vertices as an independent line segment. Vertices
-     * {@code 2n-1} and {@code 2n} define line {@code n}. {@code N/2} lines are
-     * drawn.
-     */
+      * Treats each pair of vertices as an independent line
+      * segment. Vertices {@code 2n-1} and {@code 2n} define
+      * line {@code n}. {@code N/2} lines are drawn.
+      */
     LINES(GL_LINES),
     /**
-     * Draws a connected group of line segments from the first vertex to the
-     * last. Vertices {@code n} and {@code n+1} define line {@code n}.
-     * {@code N-1} lines are drawn.
-     */
+      * Draws a connected group of line segments from the first
+      * vertex to the last. Vertices {@code n} and {@code n+1}
+      * define line {@code n}. {@code N-1} lines are drawn.
+      */
     LINE_STRIP(GL_LINE_STRIP),
     /**
      * Draws a connected group of line segments from the first vertex to the

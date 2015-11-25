@@ -9,6 +9,7 @@ import java.util.Arrays;
 class MethodizedSTDStream extends ByteArrayOutputStream {
 
     private static final Field ps_autoFlush;
+
     static {
         try {
             ps_autoFlush = PrintStream.class.getDeclaredField("autoFlush");
@@ -19,6 +20,7 @@ class MethodizedSTDStream extends ByteArrayOutputStream {
             throw new RuntimeException(e);
         }
     }
+
     PrintStream orig = null;
     String data = "";
     boolean lastNewline = true, autoFlush = false;
@@ -73,8 +75,8 @@ class MethodizedSTDStream extends ByteArrayOutputStream {
             // skip LUtils.print() because we want the method that called that
             // one.
             if (!s.getClassName().matches("^(java|sun)(.+?)")
-                    && !(s.getClassName().equals(LUtils.class.getName()) && s
-                            .getMethodName().equals("print"))) {
+                    && !(s.getClassName().equals(LUtils.class.getName())
+                            && s.getMethodName().equals("print"))) {
                 break;
             }
         }
@@ -83,10 +85,9 @@ class MethodizedSTDStream extends ByteArrayOutputStream {
             throw new IllegalStateException("No stack!");
         }
         String[] classsplit = s.getClassName().split("\\.");
-        return "[" + classsplit[classsplit.length - 1] + "."
-                + s.getMethodName() + "(" + s.getFileName() + ":"
-                + s.getLineNumber() + ")@" + Thread.currentThread().getName()
-                + "] ";
+        return "[" + classsplit[classsplit.length - 1] + "." + s.getMethodName()
+                + "(" + s.getFileName() + ":" + s.getLineNumber() + ")@"
+                + Thread.currentThread().getName() + "] ";
     }
 
     @Override
