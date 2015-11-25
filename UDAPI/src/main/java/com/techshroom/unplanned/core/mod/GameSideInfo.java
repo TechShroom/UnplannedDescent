@@ -1,9 +1,25 @@
 package com.techshroom.unplanned.core.mod;
 
+import java.util.Optional;
+
+import com.google.common.reflect.TypeToken;
+
 public interface GameSideInfo {
 
-    enum Side {
-        CLIENT, SERVER;
+    class Side<SUBCLASS extends GameSideInfo> {
+
+        public static final Side<ClientSideInfo> CLIENT = new Side<>();
+        public static final Side<ServerSideInfo> SERVER = new Side<>();
+
+        private final TypeToken<SUBCLASS> token =
+                new TypeToken<SUBCLASS>(getClass()) {
+
+                    private static final long serialVersionUID =
+                            -4649053180888347429L;
+                };
+
+        private Side() {
+        }
 
         public boolean isClient() {
             return this == CLIENT;
@@ -13,6 +29,12 @@ public interface GameSideInfo {
             return this == SERVER;
         }
 
+        @SuppressWarnings("unchecked")
+        private Class<SUBCLASS> getSubclass() {
+            // seriously java....
+            return (Class<SUBCLASS>) this.token.getRawType();
+        }
+
     }
 
     /**
@@ -20,16 +42,19 @@ public interface GameSideInfo {
      * 
      * @return the side this game info is for
      */
-    Side getSide();
+    Side<?> getSide();
 
-    /**
-     * Adds a connection listener to the game. Please take note of which side
-     * the connection listener is on, as the server and client will both fire on
-     * a connection.
-     * 
-     * @param listener
-     *            - The listener to attach
-     */
-    void addConnectionListener(ConnectionListener listener);
+    default <T extends GameSideInfo> Optional<T> asSidedInfo(Side<T> side) {
+        return getSide() == side ? Optional.of(side.getSubclass().cast(this))
+                : Optional.empty();
+    }
+
+    default Optional<ClientSideInfo> asClientSideInfo() {
+        return asSidedInfo(Side.CLIENT);
+    }
+
+    default Optional<ServerSideInfo> asServerSideInfo() {
+        return asSidedInfo(Side.SERVER);
+    }
 
 }
