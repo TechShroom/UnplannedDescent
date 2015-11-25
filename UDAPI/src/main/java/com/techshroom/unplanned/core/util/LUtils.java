@@ -1,8 +1,5 @@
 package com.techshroom.unplanned.core.util;
 
-import static org.lwjgl.opengl.GL11.GL_VERSION;
-import static org.lwjgl.opengl.GL11.glGetString;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,9 +15,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.system.Platform;
 
 import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
@@ -77,9 +71,16 @@ public final class LUtils {
     public static String PLATFORM_NAME = "unknown";
 
     static {
-        PLATFORM_NAME = Platform.get().getName();
         String osName = System.getProperty("os.name");
-        if (osName.startsWith("SunOS")) {
+        if (osName.startsWith("Windows")) {
+            PLATFORM_NAME = "windows";
+        } else if (osName.startsWith("Linux") || osName.startsWith("FreeBSD")
+                || osName.startsWith("Unix")) {
+            PLATFORM_NAME = "linux";
+        } else if (osName.startsWith("Mac OS X")
+                || osName.startsWith("Darwin")) {
+            PLATFORM_NAME = "osx";
+        } else if (osName.startsWith("SunOS")) {
             PLATFORM_NAME = "solaris";
         }
         String val = System.getProperty(LIB_NAME + ".addStackTraceToStreams");
@@ -186,13 +187,13 @@ public final class LUtils {
      * @return true if the actual version is the same as or newer than the
      *         wanted version, false otherwise
      */
-    public static boolean isVersionAvaliable(String vers) {
-        String cver = getGLVer();
+    public static boolean isVersionAvaliable(String required, String actual) {
+        String cver = actual;
         if (cver.indexOf(' ') > -1) {
             cver = cver.substring(0, cver.indexOf(' '));
         }
         String[] cver_sep = cver.split("\\.", 3);
-        String[] vers_sep = vers.split("\\.", 3);
+        String[] vers_sep = required.split("\\.", 3);
         int[] cver_sepi = new int[3];
         int[] vers_sepi = new int[3];
         int min = Maths.min(cver_sep.length, vers_sep.length, 3);
@@ -200,9 +201,8 @@ public final class LUtils {
             cver_sepi[i] = Integer.parseInt(cver_sep[i]);
             vers_sepi[i] = Integer.parseInt(vers_sep[i]);
         }
-        boolean ret = cver_sepi[0] >= vers_sepi[0]
-                && cver_sepi[1] >= vers_sepi[1] && cver_sepi[2] >= vers_sepi[2];
-        return ret;
+        return cver_sepi[0] >= vers_sepi[0] && cver_sepi[1] >= vers_sepi[1]
+                && cver_sepi[2] >= vers_sepi[2];
     }
 
     /**
@@ -281,15 +281,6 @@ public final class LUtils {
         }
         throw new IllegalAccessException("Access denied to " + className
                 + " because it wasn't in " + accept);
-    }
-
-    /**
-     * Gets the current OpenGL version
-     * 
-     * @return {@link GL11#GL_VERSION}
-     */
-    public static String getGLVer() {
-        return glGetString(GL_VERSION);
     }
 
     /**
