@@ -36,18 +36,22 @@ public final class Logging {
         /**
          * Standard output for users; etc.
          */
-        INFO, /**
-               * Non-fatal errors or suggestions for performance
-               */
-        WARNING, /**
-                  * Fatal errors
-                  */
-        ERROR, /**
-                * Debug output for developing
-                */
-        DEBUG, /**
-                * Dump group for unloading tons of data
-                */
+        INFO,
+        /**
+         * Non-fatal errors or suggestions for performance
+         */
+        WARNING,
+        /**
+         * Fatal errors
+         */
+        ERROR,
+        /**
+         * Debug output for developing
+         */
+        DEBUG,
+        /**
+         * Dump group for unloading tons of data
+         */
         JUNK;
 
         public static final Set<LoggingGroup> ALL =
@@ -78,13 +82,13 @@ public final class Logging {
                                 .of(LoggingGroup.values())
                                 .filter(x -> low.ordinal() <= x
                                         .ordinal()
-                                && x.ordinal() <= high.ordinal())::iterator));
+                                        && x.ordinal() <= high.ordinal())::iterator));
     }
 
     public static boolean isValidGroup(LoggingGroup g) {
         return getValidGroups().contains(g);
     }
-    
+
     public static void log(String msg, LoggingGroup group) {
         if (!logGroups.contains(group)) {
             return;

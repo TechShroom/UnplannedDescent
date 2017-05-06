@@ -70,11 +70,11 @@ public class ClassPathHack {
                         + u.getFile().replace('/', File.separatorChar)
                                 .substring(1).replace("%20", " "));
     }
-    
+
     public static boolean hasFile(String file) {
         return hasFile(new File(file));
     }
-    
+
     public static boolean hasFile(File file) {
         try {
             return hasURL(file.toURI().toURL());

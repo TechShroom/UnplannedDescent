@@ -16,6 +16,6 @@ public interface ServerSideInfo extends GameSideInfo {
      * 
      * @return the bound addresses
      */
-            Collection<InetSocketAddress> getBoundAddresses();
+    Collection<InetSocketAddress> getBoundAddresses();
 
 }

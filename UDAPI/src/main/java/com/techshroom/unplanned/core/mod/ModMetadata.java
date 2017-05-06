@@ -7,14 +7,14 @@ import com.google.auto.value.AutoValue;
  */
 @AutoValue
 public abstract class ModMetadata {
-    
+
     public static final Builder builder() {
         return new AutoValue_ModMetadata.Builder();
     }
 
     @AutoValue.Builder
     public interface Builder {
-        
+
         default Builder idAndName(String id) {
             return id(id).name(id);
         }
@@ -28,7 +28,7 @@ public abstract class ModMetadata {
         Builder buildNumber(long buildNumber);
 
         Builder targetGameVersion(String targetGameVersion);
-        
+
         ModMetadata build();
 
     }

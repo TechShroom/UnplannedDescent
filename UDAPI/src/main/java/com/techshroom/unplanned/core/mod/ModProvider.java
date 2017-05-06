@@ -9,7 +9,7 @@ public interface ModProvider {
      * 
      * @return the metadata for the mod
      */
-            ModMetadata getMetadata();
+    ModMetadata getMetadata();
 
     /**
      * Returns a callable that can make the mod. This allows for a variety of
@@ -18,6 +18,6 @@ public interface ModProvider {
      * 
      * @return a callable that can make the mod
      */
-            Callable<Mod> getModCreator();
+    Callable<Mod> getModCreator();
 
 }
