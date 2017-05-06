@@ -110,7 +110,7 @@ public class GLFWWindow implements Window {
 
     @Override
     public boolean isCloseRequested() {
-        return glfwWindowShouldClose(this.windowPtr.address()) == GL11.GL_TRUE;
+        return glfwWindowShouldClose(this.windowPtr.address());
     }
 
     @Override
@@ -231,7 +231,7 @@ public class GLFWWindow implements Window {
         glfwSetWindowFocusCallback(this.windowPtr.address(),
                 GLFWWindowFocusCallback.create((window, focused) -> {
                     checkWindow(window);
-                    callback.onWindowFocusChange(this, focused == GL11.GL_TRUE);
+                    callback.onWindowFocusChange(this, focused);
                 }));
     }
 
@@ -241,7 +241,7 @@ public class GLFWWindow implements Window {
                 GLFWWindowIconifyCallback.create((window, minimized) -> {
                     checkWindow(window);
                     callback.onWindowMinimizeChange(this,
-                            minimized == GL11.GL_TRUE);
+                            minimized);
                 }));
     }
 

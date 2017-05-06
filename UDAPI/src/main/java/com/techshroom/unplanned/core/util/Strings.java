@@ -81,7 +81,7 @@ public final class Strings {
      * @param join
      * @param lastPrefix
      * @param items
-     * @return
+     * @return the joined strings
      */
     public static <X> String prettyJoin(String join, String lastPrefix,
             Iterable<X> items) {

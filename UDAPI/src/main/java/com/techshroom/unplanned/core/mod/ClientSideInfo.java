@@ -5,6 +5,7 @@ import java.util.Optional;
 
 public interface ClientSideInfo extends GameSideInfo {
 
+    @Override
     default Side getSide() {
         return Side.CLIENT;
     }

@@ -3,8 +3,9 @@ package com.techshroom.unplanned.core.util;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWErrorCallbackI;
 
-public enum GLFWErrorHandler implements GLFWErrorCallback.SAM {
+public enum GLFWErrorHandler implements GLFWErrorCallbackI {
 
     HANDLER;
 
