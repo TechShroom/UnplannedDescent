@@ -16,6 +16,6 @@ public interface ClientSideInfo extends GameSideInfo {
      * 
      * @return the address of the server this client is connected to
      */
-            Optional<InetSocketAddress> getServerAddress();
+    Optional<InetSocketAddress> getServerAddress();
 
 }

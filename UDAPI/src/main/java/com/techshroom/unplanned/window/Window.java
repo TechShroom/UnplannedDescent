@@ -177,7 +177,7 @@ public interface Window {
      * @deprecated Use only for unsupported attribute access
      */
     @Deprecated
-            int getAttribute(int attr);
+    int getAttribute(int attr);
 
     /**
      * Please be careful with this window pointer. Certain properties are only

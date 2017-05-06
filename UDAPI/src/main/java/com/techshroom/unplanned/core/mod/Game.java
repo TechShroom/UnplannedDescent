@@ -5,7 +5,7 @@ public interface Game {
     String getName();
 
     String getVersion();
-    
+
     GameSideInfo getSideInfo();
 
 }

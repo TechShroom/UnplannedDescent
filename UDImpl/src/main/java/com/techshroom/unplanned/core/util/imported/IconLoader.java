@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.system.Platform;
 
-
 /**
  * A convenience class for loading icons from images.
  * 

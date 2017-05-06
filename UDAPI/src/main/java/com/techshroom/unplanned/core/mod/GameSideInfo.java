@@ -20,7 +20,7 @@ public interface GameSideInfo {
      * 
      * @return the side this game info is for
      */
-            Side getSide();
+    Side getSide();
 
     /**
      * Adds a connection listener to the game. Please take note of which side
@@ -30,6 +30,6 @@ public interface GameSideInfo {
      * @param listener
      *            - The listener to attach
      */
-            void addConnectionListener(ConnectionListener listener);
+    void addConnectionListener(ConnectionListener listener);
 
 }
