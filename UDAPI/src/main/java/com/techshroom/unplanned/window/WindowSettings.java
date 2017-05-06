@@ -73,9 +73,7 @@ public abstract class WindowSettings {
 
     public abstract Optional<Window> getSharedWindow();
 
-    public final Builder toBuilder() {
-        return new AutoValue_WindowSettings.Builder(this);
-    }
+    public abstract Builder toBuilder();
 
     public final Window createWindow() {
         return WINDOW_GENERATOR.generateWindow(getScreenSize(), getTitle(),

@@ -1,7 +1,5 @@
 package com.techshroom.unplanned.pointer;
 
-import org.lwjgl.system.PointerWrapper;
-
 public class PointerImpl implements Pointer {
 
     public static PointerImpl wrap(long ptr) {
@@ -23,10 +21,11 @@ public class PointerImpl implements Pointer {
         return this.pointer;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof PointerWrapper))
+        if (!(o instanceof Pointer))
             return false;
 
         Pointer that = (Pointer) o;
@@ -35,10 +34,12 @@ public class PointerImpl implements Pointer {
 
     }
 
+    @Override
     public int hashCode() {
         return (int) (this.pointer ^ (this.pointer >>> 32));
     }
 
+    @Override
     public String toString() {
         return String.format("%s pointer [0x%X]", getClass().getSimpleName(),
                 this.pointer);

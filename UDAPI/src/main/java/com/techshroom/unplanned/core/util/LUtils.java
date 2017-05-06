@@ -128,7 +128,6 @@ public final class LUtils {
         usrPathsField.set(null, newPaths);
     }
 
-    @SuppressWarnings("resource")
     private static void overrideStandardStreams() {
         System.err.println("Adding tracing to standard streams...");
         MethodizedSTDStream sysout = new MethodizedSTDStream(System.out);
@@ -323,7 +322,6 @@ public final class LUtils {
      * @throws IOException
      *             if there are I/O errors
      */
-    @SuppressWarnings("resource")
     public static InputStream getInputStream(String path) throws IOException {
         // Normalize to UNIX style
         path = path.replace(File.separatorChar, '/');

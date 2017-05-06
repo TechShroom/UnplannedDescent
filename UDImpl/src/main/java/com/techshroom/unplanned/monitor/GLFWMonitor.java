@@ -21,6 +21,7 @@ import java.util.function.BiConsumer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWGammaRamp;
 import org.lwjgl.glfw.GLFWMonitorCallback;
+import org.lwjgl.glfw.GLFWMonitorCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import com.google.common.collect.ImmutableList;
@@ -35,7 +36,7 @@ public class GLFWMonitor implements Monitor {
 
     private static final Map<Long, GLFWMonitor> monitorCache = new HashMap<>();
 
-    private static enum CallbackHandler implements GLFWMonitorCallback.SAM {
+    private static enum CallbackHandler implements GLFWMonitorCallbackI {
 
         INSTANCE;
 
@@ -67,13 +68,13 @@ public class GLFWMonitor implements Monitor {
         int size = ramp.size();
         ShortBuffer tmp;
         short[] tmpShorts = new short[size];
-        tmp = ramp.red(size);
+        tmp = ramp.red();
         tmp.get(tmpShorts);
         int[] red = unsignShorts(tmpShorts);
-        tmp = ramp.green(size);
+        tmp = ramp.green();
         tmp.get(tmpShorts);
         int[] green = unsignShorts(tmpShorts);
-        tmp = ramp.blue(size);
+        tmp = ramp.blue();
         tmp.get(tmpShorts);
         int[] blue = unsignShorts(tmpShorts);
         return GammaRamp.of(red, green, blue, size);

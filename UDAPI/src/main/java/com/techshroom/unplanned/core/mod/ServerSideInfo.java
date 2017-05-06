@@ -5,6 +5,7 @@ import java.util.Collection;
 
 public interface ServerSideInfo extends GameSideInfo {
 
+    @Override
     default Side getSide() {
         return Side.SERVER;
     }

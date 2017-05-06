@@ -51,8 +51,6 @@ public class ClassPathHack {
      * @throws IOException
      *             if there is any problems injecting.
      */
-    // The class loader should not be closed
-    @SuppressWarnings("resource")
     public static void addURL(URL u) throws IOException {
         URLClassLoader sysloader =
                 (URLClassLoader) ClassLoader.getSystemClassLoader();
@@ -85,7 +83,6 @@ public class ClassPathHack {
         }
     }
 
-    @SuppressWarnings("resource")
     public static boolean hasURL(URL u) {
         URLClassLoader sysloader =
                 (URLClassLoader) ClassLoader.getSystemClassLoader();
