@@ -182,8 +182,10 @@ public final class LUtils {
     /**
      * Checks for the given OpenGL version (eg. 3.0.2)
      * 
-     * @param vers
+     * @param required
      *            - the wanted version
+     * @param actual
+     *            - the actual version
      * @return true if the actual version is the same as or newer than the
      *         wanted version, false otherwise
      */
