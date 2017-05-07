@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class ClassPathHack {
 
-    private static final Class<?>[] parameters = new Class[] { URL.class };
+    private static final Class<?>[] parameters = new Class<?>[] { URL.class };
 
     /**
      * Adds the file represented by the given String to the classpath.

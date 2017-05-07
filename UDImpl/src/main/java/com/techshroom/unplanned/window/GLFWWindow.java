@@ -120,6 +120,7 @@ public class GLFWWindow implements Window {
     }
 
     @Override
+    @Deprecated
     public int getAttribute(int attr) {
         return glfwGetWindowAttrib(this.windowPtr.address(), attr);
     }
