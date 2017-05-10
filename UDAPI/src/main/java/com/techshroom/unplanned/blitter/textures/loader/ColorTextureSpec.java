@@ -33,6 +33,11 @@ import com.google.auto.value.AutoValue;
 public abstract class ColorTextureSpec {
 
     public static ColorTextureSpec create(String color, int w, int h) {
+        return create(getVectorFromString(color), new Vector2i(w, h));
+    }
+
+    @SuppressWarnings("fallthrough")
+    private static Vector4i getVectorFromString(String color) {
         int r;
         int g;
         int b;
@@ -59,7 +64,7 @@ public abstract class ColorTextureSpec {
             default:
                 throw new IllegalArgumentException("Not a hex color: " + color);
         }
-        return create(new Vector4i(r, g, b, a), new Vector2i(w, h));
+        return new Vector4i(r, g, b, a);
     }
 
     public static ColorTextureSpec create(Vector3i color, int w, int h) {
