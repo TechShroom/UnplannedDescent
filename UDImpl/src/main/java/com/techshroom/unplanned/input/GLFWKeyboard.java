@@ -27,14 +27,12 @@ package com.techshroom.unplanned.input;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
+import static org.lwjgl.glfw.GLFW.glfwGetKey;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -42,11 +40,14 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.event.keyboard.KeyState;
+import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 
 public class GLFWKeyboard implements Keyboard {
 
-    private static final BiMap<Key, Integer> TO_GLFW = readGlfwKeys();
-    private static final Map<Integer, KeyModifier> FROM_GLFW = readGlfwMods();
+    private static final BiMap<Key, Integer> UD_KEY_TO_GLFW = readGlfwKeys();
+    private static final Map<Integer, KeyModifier> GLFW_TO_KEY_MOD = readGlfwMods();
 
     private static BiMap<Key, Integer> readGlfwKeys() {
         ImmutableBiMap.Builder<Key, Integer> b = ImmutableBiMap.builder();
@@ -80,9 +81,30 @@ public class GLFWKeyboard implements Keyboard {
         return b.build();
     }
 
+    public static Collection<KeyModifier> getModifiers(int mods) {
+        ImmutableSet.Builder<KeyModifier> b = ImmutableSet.builder();
+        GLFW_TO_KEY_MOD.forEach((k, km) -> {
+            if ((k & mods) != 0) {
+                b.add(km);
+            }
+        });
+        return b.build();
+    }
+
+    private static KeyState getKeyState(int action) {
+        switch (action) {
+            case GLFW_PRESS:
+                return KeyState.PRESSED;
+            case GLFW_RELEASE:
+                return KeyState.RELEASED;
+            case GLFW_REPEAT:
+                return KeyState.REPEATED;
+            default:
+                throw new IllegalArgumentException("unknown state: " + action);
+        }
+    }
+
     private final long window;
-    private final Map<Key, KeyListener> listeners = new EnumMap<>(Key.class);
-    private final Set<Key> tappingKeys = EnumSet.noneOf(Key.class);
 
     public GLFWKeyboard(long window) {
         this.window = window;
@@ -92,46 +114,16 @@ public class GLFWKeyboard implements Keyboard {
     }
 
     @Override
-    public void addKeyListener(Key key, KeyListener keyListener) {
-        listeners.put(key, keyListener);
+    public boolean isKeyDown(Key key) {
+        return glfwGetKey(window, UD_KEY_TO_GLFW.get(key)) == GLFW_PRESS;
     }
 
     private void keyCallback(long window, int key, int scancode, int action, int mods) {
-        Key k = TO_GLFW.inverse().get(key);
-        KeyListener kl = listeners.get(k);
-        if (kl == null) {
-            return;
-        }
-        KeyEvent event = KeyEvent.create(getModifiers(mods));
-        switch (action) {
-            case GLFW_PRESS:
-                tappingKeys.add(k);
-                kl.onPressed(event);
-                break;
-            case GLFW_RELEASE:
-                kl.onReleased(event);
-                if (tappingKeys.remove(k)) {
-                    kl.onTapped(event);
-                }
-                break;
-            case GLFW_REPEAT:
-                // cannot tap when repeated
-                tappingKeys.remove(k);
-                kl.onRepeated(event);
-                break;
-            default:
-                throw new IllegalArgumentException("unexpected action " + action);
-        }
-    }
+        Key k = UD_KEY_TO_GLFW.inverse().get(key);
+        KeyState state = getKeyState(action);
+        Collection<KeyModifier> modSet = getModifiers(mods);
 
-    private Collection<KeyModifier> getModifiers(int mods) {
-        ImmutableSet.Builder<KeyModifier> b = ImmutableSet.builder();
-        FROM_GLFW.forEach((k, km) -> {
-            if ((k & mods) != 0) {
-                b.add(km);
-            }
-        });
-        return b.build();
+        Event.BUS.post(KeyStateEvent.create(this, k, state, modSet));
     }
 
 }

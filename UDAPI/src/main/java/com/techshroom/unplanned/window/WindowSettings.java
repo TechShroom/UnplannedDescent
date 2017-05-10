@@ -31,10 +31,10 @@ import java.util.ServiceLoader;
 
 import javax.annotation.Nullable;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.techshroom.unplanned.monitor.Monitor;
 import com.techshroom.unplanned.monitor.MonitorProvider;
-import com.techshroom.unplanned.value.Dimension;
 
 @AutoValue
 public abstract class WindowSettings {
@@ -43,7 +43,7 @@ public abstract class WindowSettings {
             ServiceLoader.load(WindowGenerator.class).iterator().next();
 
     public static final Builder builder() {
-        Dimension size = WINDOW_GENERATOR.getDefaultFullscreenSize();
+        Vector2i size = WINDOW_GENERATOR.getDefaultFullscreenSize();
         return new AutoValue_WindowSettings.Builder().screenSize(size).monitor((Monitor) null)
                 .sharedWindow((Window) null).fullScreen(false).resizable(true);
     }
@@ -52,10 +52,10 @@ public abstract class WindowSettings {
     public static abstract class Builder {
 
         public final Builder screenSize(int width, int height) {
-            return screenSize(Dimension.of(width, height));
+            return screenSize(new Vector2i(width, height));
         }
 
-        public abstract Builder screenSize(Dimension size);
+        public abstract Builder screenSize(Vector2i size);
 
         public abstract Builder title(String title);
 
@@ -95,7 +95,7 @@ public abstract class WindowSettings {
     WindowSettings() {
     }
 
-    public abstract Dimension getScreenSize();
+    public abstract Vector2i getScreenSize();
 
     public abstract String getTitle();
 

@@ -27,15 +27,22 @@ package com.techshroom.unplanned.input;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
+import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 
 import java.nio.DoubleBuffer;
 
 import org.lwjgl.system.MemoryStack;
 
 import com.flowpowered.math.vector.Vector2d;
+import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.event.mouse.MouseButtonEvent;
+import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
+import com.techshroom.unplanned.event.mouse.MouseScrollEvent;
 
 public class GLFWMouse implements Mouse {
 
@@ -43,6 +50,16 @@ public class GLFWMouse implements Mouse {
 
     public GLFWMouse(long window) {
         this.window = window;
+
+        glfwSetCursorPosCallback(window, (win, x, y) -> {
+            Event.BUS.post(MouseMoveEvent.create(this, x, y));
+        });
+        glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
+            Event.BUS.post(MouseButtonEvent.create(this, button, action == GLFW_PRESS, GLFWKeyboard.getModifiers(mods)));
+        });
+        glfwSetScrollCallback(window, (win, dx, dy) -> {
+            Event.BUS.post(MouseScrollEvent.create(this, dx, dy));
+        });
     }
 
     @Override
@@ -53,11 +70,6 @@ public class GLFWMouse implements Mouse {
             glfwGetCursorPos(window, xpos, ypos);
             return new Vector2d(xpos.get(0), ypos.get(0));
         }
-    }
-
-    @Override
-    public void setPositionCallback(OnMouseMoveCallback callback) {
-        glfwSetCursorPosCallback(window, (win, x, y) -> callback.onMove(x, y));
     }
 
     @Override

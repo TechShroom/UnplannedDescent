@@ -30,14 +30,6 @@ public interface Mouse {
 
     Vector2d getPosition();
 
-    void setPositionCallback(OnMouseMoveCallback callback);
-
-    interface OnMouseMoveCallback {
-
-        void onMove(double x, double y);
-
-    }
-
     void activateMouseGrab();
 
     void deactivateMouseGrab();

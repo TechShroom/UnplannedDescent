@@ -34,19 +34,16 @@ import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowAttrib;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwHideWindow;
 import static org.lwjgl.glfw.GLFW.glfwIconifyWindow;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwRestoreWindow;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowCloseCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowIconifyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowRefreshCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
@@ -55,17 +52,14 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
 import java.nio.IntBuffer;
 
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.glfw.GLFWWindowCloseCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
-import org.lwjgl.glfw.GLFWWindowIconifyCallback;
-import org.lwjgl.glfw.GLFWWindowPosCallback;
-import org.lwjgl.glfw.GLFWWindowRefreshCallback;
 import org.lwjgl.system.MemoryStack;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.core.util.GLFWUtil;
+import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
 import com.techshroom.unplanned.input.Keyboard;
@@ -73,8 +67,6 @@ import com.techshroom.unplanned.input.Mouse;
 import com.techshroom.unplanned.monitor.GLFWMonitor;
 import com.techshroom.unplanned.monitor.Monitor;
 import com.techshroom.unplanned.pointer.Pointer;
-import com.techshroom.unplanned.value.Dimension;
-import com.techshroom.unplanned.value.Point;
 
 public class GLFWWindow implements Window {
 
@@ -88,7 +80,6 @@ public class GLFWWindow implements Window {
     private final Pointer windowPtr;
     private String title;
     private boolean vsync;
-    private Point location;
     private boolean destroyed;
 
     GLFWWindow(Pointer windowPtr) {
@@ -97,33 +88,51 @@ public class GLFWWindow implements Window {
         this.mouse = new GLFWMouse(windowPtr.address());
         this.keyboard = new GLFWKeyboard(windowPtr.address());
 
+        setupEventPublishers();
+
         // setup at-exit hook to kill
         Runtime.getRuntime().addShutdownHook(new Thread(this::destroy, "GLFW Window destructor " + windowPtr.address()));
     }
 
+    private void setupEventPublishers() {
+        long window = windowPtr.address();
+
+        glfwSetWindowSizeCallback(window, (win, w, h) -> {
+            Event.BUS.post(WindowResizeEvent.create(this, w, h));
+        });
+        glfwSetFramebufferSizeCallback(window, (win, w, h) -> {
+            Event.BUS.post(WindowResizeEvent.create(this, w, h));
+        });
+    }
+
     @Override
-    public Dimension getSize() {
+    public Vector2i getSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
             glfwGetWindowSize(this.windowPtr.address(), width, height);
-            return Dimension.of(width.get(0), height.get(0));
+            return new Vector2i(width.get(0), height.get(0));
         }
     }
 
     @Override
-    public Dimension getFramebufferSize() {
+    public Vector2i getFramebufferSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
             glfwGetFramebufferSize(this.windowPtr.address(), width, height);
-            return Dimension.of(width.get(0), height.get(0));
+            return new Vector2i(width.get(0), height.get(0));
         }
     }
 
     @Override
-    public Point getLocation() {
-        return this.location;
+    public Vector2i getLocation() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer x = stack.mallocInt(1);
+            IntBuffer y = stack.mallocInt(1);
+            glfwGetWindowPos(this.windowPtr.address(), x, y);
+            return new Vector2i(x.get(0), y.get(0));
+        }
     }
 
     @Override
@@ -179,9 +188,8 @@ public class GLFWWindow implements Window {
     }
 
     @Override
-    public void setSize(Dimension size) {
-        glfwSetWindowSize(this.windowPtr.address(), size.getWidth(),
-                size.getHeight());
+    public void setSize(Vector2i size) {
+        glfwSetWindowSize(this.windowPtr.address(), size.getX(), size.getY());
     }
 
     @Override
@@ -243,70 +251,6 @@ public class GLFWWindow implements Window {
         this.destroyed = true;
         glfwFreeCallbacks(this.windowPtr.address());
         glfwDestroyWindow(this.windowPtr.address());
-    }
-
-    private void checkWindow(long window) {
-        checkState(window == this.windowPtr.address(), "incorrect window");
-    }
-
-    @Override
-    public void onClose(OnCloseCallback callback) {
-        glfwSetWindowCloseCallback(this.windowPtr.address(),
-                GLFWWindowCloseCallback.create(window -> {
-                    checkWindow(window);
-                    callback.onWindowClose(this);
-                }));
-    }
-
-    @Override
-    public void onMove(OnMoveCallback callback) {
-        glfwSetWindowPosCallback(this.windowPtr.address(),
-                GLFWWindowPosCallback.create((window, x, y) -> {
-                    checkWindow(window);
-                    callback.onWindowMove(this, x, y);
-                }));
-    }
-
-    @Override
-    public void onResize(OnResizeCallback callback) {
-        graphicsContext.setActiveResizeCallback(callback);
-    }
-
-    @Override
-    public void onResizeFramebuffer(OnResizeFramebufferCallback callback) {
-        glfwSetFramebufferSizeCallback(this.windowPtr.address(),
-                GLFWFramebufferSizeCallback.create((window, width, height) -> {
-                    checkWindow(window);
-                    callback.onWindowFramebufferResize(this, width, height);
-                }));
-    }
-
-    @Override
-    public void onFocusChange(OnFocusCallback callback) {
-        glfwSetWindowFocusCallback(this.windowPtr.address(),
-                GLFWWindowFocusCallback.create((window, focused) -> {
-                    checkWindow(window);
-                    callback.onWindowFocusChange(this, focused);
-                }));
-    }
-
-    @Override
-    public void onMinimizeChange(OnMinimizeChangeCallback callback) {
-        glfwSetWindowIconifyCallback(this.windowPtr.address(),
-                GLFWWindowIconifyCallback.create((window, minimized) -> {
-                    checkWindow(window);
-                    callback.onWindowMinimizeChange(this,
-                            minimized);
-                }));
-    }
-
-    @Override
-    public void onRefreshRequested(OnRefreshRequestedCallback callback) {
-        glfwSetWindowRefreshCallback(this.windowPtr.address(),
-                GLFWWindowRefreshCallback.create((window) -> {
-                    checkWindow(window);
-                    callback.onWindowRefreshRequested(this);
-                }));
     }
 
 }
