@@ -37,7 +37,7 @@ import com.techshroom.unplanned.core.Settings;
 import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
 public final class GLFWUtil {
-    
+
     private static boolean initialized;
 
     public static void ensureInitialized() {
@@ -55,8 +55,8 @@ public final class GLFWUtil {
             Configuration.OPENGL_LIBRARY_NAME.set(path.toAbsolutePath().toString());
             Logging.log("Using APITrace " + apiTrace, LoggingGroup.INFO);
         }
-        glfwInit();
         GLFWErrorHandler.setAsErrorCallback();
+        checkState(glfwInit(), "failed to initialize GLFW");
     }
 
     private GLFWUtil() {

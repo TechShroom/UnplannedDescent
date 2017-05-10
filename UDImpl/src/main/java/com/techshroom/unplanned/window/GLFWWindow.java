@@ -47,7 +47,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowRefreshCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
@@ -62,7 +61,6 @@ import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.glfw.GLFWWindowIconifyCallback;
 import org.lwjgl.glfw.GLFWWindowPosCallback;
 import org.lwjgl.glfw.GLFWWindowRefreshCallback;
-import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.system.MemoryStack;
 
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
@@ -84,7 +82,7 @@ public class GLFWWindow implements Window {
         GLFWUtil.ensureInitialized();
     }
 
-    private final GraphicsContext graphicsContext;
+    private final GLGraphicsContext graphicsContext;
     private final Mouse mouse;
     private final Keyboard keyboard;
     private final Pointer windowPtr;
@@ -95,7 +93,7 @@ public class GLFWWindow implements Window {
 
     GLFWWindow(Pointer windowPtr) {
         this.windowPtr = windowPtr;
-        this.graphicsContext = new GLGraphicsContext(windowPtr.address());
+        this.graphicsContext = new GLGraphicsContext(this);
         this.mouse = new GLFWMouse(windowPtr.address());
         this.keyboard = new GLFWKeyboard(windowPtr.address());
 
@@ -271,11 +269,7 @@ public class GLFWWindow implements Window {
 
     @Override
     public void onResize(OnResizeCallback callback) {
-        glfwSetWindowSizeCallback(this.windowPtr.address(),
-                GLFWWindowSizeCallback.create((window, width, height) -> {
-                    checkWindow(window);
-                    callback.onWindowResize(this, width, height);
-                }));
+        graphicsContext.setActiveResizeCallback(callback);
     }
 
     @Override
