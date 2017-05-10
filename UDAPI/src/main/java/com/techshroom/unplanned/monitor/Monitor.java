@@ -25,20 +25,13 @@
 package com.techshroom.unplanned.monitor;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.GammaRamp;
-import com.techshroom.unplanned.value.Point;
 import com.techshroom.unplanned.value.VideoMode;
 
 public interface Monitor {
-
-    enum Event {
-
-        CONNECTED, DISCONNECTED;
-
-    }
 
     List<VideoMode> getSupportedVideoModes();
 
@@ -46,13 +39,11 @@ public interface Monitor {
 
     String getTitle();
 
-    Point getLocation();
+    Vector2i getLocation();
 
     GammaRamp getGammaRamp();
 
     void setGammaRamp(GammaRamp ramp);
-
-    void setMonitorCallback(BiConsumer<Monitor, Event> callback);
 
     Pointer getMonitorPointer();
 

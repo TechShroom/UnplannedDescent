@@ -24,7 +24,7 @@
  */
 package com.techshroom.unplanned.window;
 
-import com.techshroom.unplanned.value.Dimension;
+import com.flowpowered.math.vector.Vector2i;
 
 /**
  * Generator for window objects, part of the internal API.
@@ -34,7 +34,7 @@ import com.techshroom.unplanned.value.Dimension;
 public interface WindowGenerator {
 
     Window generateWindow(WindowSettings settings);
-    
-    Dimension getDefaultFullscreenSize();
+
+    Vector2i getDefaultFullscreenSize();
 
 }

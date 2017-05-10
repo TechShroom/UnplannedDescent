@@ -26,6 +26,14 @@ package com.techshroom.unplanned.input;
 
 public interface Keyboard {
 
-    void addKeyListener(Key key, KeyListener keyListener);
+    /**
+     * Returns {@code true} if the key is down. Prefer to use key listeners
+     * rather than check this.
+     * 
+     * @param key
+     *            the key to check
+     * @return {@code true} if it is down
+     */
+    boolean isKeyDown(Key key);
 
 }

@@ -22,10 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned;
+package com.techshroom.unplanned.examples;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +34,10 @@ import com.flowpowered.math.imaginary.Quaternionf;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2f;
+import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.google.auto.service.AutoService;
+import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.Shape;
 import com.techshroom.unplanned.blitter.binding.Bindable;
@@ -52,23 +54,33 @@ import com.techshroom.unplanned.blitter.textures.loader.ColorTextureSpec;
 import com.techshroom.unplanned.blitter.textures.loader.StandardTextureLoaders;
 import com.techshroom.unplanned.blitter.textures.map.TextureAtlas;
 import com.techshroom.unplanned.blitter.textures.map.TextureCollection;
+import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.event.keyboard.KeyState;
+import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
+import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
+import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.Key;
-import com.techshroom.unplanned.input.KeyListener;
-import com.techshroom.unplanned.input.Keyboard;
-import com.techshroom.unplanned.value.Dimension;
 import com.techshroom.unplanned.window.Window;
 import com.techshroom.unplanned.window.WindowSettings;
 
-public class SimpleRotatingCube {
+@AutoService(Example.class)
+public class SimpleRotatingCube extends Example {
 
-    private static Matrix4f proj;
-    private static Vector2f cursorTotalDx = new Vector2f(0, 0);
+    private Window window;
+    private Matrix4f proj;
+    private Vector2f cursorTotalDx = new Vector2f(0, 0);
 
     public static void main(String[] args) {
+        new SimpleRotatingCube().run();
+    }
+
+    @Override
+    public void run() {
         // System.setProperty("ud.apitrace",
         // "/home/octy/Documents/GitHub/apitrace/build/wrappers/glxtrace.so");
+        Event.BUS.register(this);
 
-        Window window = WindowSettings.builder()
+        window = WindowSettings.builder()
                 .screenSize(800, 600)
                 .title("SimpleRotatingCube")
                 .build().createWindow();
@@ -78,13 +90,8 @@ public class SimpleRotatingCube {
         window.setVsyncOn(true);
         window.setVisible(true);
 
-        // load ortho for window, z from -100 to 100
-        window.onResize((win, w, h) -> {
-            resize(w, h);
-        });
-        window.getMouse().setPositionCallback(SimpleRotatingCube::mouseMove);
-        Dimension size = window.getSize();
-        resize(size.getWidth(), size.getHeight());
+        Vector2i size = window.getSize();
+        resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
 
         ColorTextureLoader loader = StandardTextureLoaders.RGBA_COLOR_LOADER;
 
@@ -140,9 +147,6 @@ public class SimpleRotatingCube {
         // BindableDrawableSequence.of(ImmutableList.of(texture),
         // ImmutableList.of(shape));
 
-        Keyboard keyboard = window.getKeyboard();
-        keyboard.addKeyListener(Key.ESCAPE, KeyListener.pressed(e -> window.setCloseRequested(true)));
-
         window.getMouse().activateMouseGrab();
 
         double p = 60;
@@ -161,7 +165,7 @@ public class SimpleRotatingCube {
             Matrix4f view = Matrix4f.IDENTITY;
 
             setMVP(ctx, model, view);
-            drawShape(shape, texture);
+            drawShapeWithRandomTexture(textures, shape);
 
             ctx.swapBuffers();
         }
@@ -169,27 +173,27 @@ public class SimpleRotatingCube {
         window.destroy();
     }
 
-    public static void setMVP(GraphicsContext ctx, Matrix4f model, Matrix4f view) {
+    public void setMVP(GraphicsContext ctx, Matrix4f model, Matrix4f view) {
         Matrix4f mvp = Matrices.buildMVPMatrix(model, view, proj);
         ctx.getMatrixUploader().upload(mvp);
     }
 
-    public static void drawShapeWithRandomTexture(List<Texture> textures, Shape shape) {
+    public void drawShapeWithRandomTexture(List<Texture> textures, Shape shape) {
         Texture t = textures.get(random.nextInt(textures.size()));
         drawShape(shape, t);
     }
 
-    public static void drawShape(Shape shape, Texture t) {
+    public void drawShape(Shape shape, Texture t) {
         try (Bindable bound = t.bind()) {
             shape.draw();
         }
     }
 
-    private static List<TextureAtlas> getColors(TextureSettings textureSettings) {
+    private List<TextureAtlas> getColors(TextureSettings textureSettings) {
         return IntStream.range(0, 255).mapToObj(i -> generateTextureCollection(textureSettings)).collect(toImmutableList());
     }
 
-    private static TextureAtlas generateTextureCollection(TextureSettings textureSettings) {
+    private TextureAtlas generateTextureCollection(TextureSettings textureSettings) {
         TextureCollection coll = TextureCollection.of();
         for (int i = 0; i < 6; i++) {
             String hex = generateHex();
@@ -201,17 +205,26 @@ public class SimpleRotatingCube {
 
     private static final Random random = new Random();
 
-    private static String generateHex() {
+    private String generateHex() {
         return String.format("%06x", random.nextInt() & 0xFFFFFF);
     }
 
-    private static void mouseMove(double x, double y) {
-        cursorTotalDx = new Vector2f(x, y);
+    @Subscribe
+    public void mouseMove(MouseMoveEvent event) {
+        cursorTotalDx = event.getPosition().toFloat();
     }
 
-    private static void resize(int w, int h) {
-        glViewport(0, 0, w, h);
-        proj = Matrices.orthographicProjection(w, h, -1000, 1000);
+    @Subscribe
+    public void resize(WindowResizeEvent event) {
+        Vector2i size = event.getSize();
+        proj = Matrices.orthographicProjection(size.getX(), size.getY(), -1000, 1000);
+    }
+
+    @Subscribe
+    public void keyHandler(KeyStateEvent event) {
+        if (event.is(Key.ESCAPE, KeyState.PRESSED)) {
+            window.setCloseRequested(true);
+        }
     }
 
 }

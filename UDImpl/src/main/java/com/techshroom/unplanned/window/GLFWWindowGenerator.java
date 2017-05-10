@@ -41,13 +41,13 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 
 import org.lwjgl.system.Platform;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.service.AutoService;
 import com.techshroom.unplanned.core.util.GLFWUtil;
 import com.techshroom.unplanned.monitor.Monitor;
 import com.techshroom.unplanned.monitor.MonitorProvider;
 import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.pointer.PointerImpl;
-import com.techshroom.unplanned.value.Dimension;
 import com.techshroom.unplanned.value.VideoMode;
 
 @AutoService(WindowGenerator.class)
@@ -58,10 +58,10 @@ public class GLFWWindowGenerator implements WindowGenerator {
     }
 
     @Override
-    public Dimension getDefaultFullscreenSize() {
+    public Vector2i getDefaultFullscreenSize() {
         Monitor primary = MonitorProvider.getInstance().getPrimaryMonitor();
         VideoMode videoMode = primary.getVideoMode();
-        return Dimension.of(videoMode.getWidth(), videoMode.getHeight());
+        return new Vector2i(videoMode.getWidth(), videoMode.getHeight());
     }
 
     @Override
@@ -73,14 +73,15 @@ public class GLFWWindowGenerator implements WindowGenerator {
         if (Platform.get() == Platform.MACOSX) {
             glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
         }
-        
+
         // setup core context
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        long window = glfwCreateWindow(settings.getScreenSize().getWidth(), settings.getScreenSize().getHeight(), settings.getTitle(),
+        Vector2i screenSize = settings.getScreenSize();
+        long window = glfwCreateWindow(screenSize.getX(), screenSize.getY(), settings.getTitle(),
                 monitorIfNeeded(settings), sharedWindow(settings));
         return new GLFWWindow(PointerImpl.wrap(window));
     }

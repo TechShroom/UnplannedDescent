@@ -24,162 +24,23 @@
  */
 package com.techshroom.unplanned.window;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.input.Mouse;
 import com.techshroom.unplanned.monitor.Monitor;
 import com.techshroom.unplanned.pointer.Pointer;
-import com.techshroom.unplanned.value.Dimension;
-import com.techshroom.unplanned.value.Point;
 
 /**
- * Window object for a more object oriented GLFW.
- * 
- * @author Kenzie Togami
+ * Window API.
  */
 public interface Window {
 
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnCloseCallback {
+    Vector2i getSize();
 
-        /**
-         * Called when {@code window} is closed.
-         * 
-         * @param window
-         *            - window reference
-         */
-        void onWindowClose(Window window);
+    Vector2i getFramebufferSize();
 
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnMoveCallback {
-
-        /**
-         * Called when {@code window} is moved.
-         * 
-         * @param window
-         *            - window reference
-         * @param newX
-         *            - new window X
-         * @param newY
-         *            - new window Y
-         */
-        void onWindowMove(Window window, int newX, int newY);
-
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnResizeCallback {
-
-        /**
-         * Called when {@code window} is resized.
-         * 
-         * @param window
-         *            - window reference
-         * @param newWidth
-         *            - new window width
-         * @param newHeight
-         *            - new window height
-         */
-        void onWindowResize(Window window, int newWidth, int newHeight);
-
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnResizeFramebufferCallback {
-
-        /**
-         * Called when {@code window}'s framebuffer is resized.
-         * 
-         * @param window
-         *            - window reference
-         * @param newWidth
-         *            - new framebuffer width
-         * @param newHeight
-         *            - new framebuffer height
-         */
-        void onWindowFramebufferResize(Window window, int newWidth,
-                int newHeight);
-
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnFocusCallback {
-
-        /**
-         * Called when {@code window}'s focus status changes.
-         * 
-         * @param window
-         *            - window reference
-         * @param focused
-         *            - The window's focus status
-         */
-        void onWindowFocusChange(Window window, boolean focused);
-
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnMinimizeChangeCallback {
-
-        /**
-         * Called when {@code window}'s minimize status changes.
-         * 
-         * @param window
-         *            - window reference
-         * @param minimized
-         *            - The window's minimize status
-         */
-        void onWindowMinimizeChange(Window window, boolean minimized);
-
-    }
-
-    /**
-     * Window callback interface.
-     * 
-     * @author Kenzie Togami
-     */
-    interface OnRefreshRequestedCallback {
-
-        /**
-         * Called when {@code window} needs to be refreshed.
-         * 
-         * @param window
-         *            - window reference
-         */
-        void onWindowRefreshRequested(Window window);
-
-    }
-
-    Dimension getSize();
-
-    Dimension getFramebufferSize();
-
-    Point getLocation();
+    Vector2i getLocation();
 
     Mouse getMouse();
 
@@ -221,7 +82,7 @@ public interface Window {
      */
     Pointer getWindowPointer();
 
-    void setSize(Dimension size);
+    void setSize(Vector2i size);
 
     void setVsyncOn(boolean on);
 
@@ -240,61 +101,5 @@ public interface Window {
     void processEvents();
 
     void waitForEvents();
-
-    /**
-     * Add a callback for when the Window closes.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onClose(OnCloseCallback callback);
-
-    /**
-     * Add a callback for when the Window moves.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onMove(OnMoveCallback callback);
-
-    /**
-     * Add a callback for when the Window resizes.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onResize(OnResizeCallback callback);
-
-    /**
-     * Add a callback for when the Window framebuffer resizes.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onResizeFramebuffer(OnResizeFramebufferCallback callback);
-
-    /**
-     * Add a callback for when the Window's focus status changes.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onFocusChange(OnFocusCallback callback);
-
-    /**
-     * Add a callback for when the Window's minimize status changes.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onMinimizeChange(OnMinimizeChangeCallback callback);
-
-    /**
-     * Add a callback for when the Window is told to refresh.
-     * 
-     * @param callback
-     *            - the callback
-     */
-    void onRefreshRequested(OnRefreshRequestedCallback callback);
 
 }

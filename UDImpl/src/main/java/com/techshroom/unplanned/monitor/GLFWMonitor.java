@@ -25,62 +25,38 @@
 package com.techshroom.unplanned.monitor;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.glfw.GLFW.GLFW_CONNECTED;
-import static org.lwjgl.glfw.GLFW.GLFW_DISCONNECTED;
 import static org.lwjgl.glfw.GLFW.glfwGetGammaRamp;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorName;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPos;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoModes;
 import static org.lwjgl.glfw.GLFW.glfwSetGammaRamp;
-import static org.lwjgl.glfw.GLFW.glfwSetMonitorCallback;
 
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWGammaRamp;
-import org.lwjgl.glfw.GLFWMonitorCallback;
-import org.lwjgl.glfw.GLFWMonitorCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.system.MemoryStack;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.core.util.GLFWUtil;
 import com.techshroom.unplanned.pointer.DualPointer;
 import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.GammaRamp;
-import com.techshroom.unplanned.value.Point;
 import com.techshroom.unplanned.value.VideoMode;
 
 public class GLFWMonitor implements Monitor {
 
     private static final Map<Long, GLFWMonitor> monitorCache = new HashMap<>();
 
-    private static enum CallbackHandler implements GLFWMonitorCallbackI {
-
-        INSTANCE;
-
-        private GLFWMonitorCallback actualCallback;
-
-        @Override
-        public void invoke(long monitor, int event) {
-            if (event == GLFW_DISCONNECTED) {
-                // clear from cache
-                monitorCache.remove(monitor);
-            }
-            this.actualCallback.invoke(monitor, event);
-        }
-
-    }
-
     static {
         GLFWUtil.ensureInitialized();
-        glfwSetMonitorCallback(
-                GLFWMonitorCallback.create(CallbackHandler.INSTANCE));
     }
 
     private static final VideoMode convertVidMode(GLFWVidMode mode) {
@@ -150,8 +126,6 @@ public class GLFWMonitor implements Monitor {
     }
 
     private final Pointer monitorPointer;
-    private final IntBuffer locationX = BufferUtils.createIntBuffer(1);
-    private final IntBuffer locationY = BufferUtils.createIntBuffer(1);
 
     private GLFWMonitor(long monitorPointer) {
         this.monitorPointer = DualPointer.wrap(monitorPointer);
@@ -181,10 +155,13 @@ public class GLFWMonitor implements Monitor {
     }
 
     @Override
-    public Point getLocation() {
-        glfwGetMonitorPos(this.monitorPointer.address(), this.locationX,
-                this.locationY);
-        return Point.of(this.locationX.get(0), this.locationY.get(0));
+    public Vector2i getLocation() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer x = stack.mallocInt(1);
+            IntBuffer y = stack.mallocInt(1);
+            glfwGetMonitorPos(this.monitorPointer.address(), x, y);
+            return new Vector2i(x.get(0), y.get(0));
+        }
     }
 
     @Override
@@ -196,17 +173,6 @@ public class GLFWMonitor implements Monitor {
     @Override
     public void setGammaRamp(GammaRamp ramp) {
         glfwSetGammaRamp(this.monitorPointer.address(), convertGammaRamp(ramp));
-    }
-
-    @Override
-    public void setMonitorCallback(BiConsumer<Monitor, Event> callback) {
-        CallbackHandler.INSTANCE.actualCallback =
-                GLFWMonitorCallback.create((monitorPtr, event) -> {
-                    checkState(monitorPtr == this.monitorPointer.address(),
-                            "wrong window?");
-                    callback.accept(this, event == GLFW_CONNECTED
-                            ? Event.CONNECTED : Event.DISCONNECTED);
-                });
     }
 
     @Override
