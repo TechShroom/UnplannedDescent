@@ -78,7 +78,7 @@ public final class GenerateKeyEnum {
                     .put("UNKNOWN",
                             "The value corresponding to an unknown key.\n")
                     .build();
-    
+
     private static final Set<String> BANNED_KEYS =
             ImmutableSet.of("LAST");
 

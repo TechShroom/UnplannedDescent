@@ -46,19 +46,26 @@ import java.util.List;
 
 import org.lwjgl.BufferUtils;
 
-import com.flowpowered.math.vector.Vector2d;
-import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector2f;
+import com.flowpowered.math.vector.Vector3f;
 import com.techshroom.unplanned.blitter.binding.BindableDrawableBase;
 import com.techshroom.unplanned.core.util.GLErrorCheck;
+import com.techshroom.unplanned.core.util.LifecycleObject;
 
+// in this class normal=<q,r,s>
 /**
  * VAO for storing everything. Stores all data in one VBO, with a layout of
- * {@code [XYZUV, XYZUV, ...]}.
+ * {@code [XYZUVQRS, XYZUVQRS, ...]}.
  */
-public class VAO extends BindableDrawableBase {
+public class VAO extends BindableDrawableBase implements LifecycleObject {
 
     private static final int POS_INDEX = 0;
     private static final int TEX_INDEX = 1;
+    private static final int NOR_INDEX = 2;
+    private static final int POS_SIZE = 3;
+    private static final int TEX_SIZE = 2;
+    private static final int NOR_SIZE = 3;
+    private static final int TOTAL_SIZE = POS_SIZE + TEX_SIZE + NOR_SIZE;
     private static final int[] EMPTY_INT = {};
 
     public static VAO create(int indicesVbo, int indiciesLength, List<Vertex> vertices) {
@@ -71,15 +78,14 @@ public class VAO extends BindableDrawableBase {
 
     private static FloatBuffer makePrimitives(List<Vertex> vertices) {
         int size = vertices.size();
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(size * 5);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(size * (POS_SIZE + TEX_SIZE + NOR_SIZE));
         for (Vertex v : vertices) {
-            Vector3d pos = v.getPosition();
-            Vector2d tex = v.getTexture();
-            buffer.put((float) pos.getX());
-            buffer.put((float) pos.getY());
-            buffer.put((float) pos.getZ());
-            buffer.put((float) tex.getX());
-            buffer.put((float) tex.getY());
+            Vector3f pos = v.getPosition().toFloat();
+            Vector2f tex = v.getTexture().toFloat();
+            Vector3f nor = v.getNormal().toFloat();
+            buffer.put(pos.toArray());
+            buffer.put(tex.toArray());
+            buffer.put(nor.toArray());
         }
         buffer.flip();
         return buffer;
@@ -125,27 +131,36 @@ public class VAO extends BindableDrawableBase {
 
         GLErrorCheck.check();
 
-        // enable 0/1, as we always use them
+        // enable 0/1/2, as we always use them
         glEnableVertexAttribArray(POS_INDEX);
         glEnableVertexAttribArray(TEX_INDEX);
+        glEnableVertexAttribArray(NOR_INDEX);
 
         GLErrorCheck.check();
 
+        final int stride = TOTAL_SIZE * Float.BYTES;
         // bind to VAO
         // first one is POSITION
         // - size 3 (x,y,z)
         // - type float
         // - don't bother normalizing (expensive + should already be handled!)
-        // - stride 5 (x,y,z,u,v)
+        // - stride 8 (x,y,z,u,v,q,r,s)
         // - pointer 0 (starts at index 0)
-        glVertexAttribPointer(POS_INDEX, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
+        glVertexAttribPointer(POS_INDEX, 3, GL_FLOAT, false, stride, 0);
         // second one is TEXTURE
         // - size 2 (u,v)
         // - type float
         // - don't bother normalizing (expensive + should already be handled!)
-        // - stride 5 (x,y,z,u,v)
+        // - stride 8 (x,y,z,u,v,q,r,s)
         // - pointer 3 (starts at index 3, skipping (0=x,1=y,2=z))
-        glVertexAttribPointer(TEX_INDEX, 2, GL_FLOAT, false, 5 * Float.BYTES, 3 * Float.BYTES);
+        glVertexAttribPointer(TEX_INDEX, 2, GL_FLOAT, false, stride, (POS_SIZE) * Float.BYTES);
+        // third one is NORMAL
+        // - size 3 (xN,yN,zN)
+        // - type float
+        // - don't bother normalizing (expensive + should already be handled!)
+        // - stride 8 (x,y,z,u,v,q,r,s)
+        // - pointer 5 (starts at index 5, skipping (0=x,1=y,2=z,3=u,4=t))
+        glVertexAttribPointer(NOR_INDEX, 3, GL_FLOAT, false, stride, (POS_SIZE + TEX_SIZE) * Float.BYTES);
 
         GLErrorCheck.check();
 

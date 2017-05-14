@@ -24,13 +24,11 @@
  */
 package com.techshroom.unplanned.blitter;
 
-import com.techshroom.unplanned.core.util.LifecycleObject;
-
 /**
  * Represents something that can be drawn. The attributes will have been
  * specified at creation.
  */
-public interface Drawable extends LifecycleObject {
+public interface Drawable {
 
     /**
      * Draw the object.

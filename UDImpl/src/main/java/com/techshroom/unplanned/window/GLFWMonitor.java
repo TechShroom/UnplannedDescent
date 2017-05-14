@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.monitor;
+package com.techshroom.unplanned.window;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.glfw.GLFW.glfwGetGammaRamp;
@@ -46,8 +46,6 @@ import org.lwjgl.system.MemoryStack;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.core.util.GLFWUtil;
-import com.techshroom.unplanned.pointer.DualPointer;
-import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.GammaRamp;
 import com.techshroom.unplanned.value.VideoMode;
 
@@ -125,16 +123,16 @@ public class GLFWMonitor implements Monitor {
         return monitorCache.computeIfAbsent(pointer, GLFWMonitor::new);
     }
 
-    private final Pointer monitorPointer;
+    private final long pointer;
 
-    private GLFWMonitor(long monitorPointer) {
-        this.monitorPointer = DualPointer.wrap(monitorPointer);
+    private GLFWMonitor(long pointer) {
+        this.pointer = pointer;
     }
 
     @Override
     public List<VideoMode> getSupportedVideoModes() {
         GLFWVidMode.Buffer videoModes =
-                glfwGetVideoModes(this.monitorPointer.address());
+                glfwGetVideoModes(pointer);
         int count = videoModes.capacity();
         checkState(count != 0, "error");
         ImmutableList.Builder<VideoMode> list = ImmutableList.builder();
@@ -146,12 +144,12 @@ public class GLFWMonitor implements Monitor {
 
     @Override
     public VideoMode getVideoMode() {
-        return convertVidMode(glfwGetVideoMode(this.monitorPointer.address()));
+        return convertVidMode(glfwGetVideoMode(pointer));
     }
 
     @Override
     public String getTitle() {
-        return glfwGetMonitorName(this.monitorPointer.address());
+        return glfwGetMonitorName(pointer);
     }
 
     @Override
@@ -159,7 +157,7 @@ public class GLFWMonitor implements Monitor {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer x = stack.mallocInt(1);
             IntBuffer y = stack.mallocInt(1);
-            glfwGetMonitorPos(this.monitorPointer.address(), x, y);
+            glfwGetMonitorPos(pointer, x, y);
             return new Vector2i(x.get(0), y.get(0));
         }
     }
@@ -167,17 +165,17 @@ public class GLFWMonitor implements Monitor {
     @Override
     public GammaRamp getGammaRamp() {
         return convertGammaramp(
-                glfwGetGammaRamp(this.monitorPointer.address()));
+                glfwGetGammaRamp(pointer));
     }
 
     @Override
     public void setGammaRamp(GammaRamp ramp) {
-        glfwSetGammaRamp(this.monitorPointer.address(), convertGammaRamp(ramp));
+        glfwSetGammaRamp(pointer, convertGammaRamp(ramp));
     }
 
     @Override
-    public Pointer getMonitorPointer() {
-        return this.monitorPointer;
+    public long getMonitorPointer() {
+        return pointer;
     }
 
 }

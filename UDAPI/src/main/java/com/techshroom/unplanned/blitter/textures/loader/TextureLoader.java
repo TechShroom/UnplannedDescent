@@ -27,7 +27,7 @@ package com.techshroom.unplanned.blitter.textures.loader;
 import com.techshroom.unplanned.blitter.textures.TextureData;
 
 public interface TextureLoader<T, E extends Exception> {
-    
+
     TextureData load(T source) throws E;
 
 }

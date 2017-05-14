@@ -33,8 +33,6 @@ import javax.annotation.Nullable;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
-import com.techshroom.unplanned.monitor.Monitor;
-import com.techshroom.unplanned.monitor.MonitorProvider;
 
 @AutoValue
 public abstract class WindowSettings {
@@ -68,7 +66,7 @@ public abstract class WindowSettings {
         }
 
         public final Builder usePrimaryMonitor() {
-            return monitor(MonitorProvider.getInstance().getPrimaryMonitor());
+            return monitor(WindowSystem.getInstance().getPrimaryMonitor());
         }
 
         public abstract Builder monitor(Optional<Monitor> monitor);

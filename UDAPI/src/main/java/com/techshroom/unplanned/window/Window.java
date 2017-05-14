@@ -28,8 +28,6 @@ import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.input.Mouse;
-import com.techshroom.unplanned.monitor.Monitor;
-import com.techshroom.unplanned.pointer.Pointer;
 
 /**
  * Window API.
@@ -78,9 +76,9 @@ public interface Window {
      * It is recommended to only use this pointer for unsupported features.
      * </p>
      * 
-     * @return a {@link Pointer} wrapper for the window pointer
+     * @return the window pointer
      */
-    Pointer getWindowPointer();
+    long getWindowPointer();
 
     void setSize(Vector2i size);
 

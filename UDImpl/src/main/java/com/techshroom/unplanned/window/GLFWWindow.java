@@ -51,6 +51,8 @@ import static org.lwjgl.glfw.GLFW.glfwWaitEvents;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
 import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.lwjgl.system.MemoryStack;
 
@@ -64,9 +66,6 @@ import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.input.Mouse;
-import com.techshroom.unplanned.monitor.GLFWMonitor;
-import com.techshroom.unplanned.monitor.Monitor;
-import com.techshroom.unplanned.pointer.Pointer;
 
 public class GLFWWindow implements Window {
 
@@ -74,33 +73,37 @@ public class GLFWWindow implements Window {
         GLFWUtil.ensureInitialized();
     }
 
+    private static final Map<Long, GLFWWindow> windows = new HashMap<>();
+
+    public static GLFWWindow get(long pointer) {
+        return windows.computeIfAbsent(pointer, GLFWWindow::new);
+    }
+
     private final GLGraphicsContext graphicsContext;
     private final Mouse mouse;
     private final Keyboard keyboard;
-    private final Pointer windowPtr;
+    private final long pointer;
     private String title;
     private boolean vsync;
     private boolean destroyed;
 
-    GLFWWindow(Pointer windowPtr) {
-        this.windowPtr = windowPtr;
+    private GLFWWindow(long pointer) {
+        this.pointer = pointer;
         this.graphicsContext = new GLGraphicsContext(this);
-        this.mouse = new GLFWMouse(windowPtr.address());
-        this.keyboard = new GLFWKeyboard(windowPtr.address());
+        this.mouse = new GLFWMouse(pointer);
+        this.keyboard = new GLFWKeyboard(pointer);
 
         setupEventPublishers();
 
         // setup at-exit hook to kill
-        Runtime.getRuntime().addShutdownHook(new Thread(this::destroy, "GLFW Window destructor " + windowPtr.address()));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::destroy, "GLFW Window destructor " + pointer));
     }
 
     private void setupEventPublishers() {
-        long window = windowPtr.address();
-
-        glfwSetWindowSizeCallback(window, (win, w, h) -> {
+        glfwSetWindowSizeCallback(pointer, (win, w, h) -> {
             Event.BUS.post(WindowResizeEvent.create(this, w, h));
         });
-        glfwSetFramebufferSizeCallback(window, (win, w, h) -> {
+        glfwSetFramebufferSizeCallback(pointer, (win, w, h) -> {
             Event.BUS.post(WindowResizeEvent.create(this, w, h));
         });
     }
@@ -110,7 +113,7 @@ public class GLFWWindow implements Window {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
-            glfwGetWindowSize(this.windowPtr.address(), width, height);
+            glfwGetWindowSize(pointer, width, height);
             return new Vector2i(width.get(0), height.get(0));
         }
     }
@@ -120,7 +123,7 @@ public class GLFWWindow implements Window {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.mallocInt(1);
             IntBuffer height = stack.mallocInt(1);
-            glfwGetFramebufferSize(this.windowPtr.address(), width, height);
+            glfwGetFramebufferSize(pointer, width, height);
             return new Vector2i(width.get(0), height.get(0));
         }
     }
@@ -130,7 +133,7 @@ public class GLFWWindow implements Window {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer x = stack.mallocInt(1);
             IntBuffer y = stack.mallocInt(1);
-            glfwGetWindowPos(this.windowPtr.address(), x, y);
+            glfwGetWindowPos(pointer, x, y);
             return new Vector2i(x.get(0), y.get(0));
         }
     }
@@ -153,12 +156,12 @@ public class GLFWWindow implements Window {
     @Override
     public Monitor getMonitor() {
         return GLFWMonitor
-                .getMonitor(glfwGetWindowMonitor(this.windowPtr.address()));
+                .getMonitor(glfwGetWindowMonitor(pointer));
     }
 
     @Override
     public String getClipboardContents() {
-        return glfwGetClipboardString(this.windowPtr.address());
+        return glfwGetClipboardString(pointer);
     }
 
     @Override
@@ -168,64 +171,64 @@ public class GLFWWindow implements Window {
 
     @Override
     public boolean isCloseRequested() {
-        return glfwWindowShouldClose(this.windowPtr.address());
+        return glfwWindowShouldClose(pointer);
     }
 
     @Override
     public boolean isVisible() {
-        return glfwGetWindowAttrib(this.windowPtr.address(), GLFW_VISIBLE) == GLFW_TRUE;
+        return glfwGetWindowAttrib(pointer, GLFW_VISIBLE) == GLFW_TRUE;
     }
 
     @Override
     @Deprecated
     public int getAttribute(int attr) {
-        return glfwGetWindowAttrib(this.windowPtr.address(), attr);
+        return glfwGetWindowAttrib(pointer, attr);
     }
 
     @Override
-    public Pointer getWindowPointer() {
-        return this.windowPtr;
+    public long getWindowPointer() {
+        return this.pointer;
     }
 
     @Override
     public void setSize(Vector2i size) {
-        glfwSetWindowSize(this.windowPtr.address(), size.getX(), size.getY());
+        glfwSetWindowSize(pointer, size.getX(), size.getY());
     }
 
     @Override
     public void setVsyncOn(boolean on) {
-        checkState(glfwGetCurrentContext() == this.windowPtr.address(), "Not the active window!");
+        checkState(glfwGetCurrentContext() == pointer, "Not the active window!");
         this.vsync = true;
         glfwSwapInterval(1);
     }
 
     @Override
     public void setCloseRequested(boolean requested) {
-        glfwSetWindowShouldClose(this.windowPtr.address(), requested);
+        glfwSetWindowShouldClose(pointer, requested);
     }
 
     @Override
     public void setMinimized(boolean minimized) {
         if (minimized) {
-            glfwIconifyWindow(this.windowPtr.address());
+            glfwIconifyWindow(pointer);
         } else {
-            glfwRestoreWindow(this.windowPtr.address());
+            glfwRestoreWindow(pointer);
         }
     }
 
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
-            glfwShowWindow(this.windowPtr.address());
+            glfwShowWindow(pointer);
         } else {
-            glfwHideWindow(this.windowPtr.address());
+            glfwHideWindow(pointer);
         }
     }
 
     @Override
     public void setTitle(String title) {
         this.title = title;
-        glfwSetWindowTitle(this.windowPtr.address(), title);
+        glfwSetWindowTitle(pointer, title);
     }
 
     @Override
@@ -249,8 +252,9 @@ public class GLFWWindow implements Window {
             return;
         }
         this.destroyed = true;
-        glfwFreeCallbacks(this.windowPtr.address());
-        glfwDestroyWindow(this.windowPtr.address());
+        glfwFreeCallbacks(pointer);
+        glfwDestroyWindow(pointer);
+        windows.remove(pointer);
     }
 
 }

@@ -25,6 +25,7 @@
 package com.techshroom.unplanned.blitter;
 
 import com.techshroom.unplanned.blitter.binding.Bindable;
+import com.techshroom.unplanned.core.util.LifecycleObject;
 
 /**
  * Opaque shape object. Can be drawn.
@@ -34,6 +35,6 @@ import com.techshroom.unplanned.blitter.binding.Bindable;
  * are encouraged to check for it and optimize accordingly.
  * </p>
  */
-public interface Shape extends Drawable {
+public interface Shape extends Drawable, LifecycleObject {
 
 }

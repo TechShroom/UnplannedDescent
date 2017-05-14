@@ -22,39 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.monitor;
+package com.techshroom.unplanned.window;
 
-import static org.lwjgl.glfw.GLFW.glfwGetMonitors;
-import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import java.util.ServiceLoader;
 
-import java.util.List;
+class WindowSystemReferenceHolder {
 
-import org.lwjgl.PointerBuffer;
-
-import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
-import com.techshroom.unplanned.core.util.GLFWUtil;
-
-@AutoService(MonitorProvider.class)
-public class GLFWMonitorProvider implements MonitorProvider {
-
-    static {
-        GLFWUtil.ensureInitialized();
-    }
-
-    @Override
-    public Monitor getPrimaryMonitor() {
-        return GLFWMonitor.getMonitor(glfwGetPrimaryMonitor());
-    }
-
-    @Override
-    public List<Monitor> getMonitors() {
-        PointerBuffer ptrs = glfwGetMonitors();
-        ImmutableList.Builder<Monitor> list = ImmutableList.builder();
-        while (ptrs.hasRemaining()) {
-            list.add(GLFWMonitor.getMonitor(ptrs.get()));
-        }
-        return list.build();
-    }
+    static final WindowSystem REFERENCE =
+            ServiceLoader.load(WindowSystem.class).iterator().next();
 
 }

@@ -30,9 +30,9 @@ import com.techshroom.unplanned.blitter.Shape;
 import com.techshroom.unplanned.blitter.Vertex;
 
 public class GLTriangle extends ShaperBase implements Triangle {
-    
+
     private static final int[] INDICES = { 0, 1, 2 };
-    
+
     private static int indiciesVbo;
 
     public GLTriangle() {

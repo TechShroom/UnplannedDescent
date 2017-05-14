@@ -27,7 +27,7 @@ package com.techshroom.unplanned.blitter.matrix;
 import com.flowpowered.math.matrix.Matrix4f;
 
 public interface MatrixUploader {
-    
-    void upload(Matrix4f matrix);
+
+    void upload(Matrix4f model, Matrix4f view, Matrix4f projection);
 
 }
