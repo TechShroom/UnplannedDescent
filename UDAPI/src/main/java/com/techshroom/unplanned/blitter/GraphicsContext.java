@@ -24,6 +24,7 @@
  */
 package com.techshroom.unplanned.blitter;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
 import com.techshroom.unplanned.blitter.shapers.Shapes;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
@@ -35,6 +36,8 @@ public interface GraphicsContext {
     void makeActiveContext();
 
     void swapBuffers();
+
+    void setLight(Vector3d pos, Vector3d color);
 
     TextureProvider getTextureProvider();
 

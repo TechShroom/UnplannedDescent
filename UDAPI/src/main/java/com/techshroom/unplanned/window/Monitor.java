@@ -22,12 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.monitor;
+package com.techshroom.unplanned.window;
 
 import java.util.List;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.techshroom.unplanned.pointer.Pointer;
 import com.techshroom.unplanned.value.GammaRamp;
 import com.techshroom.unplanned.value.VideoMode;
 
@@ -45,6 +44,6 @@ public interface Monitor {
 
     void setGammaRamp(GammaRamp ramp);
 
-    Pointer getMonitorPointer();
+    long getMonitorPointer();
 
 }

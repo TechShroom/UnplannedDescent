@@ -67,7 +67,7 @@ public class ModsTest {
         }
         SERVICE = tmp;
     }
-    
+
     private static Set<LoggingGroup> previousLoggingGroup;
 
     @BeforeClass
@@ -75,7 +75,7 @@ public class ModsTest {
         previousLoggingGroup = Logging.getValidGroups();
         Logging.setValidGroups(LoggingGroup.ALL);
     }
-    
+
     @AfterClass
     public static void restorePreviousLoggingGroups() {
         Logging.setValidGroups(previousLoggingGroup);

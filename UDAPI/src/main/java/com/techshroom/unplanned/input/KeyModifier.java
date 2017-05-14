@@ -46,7 +46,8 @@ public enum KeyModifier {
     /**
      * The value corresponding to the modifier 'SUPER'.
      *
-     * @see <a href="https://en.wikipedia.org/wiki/Super_key_(keyboard_button)">https://en.wikipedia.org/wiki/Super_key_(keyboard_button)</a>
+     * @see <a href=
+     *      "https://en.wikipedia.org/wiki/Super_key_(keyboard_button)">https://en.wikipedia.org/wiki/Super_key_(keyboard_button)</a>
      */
     SUPER
 }

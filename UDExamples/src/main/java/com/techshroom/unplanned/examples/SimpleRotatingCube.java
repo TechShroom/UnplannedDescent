@@ -36,10 +36,12 @@ import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2f;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3f;
 import com.google.auto.service.AutoService;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.Shape;
+import com.techshroom.unplanned.blitter.Vertex;
 import com.techshroom.unplanned.blitter.binding.Bindable;
 import com.techshroom.unplanned.blitter.matrix.Matrices;
 import com.techshroom.unplanned.blitter.shapers.CubeLayout;
@@ -60,6 +62,7 @@ import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.Key;
+import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.window.Window;
 import com.techshroom.unplanned.window.WindowSettings;
 
@@ -68,7 +71,14 @@ public class SimpleRotatingCube extends Example {
 
     private Window window;
     private Matrix4f proj;
-    private Vector2f cursorTotalDx = new Vector2f(0, 0);
+    private Matrix4f view;
+    private Vector2f cursorTotalDx = Vector2f.ZERO;
+    private double cameraPullback = 1000;
+    private Vector2d centerScreen;
+    private Vector3f cameraRot = Vector3f.ZERO;
+    private List<Vector2d> cubeLayout;
+    private Shape shape;
+    private Shape lightSource;
 
     public static void main(String[] args) {
         new SimpleRotatingCube().run();
@@ -121,27 +131,28 @@ public class SimpleRotatingCube extends Example {
 
         // load atlas into card
         Texture texture = ctx.getTextureProvider().load(atlas.getData(), settings);
+        Texture redTex = ctx.getTextureProvider().load(red, settings);
 
         // load secondary atlases
         List<Texture> textures = getColors(settings).stream()
                 .map(t -> ctx.getTextureProvider().load(t.getData(), settings))
                 .collect(toImmutableList());
 
-        List<Vector2d> cubeLayout =
-                new CubeLayout(atlas, base)
-                        .front("red")
-                        .back("green")
-                        .left("blue")
-                        .right("vinyl1")
-                        .top("vinyl2")
-                        .bottom("vinyl3")
-                        .build();
+        cubeLayout = new CubeLayout(atlas, base)
+                .front("red")
+                .back("green")
+                .left("blue")
+                .right("vinyl1")
+                .top("vinyl2")
+                .bottom("vinyl3")
+                .build();
 
-        Shape shape = ctx.getShapes().rectPrism().shape(
-                new Vector3d(-100, -100, -100),
-                new Vector3d(100, 100, 100),
-                cubeLayout);
-        shape.initialize();
+        initShape();
+
+        // somewhere in the center
+        centerScreen = size.toDouble().div(2);
+        updateViewMatrix();
+        ctx.setLight(new Vector3d(centerScreen.add(10000, 0), 10000), new Vector3d(1.0, 1.0, 1.0));
 
         // BindableDrawableSequence texturedShape =
         // BindableDrawableSequence.of(ImmutableList.of(texture),
@@ -153,19 +164,34 @@ public class SimpleRotatingCube extends Example {
         double y = 60;
         double r = 0;
 
+        Vector3f translate = Vector3f.ZERO;// centerScreen.toVector3().toFloat();
+
         while (!window.isCloseRequested()) {
             window.processEvents();
             ctx.clearGraphicsState();
 
             y = cursorTotalDx.getX() / 7;
-            p = -cursorTotalDx.getY() / 7;
+            p = (-cursorTotalDx.getY() / 7);
 
-            Matrix4f model = Matrix4f.createRotation(Quaternionf.fromAxesAnglesDeg(p, y, r))
-                    .translate(300, 300, 0);
-            Matrix4f view = Matrix4f.IDENTITY;
+            p += 5;
+            y += 3;
 
-            setMVP(ctx, model, view);
-            drawShapeWithRandomTexture(textures, shape);
+            setRotatatedMVP(ctx, translate, new Vector3d(p, y, r));
+            drawShape(shape, texture);
+            setRotatatedMVP(ctx, translate.add(200, 0, 0), new Vector3d(p, y, r));
+            drawShape(shape, texture);
+            setRotatatedMVP(ctx, translate.sub(200, 0, 0), new Vector3d(p, y, r));
+            drawShape(shape, texture);
+            drawShape(shape, texture);
+            setRotatatedMVP(ctx, translate.add(0, 200, 0), new Vector3d(p, y, r));
+            drawShape(shape, texture);
+            setRotatatedMVP(ctx, translate.sub(0, 200, 0), new Vector3d(p, y, r));
+            drawShape(shape, texture);
+
+            setRotatatedMVP(ctx, translate, Vector3d.ZERO);
+            drawShape(lightSource, redTex);
+
+            handleCamera();
 
             ctx.swapBuffers();
         }
@@ -173,9 +199,15 @@ public class SimpleRotatingCube extends Example {
         window.destroy();
     }
 
-    public void setMVP(GraphicsContext ctx, Matrix4f model, Matrix4f view) {
-        Matrix4f mvp = Matrices.buildMVPMatrix(model, view, proj);
-        ctx.getMatrixUploader().upload(mvp);
+    public void setRotatatedMVP(GraphicsContext ctx, Vector3f translate, Vector3d pyr) {
+        Matrix4f model = Matrix4f.createRotation(Quaternionf.fromAxesAnglesDeg(pyr.getX(), pyr.getY(), pyr.getZ()))
+                .translate(translate);
+
+        setMVP(ctx, model);
+    }
+
+    public void setMVP(GraphicsContext ctx, Matrix4f model) {
+        ctx.getMatrixUploader().upload(model, view, proj);
     }
 
     public void drawShapeWithRandomTexture(List<Texture> textures, Shape shape) {
@@ -209,6 +241,51 @@ public class SimpleRotatingCube extends Example {
         return String.format("%06x", random.nextInt() & 0xFFFFFF);
     }
 
+    private void initShape() {
+        if (shape != null) {
+            shape.destroy();
+        }
+        if (lightSource != null) {
+            lightSource.destroy();
+        }
+        shape = window.getGraphicsContext().getShapes().rectPrism().shape(
+                new Vector3d(-100, -100, -100),
+                new Vector3d(100, 100, 100),
+                cubeLayout);
+        shape.initialize();
+
+        lightSource = window.getGraphicsContext().getShapes().triangle().shape(
+                Vertex.at(-25, 0, 200).texture(0, 0).build(),
+                Vertex.at(25, 0, 200).texture(1, 0).build(),
+                Vertex.at(0, 50, 200).texture(0.5, 1).build());
+        lightSource.initialize();
+    }
+
+    private void updateViewMatrix() {
+        Quaternionf cameraRot = Quaternionf.fromAxesAnglesDeg(
+                this.cameraRot.getX(),
+                this.cameraRot.getY(),
+                this.cameraRot.getZ());
+        // camera is looking at (0,0,0) by default, not rotated
+        // if we want the camera to be at (1000,0,0)
+        // (90deg off from (0,0,1000), the default)
+        // and looking -90, so it looks towards the center.
+        // this should end up rotating the world by 90deg in some dir
+
+        // compute the ACTUAL camera position by pulling back in the dir of the
+        // rotation
+        Vector3f cameraPos = cameraRot.getDirection().mul(cameraPullback);
+        // compute world transform as inverse
+        Vector3f worldTranslate = cameraPos.negate();
+
+        // compute ACTUAL rotation as cameraRot
+        // compute world transform as inverse (conjugate)
+        Quaternionf worldRotation = cameraRot.conjugate().normalize();
+
+        // return combined world transform
+        view = Matrix4f.createTranslation(worldTranslate).rotate(worldRotation);
+    }
+
     @Subscribe
     public void mouseMove(MouseMoveEvent event) {
         cursorTotalDx = event.getPosition().toFloat();
@@ -217,14 +294,44 @@ public class SimpleRotatingCube extends Example {
     @Subscribe
     public void resize(WindowResizeEvent event) {
         Vector2i size = event.getSize();
-        proj = Matrices.orthographicProjection(size.getX(), size.getY(), -1000, 1000);
+        proj = Matrices.orthographicProjection(size.getX(), size.getY(), -10000, 10000);
     }
 
     @Subscribe
     public void keyHandler(KeyStateEvent event) {
         if (event.is(Key.ESCAPE, KeyState.PRESSED)) {
             window.setCloseRequested(true);
+        } else if (event.is(Key.R, KeyState.PRESSED)) {
+            initShape();
         }
+    }
+
+    private boolean handleCamera() {
+        Keyboard kbd = window.getKeyboard();
+        final double change = 5;
+        boolean any = false;
+        if (kbd.isKeyDown(Key.W)) {
+            cameraRot = cameraRot.add(change, 0, 0);
+            any = true;
+        }
+        if (kbd.isKeyDown(Key.S)) {
+            cameraRot = cameraRot.add(-change, 0, 0);
+            any = true;
+        }
+        if (kbd.isKeyDown(Key.D)) {
+            cameraRot = cameraRot.add(0, change, 0);
+            any = true;
+        }
+        if (kbd.isKeyDown(Key.A)) {
+            cameraRot = cameraRot.add(0, -change, 0);
+            any = true;
+        }
+
+        if (any) {
+            updateViewMatrix();
+        }
+
+        return any;
     }
 
 }

@@ -48,6 +48,8 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumMap;
+import java.util.Map;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
@@ -58,11 +60,21 @@ import com.techshroom.unplanned.core.util.GLErrorCheck;
  */
 public class ShaderInitialization {
 
+    public enum Uniform {
+        MVP("mvpMat"), MODEL("modelMat"), NORMAL("normalMat"), LIGHT_POSITION("lightPos"), LIGHT_COLOR("lightColor");
+
+        private final String shaderName;
+
+        Uniform(String shaderName) {
+            this.shaderName = shaderName;
+        }
+    }
+
     private static int vertexShaderId;
     private static int fragShaderId;
     private static int programId;
-    
-    private static int matrixUniform;
+
+    private static final Map<Uniform, Integer> uniforms = new EnumMap<>(Uniform.class);
 
     private static void checkInit() {
         checkState(programId != 0, "setupShaders not called yet");
@@ -72,10 +84,12 @@ public class ShaderInitialization {
         checkInit();
         return programId;
     }
-    
-    public static int getMatrixUniform() {
+
+    public static int getUniform(Uniform uniform) {
         checkInit();
-        return matrixUniform;
+        Integer id = uniforms.get(uniform);
+        checkState(id != null, "missing uniform %s", uniform);
+        return id;
     }
 
     public static void setupShaders() {
@@ -104,16 +118,16 @@ public class ShaderInitialization {
         String vertexShader = loadFile("/com/techshroom/unplanned/shaders/vertex.glsl");
         String fragmentShader = loadFile("/com/techshroom/unplanned/shaders/fragment.glsl");
 
-        compileShader(vertexShaderId, vertexShader);
-        compileShader(fragShaderId, fragmentShader);
+        compileShader("vertex", vertexShaderId, vertexShader);
+        compileShader("fragment", fragShaderId, fragmentShader);
     }
 
-    private static void compileShader(int shader, String data) {
+    private static void compileShader(String label, int shader, String data) {
         glShaderSource(shader, data);
         glCompileShader(shader);
 
         if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
-            throw new IllegalStateException("Shader failed to compile: " + glGetShaderInfoLog(shader));
+            throw new IllegalStateException(label + " shader failed to compile: " + glGetShaderInfoLog(shader));
         }
     }
 
@@ -139,9 +153,11 @@ public class ShaderInitialization {
 
         GLErrorCheck.check();
     }
-    
+
     private static void setBindings() {
-        matrixUniform = glGetUniformLocation(programId, "matrix");
+        for (Uniform u : Uniform.values()) {
+            uniforms.put(u, glGetUniformLocation(programId, u.shaderName));
+        }
     }
 
     private static String loadFile(String file) throws IOException {

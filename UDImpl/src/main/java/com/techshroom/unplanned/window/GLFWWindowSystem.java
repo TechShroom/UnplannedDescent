@@ -22,17 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.pointer;
+package com.techshroom.unplanned.window;
 
-public class DualPointer extends PointerImpl
-        implements org.lwjgl.system.Pointer {
+import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
+import static org.lwjgl.glfw.GLFW.glfwGetMonitors;
+import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 
-    public static DualPointer wrap(long pointer) {
-        return new DualPointer(pointer);
+import java.util.List;
+
+import org.lwjgl.PointerBuffer;
+
+import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.techshroom.unplanned.core.util.GLFWUtil;
+
+@AutoService(WindowSystem.class)
+public class GLFWWindowSystem implements WindowSystem {
+
+    static {
+        GLFWUtil.ensureInitialized();
     }
 
-    private DualPointer(long pointer) {
-        super(pointer);
+    @Override
+    public Window getActiveWindow() throws IllegalStateException {
+        long active = glfwGetCurrentContext();
+        if (active == 0) {
+            throw new IllegalStateException("No active window");
+        }
+        return GLFWWindow.get(active);
+    }
+
+    @Override
+    public Monitor getPrimaryMonitor() {
+        return GLFWMonitor.getMonitor(glfwGetPrimaryMonitor());
+    }
+
+    @Override
+    public List<Monitor> getMonitors() {
+        PointerBuffer ptrs = glfwGetMonitors();
+        ImmutableList.Builder<Monitor> list = ImmutableList.builder();
+        while (ptrs.hasRemaining()) {
+            list.add(GLFWMonitor.getMonitor(ptrs.get()));
+        }
+        return list.build();
     }
 
 }

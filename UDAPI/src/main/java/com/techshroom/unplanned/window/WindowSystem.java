@@ -22,10 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.pointer;
+package com.techshroom.unplanned.window;
 
-public interface Pointer {
+import java.util.List;
 
-    long address();
+public interface WindowSystem {
+
+    static WindowSystem getInstance() {
+        return WindowSystemReferenceHolder.REFERENCE;
+    }
+
+    /**
+     * Returns the {@link Window} currently active in this thread.
+     * 
+     * @return the active window
+     * @throws IllegalStateException
+     *             if there is no active window
+     */
+    Window getActiveWindow() throws IllegalStateException;
+
+    Monitor getPrimaryMonitor();
+
+    List<Monitor> getMonitors();
 
 }

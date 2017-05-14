@@ -56,14 +56,4 @@ public final class BindableDrawableSequence extends BindableSequenceBase impleme
         drawableSequence.forEach(Drawable::draw);
     }
 
-    @Override
-    public void initialize() {
-        // do nothing...
-    }
-
-    @Override
-    public void destroy() {
-        // do nothing...
-    }
-
 }

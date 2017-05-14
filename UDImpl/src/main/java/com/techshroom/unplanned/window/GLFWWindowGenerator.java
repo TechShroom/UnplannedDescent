@@ -44,10 +44,6 @@ import org.lwjgl.system.Platform;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.service.AutoService;
 import com.techshroom.unplanned.core.util.GLFWUtil;
-import com.techshroom.unplanned.monitor.Monitor;
-import com.techshroom.unplanned.monitor.MonitorProvider;
-import com.techshroom.unplanned.pointer.Pointer;
-import com.techshroom.unplanned.pointer.PointerImpl;
 import com.techshroom.unplanned.value.VideoMode;
 
 @AutoService(WindowGenerator.class)
@@ -59,7 +55,7 @@ public class GLFWWindowGenerator implements WindowGenerator {
 
     @Override
     public Vector2i getDefaultFullscreenSize() {
-        Monitor primary = MonitorProvider.getInstance().getPrimaryMonitor();
+        Monitor primary = WindowSystem.getInstance().getPrimaryMonitor();
         VideoMode videoMode = primary.getVideoMode();
         return new Vector2i(videoMode.getWidth(), videoMode.getHeight());
     }
@@ -81,21 +77,21 @@ public class GLFWWindowGenerator implements WindowGenerator {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         Vector2i screenSize = settings.getScreenSize();
-        long window = glfwCreateWindow(screenSize.getX(), screenSize.getY(), settings.getTitle(),
+        long pointer = glfwCreateWindow(screenSize.getX(), screenSize.getY(), settings.getTitle(),
                 monitorIfNeeded(settings), sharedWindow(settings));
-        return new GLFWWindow(PointerImpl.wrap(window));
+        return GLFWWindow.get(pointer);
     }
 
     private long monitorIfNeeded(WindowSettings settings) {
         if (settings.isFullScreen()) {
             checkState(settings.getMonitor().isPresent(), "A monitor is required for fullscreen");
-            return settings.getMonitor().get().getMonitorPointer().address();
+            return settings.getMonitor().get().getMonitorPointer();
         }
         return 0;
     }
 
     private long sharedWindow(WindowSettings settings) {
-        return settings.getSharedWindow().map(Window::getWindowPointer).map(Pointer::address).orElse(0L);
+        return settings.getSharedWindow().map(Window::getWindowPointer).orElse(0L);
     }
 
 }

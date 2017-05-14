@@ -24,7 +24,6 @@
  */
 package com.techshroom.unplanned.blitter.textures;
 
-
 public enum Upscaling {
     NEAREST, LINEAR
 }

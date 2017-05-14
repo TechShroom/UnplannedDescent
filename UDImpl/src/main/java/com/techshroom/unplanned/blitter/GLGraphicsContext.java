@@ -37,11 +37,13 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import org.lwjgl.opengl.GL;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.matrix.GLMatrixUploader;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
@@ -52,6 +54,7 @@ import com.techshroom.unplanned.blitter.textures.TextureProvider;
 import com.techshroom.unplanned.event.Event;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.window.ShaderInitialization;
+import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
 import com.techshroom.unplanned.window.Window;
 
 public class GLGraphicsContext implements GraphicsContext {
@@ -76,14 +79,14 @@ public class GLGraphicsContext implements GraphicsContext {
 
     @Override
     public void makeActiveContext() {
-        glfwMakeContextCurrent(window.getWindowPointer().address());
+        glfwMakeContextCurrent(window.getWindowPointer());
         GL.createCapabilities();
 
         // setup GL context
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         ShaderInitialization.setupShaders();
-        glClearColor(1, 0, 1, 1);
+        glClearColor(0, 0, 0, 1);
 
         Event.BUS.register(this);
         Vector2i size = window.getSize();
@@ -92,7 +95,7 @@ public class GLGraphicsContext implements GraphicsContext {
 
     @Subscribe
     public void onResize(WindowResizeEvent event) {
-        if (event.getSource() != window || glfwGetCurrentContext() != window.getWindowPointer().address()) {
+        if (event.getSource() != window || glfwGetCurrentContext() != window.getWindowPointer()) {
             return;
         }
         Vector2i size = event.getSize();
@@ -101,7 +104,17 @@ public class GLGraphicsContext implements GraphicsContext {
 
     @Override
     public void swapBuffers() {
-        glfwSwapBuffers(window.getWindowPointer().address());
+        glfwSwapBuffers(window.getWindowPointer());
+    }
+
+    @Override
+    public void setLight(Vector3d pos, Vector3d color) {
+        setVec3(Uniform.LIGHT_POSITION, pos);
+        setVec3(Uniform.LIGHT_COLOR, color);
+    }
+
+    private void setVec3(Uniform uniform, Vector3d vec) {
+        glUniform3f(ShaderInitialization.getUniform(uniform), (float) vec.getX(), (float) vec.getY(), (float) vec.getZ());
     }
 
     @Override

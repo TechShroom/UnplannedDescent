@@ -24,6 +24,7 @@
  */
 package com.techshroom.unplanned.blitter.matrix;
 
+import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector3f;
 
@@ -40,11 +41,21 @@ public final class Matrices {
     // }
 
     public static Matrix4f orthographicProjection(double width, double height, double zNear, double zFar) {
-        return Matrix4f.createOrthographic(width, 0, 0, height, zNear, zFar);
+        double halfW = width / 2;
+        double halfH = height / 2;
+        return Matrix4f.createOrthographic(halfW, -halfW, -halfH, halfH, zNear, zFar);
     }
 
     public static Matrix4f lookAt(Vector3f cameraPos, Vector3f targetView, Vector3f up) {
-        return Matrix4f.createLookAt(cameraPos, targetView, up);
+        final Vector3f f = GenericMath.normalizeSafe(targetView.sub(cameraPos));
+        final Vector3f s = GenericMath.normalizeSafe(f.cross(up));
+        final Vector3f u = s.cross(f);
+        final Matrix4f mat = new Matrix4f(
+                s.getX(), s.getY(), s.getZ(), 0,
+                u.getX(), u.getY(), u.getZ(), 0,
+                -f.getX(), -f.getY(), -f.getZ(), 0,
+                0, 0, 0, 1);
+        return mat.translate(cameraPos.negate());
     }
 
     public static Matrix4f buildMVPMatrix(Matrix4f model, Matrix4f view, Matrix4f proj) {
