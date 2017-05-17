@@ -22,39 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.blitter.shapers;
+package com.techshroom.unplanned.geometry;
 
-import java.util.List;
-
-import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
-import com.google.common.collect.ImmutableList;
-import com.techshroom.unplanned.blitter.Shape;
-import com.techshroom.unplanned.blitter.Vertex;
-import com.techshroom.unplanned.geometry.Plane;
+import com.flowpowered.math.vector.Vector3i;
 
-/**
- * Shapes a quad, requires 4 points.
- */
-public interface Quad extends SinglePlaneVertexShaper {
+public enum Plane {
+    XY {
 
-    @Override
-    default int getSize() {
-        return 4;
-    }
+        @Override
+        public Vector3i convertToVector3(Vector2i a) {
+            return a.toVector3();
+        }
+    },
+    XZ {
 
-    default Shape shape(Plane plane, Vector2i a, Vector2i b, List<Vector2d> texture) {
-        // a--d
-        // | /|
-        // |/ |
-        // c--b
-        Vector2i c = new Vector2i(a.getX(), b.getY());
-        Vector2i d = new Vector2i(b.getX(), a.getY());
-        return shape(ImmutableList.of(
-                Vertex.at(plane.convertToVector3(a).toDouble()).texture(texture.get(0)).build(),
-                Vertex.at(plane.convertToVector3(c).toDouble()).texture(texture.get(1)).build(),
-                Vertex.at(plane.convertToVector3(d).toDouble()).texture(texture.get(2)).build(),
-                Vertex.at(plane.convertToVector3(b).toDouble()).texture(texture.get(3)).build()));
-    }
+        @Override
+        public Vector3i convertToVector3(Vector2i a) {
+            return new Vector3i(a.getX(), 0, a.getY());
+        }
+    },
+    YZ {
+
+        @Override
+        public Vector3i convertToVector3(Vector2i a) {
+            return new Vector3i(0, a.getX(), a.getY());
+        }
+    };
+
+    public abstract Vector3i convertToVector3(Vector2i a);
 
 }
