@@ -22,39 +22,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.blitter.shapers;
+package com.techshroom.unplanned.examples.rubix;
 
-import java.util.List;
+import com.google.auto.service.AutoService;
+import com.techshroom.unplanned.examples.Example;
+import com.techshroom.unplanned.window.Window;
+import com.techshroom.unplanned.window.WindowSettings;
 
-import com.flowpowered.math.vector.Vector2d;
-import com.flowpowered.math.vector.Vector2i;
-import com.google.common.collect.ImmutableList;
-import com.techshroom.unplanned.blitter.Shape;
-import com.techshroom.unplanned.blitter.Vertex;
-import com.techshroom.unplanned.geometry.Plane;
+@AutoService(Example.class)
+public class RubixCube extends Example {
 
-/**
- * Shapes a quad, requires 4 points.
- */
-public interface Quad extends SinglePlaneVertexShaper {
+    private Window window;
 
     @Override
-    default int getSize() {
-        return 4;
-    }
+    public void run() {
+        window = WindowSettings.builder()
+                .screenSize(1024, 768)
+                .title("Rubix Cube")
+                .build().createWindow();
+        
+        window.getGraphicsContext().makeActiveContext();
+        window.setVsyncOn(true);
+        window.setVisible(true);
 
-    default Shape shape(Plane plane, Vector2i a, Vector2i b, List<Vector2d> texture) {
-        // a--d
-        // | /|
-        // |/ |
-        // c--b
-        Vector2i c = new Vector2i(a.getX(), b.getY());
-        Vector2i d = new Vector2i(b.getX(), a.getY());
-        return shape(ImmutableList.of(
-                Vertex.at(plane.convertToVector3(a).toDouble()).texture(texture.get(0)).build(),
-                Vertex.at(plane.convertToVector3(c).toDouble()).texture(texture.get(1)).build(),
-                Vertex.at(plane.convertToVector3(d).toDouble()).texture(texture.get(2)).build(),
-                Vertex.at(plane.convertToVector3(b).toDouble()).texture(texture.get(3)).build()));
+        CubeHandler handler = new CubeHandler();
+
+        while (!window.isCloseRequested()) {
+            window.processEvents();
+            window.getGraphicsContext().clearGraphicsState();
+            
+            window.getGraphicsContext().swapBuffers();
+        }
+
+        window.destroy();
     }
 
 }

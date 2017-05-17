@@ -82,7 +82,7 @@ public final class TextureAtlas {
         return new TextureAtlas(TextureData.wrap(target), optimalPacking);
     }
 
-    public static void fillWithDebug(int[][] target) {
+    private static void fillWithDebug(int[][] target) {
         for (int i = 0; i < target.length; i++) {
             int[] col = target[i];
             for (int y = 0; y < col.length; y++) {
