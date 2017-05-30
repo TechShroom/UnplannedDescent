@@ -22,28 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.blitter.binding;
+package com.techshroom.unplanned.blitter;
 
-import com.techshroom.unplanned.blitter.Drawable;
+import com.techshroom.unplanned.blitter.binding.Bindable;
+import com.techshroom.unplanned.blitter.binding.BindableDrawable;
 
-public interface BindableDrawable extends Bindable, Drawable {
-
-    @Override
-    BindableDrawable bind();
-
-    /**
-     * Like {@link #drawWithoutBinding()}, but binds and unbinds the object.
-     */
-    @Override
-    default void draw() {
-        try (Bindable b = bind()) {
-            drawWithoutBinding();
-        }
-    }
-
-    /**
-     * Draws the object without managing bindings.
-     */
-    void drawWithoutBinding();
+/**
+ * {@link Shape} implementing {@link Bindable}.
+ */
+public interface BindableShape extends Shape, BindableDrawable {
 
 }

@@ -87,6 +87,7 @@ public class GLGraphicsContext implements GraphicsContext {
         glDepthFunc(GL_LESS);
         ShaderInitialization.setupShaders();
         glClearColor(0, 0, 0, 1);
+        setLight(Vector3d.ZERO, Vector3d.ONE);
 
         Event.BUS.register(this);
         Vector2i size = window.getSize();

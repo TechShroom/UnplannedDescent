@@ -58,6 +58,10 @@ public final class CubeLayout {
         vectors[from + 3] = new Vector2d(u2, v1);
     }
 
+    public CubeLayout all(String id) {
+        return front(id).back(id).left(id).right(id).top(id).bottom(id);
+    }
+
     public CubeLayout front(String id) {
         addPoints(id, 0);
         return this;

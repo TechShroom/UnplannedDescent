@@ -24,6 +24,8 @@
  */
 package com.techshroom.unplanned.blitter.matrix;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector3f;
@@ -59,6 +61,9 @@ public final class Matrices {
     }
 
     public static Matrix4f buildMVPMatrix(Matrix4f model, Matrix4f view, Matrix4f proj) {
+        checkNotNull(model, "model");
+        checkNotNull(view, "view");
+        checkNotNull(proj, "proj");
         Matrix4f fin = proj;
         fin = fin.mul(view);
         fin = fin.mul(model);

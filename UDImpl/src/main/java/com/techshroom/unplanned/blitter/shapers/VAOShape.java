@@ -26,12 +26,12 @@ package com.techshroom.unplanned.blitter.shapers;
 
 import java.util.List;
 
-import com.techshroom.unplanned.blitter.Shape;
+import com.techshroom.unplanned.blitter.BindableShape;
 import com.techshroom.unplanned.blitter.VAO;
 import com.techshroom.unplanned.blitter.Vertex;
 import com.techshroom.unplanned.blitter.binding.BindableDrawable;
 
-public class VAOShape implements Shape, BindableDrawable {
+public class VAOShape implements BindableShape {
 
     private final VAO shape;
 

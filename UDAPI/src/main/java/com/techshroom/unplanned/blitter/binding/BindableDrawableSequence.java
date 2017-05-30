@@ -50,6 +50,12 @@ public final class BindableDrawableSequence extends BindableSequenceBase impleme
         super(bindSeq);
         this.drawableSequence = drawSeq;
     }
+    
+    @Override
+    public BindableDrawableSequence bind() {
+        super.bind();
+        return this;
+    }
 
     @Override
     public void drawWithoutBinding() {
