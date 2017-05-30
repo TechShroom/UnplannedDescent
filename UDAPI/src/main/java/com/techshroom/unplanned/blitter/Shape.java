@@ -24,6 +24,8 @@
  */
 package com.techshroom.unplanned.blitter;
 
+import java.util.Optional;
+
 import com.techshroom.unplanned.blitter.binding.Bindable;
 import com.techshroom.unplanned.core.util.LifecycleObject;
 
@@ -36,5 +38,9 @@ import com.techshroom.unplanned.core.util.LifecycleObject;
  * </p>
  */
 public interface Shape extends Drawable, LifecycleObject {
+
+    default Optional<BindableShape> asBindable() {
+        return Optional.of(this).filter(BindableShape.class::isInstance).map(BindableShape.class::cast);
+    }
 
 }

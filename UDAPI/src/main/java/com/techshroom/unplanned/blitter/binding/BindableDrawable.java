@@ -28,6 +28,9 @@ import com.techshroom.unplanned.blitter.Drawable;
 
 public interface BindableDrawable extends Bindable, Drawable {
 
+    @Override
+    BindableDrawable bind();
+
     /**
      * Like {@link #drawWithoutBinding()}, but binds and unbinds the object.
      */

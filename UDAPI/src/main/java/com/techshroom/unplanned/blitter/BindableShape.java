@@ -22,32 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes;
+package com.techshroom.unplanned.blitter;
 
-import javax.inject.Inject;
+import com.techshroom.unplanned.blitter.binding.Bindable;
+import com.techshroom.unplanned.blitter.binding.BindableDrawable;
 
-import com.techshroom.unplanned.blitter.Drawable;
-import com.techshroom.unplanned.core.util.LifecycleObject;
-
-public class MidiScreenView implements Drawable, LifecycleObject {
-
-    private final MidiScreenModel model;
-
-    @Inject
-    MidiScreenView(MidiScreenModel model) {
-        this.model = model;
-    }
-
-    @Override
-    public void initialize() {
-    }
-
-    @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void draw() {
-    }
+/**
+ * {@link Shape} implementing {@link Bindable}.
+ */
+public interface BindableShape extends Shape, BindableDrawable {
 
 }

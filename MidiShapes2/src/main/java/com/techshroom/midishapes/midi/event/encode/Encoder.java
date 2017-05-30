@@ -22,20 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.event.channel;
+package com.techshroom.midishapes.midi.event.encode;
 
-import com.google.auto.value.AutoValue;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.function.ToIntFunction;
 
-@AutoValue
-public abstract class ProgramChangeEvent implements ChannelEvent {
+import com.techshroom.midishapes.midi.event.MidiEvent;
 
-    public static ProgramChangeEvent create(int tick, int channel, int program) {
-        return new AutoValue_ProgramChangeEvent(tick, channel, program);
+interface Encoder<T extends MidiEvent> {
+
+    static <M extends MidiEvent> Encoder<M> twoByte(int type, ToIntFunction<M> first, ToIntFunction<M> second) {
+        return (event, stream) -> {
+            stream.writeByte(type | event.getChannel());
+            stream.writeByte(first.applyAsInt(event));
+            stream.writeByte(second.applyAsInt(event));
+        };
     }
 
-    ProgramChangeEvent() {
+    static <M extends MidiEvent> Encoder<M> oneByte(int type, ToIntFunction<M> first) {
+        return (event, stream) -> {
+            stream.writeByte(type | event.getChannel());
+            stream.writeByte(first.applyAsInt(event));
+        };
     }
 
-    public abstract int getProgram();
+    void encode(T event, DataOutputStream stream) throws IOException;
 
 }
