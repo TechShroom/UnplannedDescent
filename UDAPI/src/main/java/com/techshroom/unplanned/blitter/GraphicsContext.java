@@ -28,6 +28,8 @@ import com.flowpowered.math.vector.Vector3d;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
 import com.techshroom.unplanned.blitter.shapers.Shapes;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
+import com.techshroom.unplanned.blitter.transform.DefaultTransformer;
+import com.techshroom.unplanned.blitter.transform.TransformStack;
 
 public interface GraphicsContext {
 
@@ -44,5 +46,9 @@ public interface GraphicsContext {
     Shapes getShapes();
 
     MatrixUploader getMatrixUploader();
+
+    default TransformStack pushTransformer() {
+        return DefaultTransformer.getInstance().push();
+    }
 
 }
