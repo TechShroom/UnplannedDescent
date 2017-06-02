@@ -37,7 +37,25 @@ import com.techshroom.unplanned.blitter.textures.map.TextureCollection;
  */
 public final class CubeLayout {
 
-    private final Vector2d[] vectors = new Vector2d[24];
+    private static final int SIZE = 24;
+
+    private static final ImmutableList<Vector2d> SINGLE_TEXTURE;
+    static {
+        ImmutableList.Builder<Vector2d> b = ImmutableList.builder();
+        for (int i = 0; i < SIZE / 4; i++) {
+            b.add(new Vector2d(0, 0));
+            b.add(new Vector2d(0, 1));
+            b.add(new Vector2d(1, 1));
+            b.add(new Vector2d(1, 0));
+        }
+        SINGLE_TEXTURE = b.build();
+    }
+
+    public static ImmutableList<Vector2d> singleTexture() {
+        return SINGLE_TEXTURE;
+    }
+
+    private final Vector2d[] vectors = new Vector2d[SIZE];
     private final TextureCollection lookup;
     private final TextureAtlas source;
 

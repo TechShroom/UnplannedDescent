@@ -22,33 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.blitter;
+package com.techshroom.unplanned.blitter.transform;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
-import com.techshroom.unplanned.blitter.shapers.Shapes;
-import com.techshroom.unplanned.blitter.textures.TextureProvider;
-import com.techshroom.unplanned.blitter.transform.DefaultTransformer;
-import com.techshroom.unplanned.blitter.transform.TransformStack;
+import com.flowpowered.math.imaginary.Quaternionf;
+import com.flowpowered.math.matrix.Matrix4f;
+import com.flowpowered.math.vector.Vector3f;
 
-public interface GraphicsContext {
-
-    void clearGraphicsState();
-
-    void makeActiveContext();
-
-    void swapBuffers();
-
-    void setLight(Vector3d pos, Vector3d color);
-
-    TextureProvider getTextureProvider();
-
-    Shapes getShapes();
-
-    MatrixUploader getMatrixUploader();
-
-    default TransformStack pushTransformer() {
-        return DefaultTransformer.getInstance().push();
+public interface MatrixTransformer {
+    
+    default MatrixTransformer reset() {
+        set(Matrix4f.IDENTITY);
+        return this;
     }
+
+    void set(Matrix4f matrix);
+
+    default MatrixTransformer translate(float x, float y, float z) {
+        return translate(new Vector3f(x, y, z));
+    }
+
+    MatrixTransformer translate(Vector3f translation);
+
+    default MatrixTransformer rotate(Vector3f eulerAngles) {
+        return rotate(Quaternionf.fromAxesAnglesDeg(eulerAngles.getX(), eulerAngles.getY(), eulerAngles.getZ()));
+    }
+
+    MatrixTransformer rotate(Quaternionf quat);
+
+    default MatrixTransformer scale(float x, float y, float z) {
+        return scale(new Vector3f(x, y, z));
+    }
+
+    MatrixTransformer scale(Vector3f scale);
 
 }
