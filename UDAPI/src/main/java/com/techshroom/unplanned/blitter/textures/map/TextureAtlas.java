@@ -31,7 +31,7 @@ import java.util.Map;
 import com.techshroom.unplanned.blitter.textures.TextureData;
 import com.techshroom.unplanned.core.Settings;
 import com.techshroom.unplanned.core.util.Maths;
-import com.techshroom.unplanned.geometry.WHRectangle;
+import com.techshroom.unplanned.geometry.WHRectangleI;
 
 /**
  * Creates a texture atlas by combining multiple {@link TextureData}. U/V
@@ -42,12 +42,12 @@ public final class TextureAtlas {
 
     public static TextureAtlas create(int maximumWidth, int maximumHeight, TextureCollection individualTextures) {
         // stitch together a huge TextureData from the individual ones
-        Map<String, WHRectangle> optimalPacking = TexturePacker.pack(maximumWidth, maximumHeight, individualTextures);
+        Map<String, WHRectangleI> optimalPacking = TexturePacker.pack(maximumWidth, maximumHeight, individualTextures);
 
         // figure out the closest power of 2 for width and height
         int w = 0;
         int h = 0;
-        for (WHRectangle rect : optimalPacking.values()) {
+        for (WHRectangleI rect : optimalPacking.values()) {
             w = Math.max(rect.getX() + rect.getWidth(), w);
             h = Math.max(rect.getY() + rect.getHeight(), h);
         }
@@ -94,9 +94,9 @@ public final class TextureAtlas {
     }
 
     private final TextureData data;
-    private final Map<String, WHRectangle> positions;
+    private final Map<String, WHRectangleI> positions;
 
-    private TextureAtlas(TextureData data, Map<String, WHRectangle> positions) {
+    private TextureAtlas(TextureData data, Map<String, WHRectangleI> positions) {
         this.data = data;
         this.positions = positions;
     }

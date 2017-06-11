@@ -37,6 +37,7 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
@@ -53,9 +54,9 @@ import com.techshroom.unplanned.blitter.textures.GLTextureProvider;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
 import com.techshroom.unplanned.event.Event;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.window.GLFWWindow;
 import com.techshroom.unplanned.window.ShaderInitialization;
 import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
-import com.techshroom.unplanned.window.Window;
 
 public class GLGraphicsContext implements GraphicsContext {
 
@@ -63,9 +64,9 @@ public class GLGraphicsContext implements GraphicsContext {
     private final Shapes shapes = new GLShapes();
     private final MatrixUploader matUpload = new GLMatrixUploader();
 
-    private final Window window;
+    private final GLFWWindow window;
 
-    public GLGraphicsContext(Window window) {
+    public GLGraphicsContext(GLFWWindow window) {
         this.window = window;
     }
 
@@ -82,6 +83,9 @@ public class GLGraphicsContext implements GraphicsContext {
         glfwMakeContextCurrent(window.getWindowPointer());
         GL.createCapabilities();
 
+        if (window.getSettings().isMsaa()) {
+            glEnable(GL_MULTISAMPLE);
+        }
         // setup GL context
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);

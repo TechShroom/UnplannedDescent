@@ -22,42 +22,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.blitter.textures.loader;
+package com.techshroom.unplanned.geometry;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-import com.flowpowered.math.vector.Vector4i;
+import com.flowpowered.math.vector.Vector2f;
 import com.google.auto.value.AutoValue;
-import com.techshroom.unplanned.core.util.Maths;
 
+/**
+ * Rectangle based on x, y, width and height, rather than 4 points.
+ */
 @AutoValue
-public abstract class ColorTextureSpec {
+public abstract class WHRectangleF {
 
-    public static ColorTextureSpec create(String color, int w, int h) {
-        return create(Maths.getColorVector(color), new Vector2i(w, h));
+    public static WHRectangleF of(float x, float y, float w, float h) {
+        return new AutoValue_WHRectangleF(x, y, w, h);
     }
 
-    public static ColorTextureSpec create(Vector3i color, int w, int h) {
-        return create(color, new Vector2i(w, h));
+    public static WHRectangleF fromXY(float x1, float y1, float x2, float y2) {
+        return new AutoValue_WHRectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
-    public static ColorTextureSpec create(Vector3i color, Vector2i size) {
-        return create(new Vector4i(color, 255), size);
+    WHRectangleF() {
     }
 
-    public static ColorTextureSpec create(Vector4i color, int w, int h) {
-        return create(color, new Vector2i(w, h));
+    public abstract float getX();
+
+    public abstract float getY();
+
+    public abstract float getWidth();
+
+    public abstract float getHeight();
+
+    public final boolean contains(Vector2f vec) {
+        boolean xIn = getX() <= vec.getX() && vec.getX() <= getX() + getWidth();
+        boolean yIn = getY() <= vec.getY() && vec.getY() <= getY() + getHeight();
+        return xIn && yIn;
     }
-
-    public static ColorTextureSpec create(Vector4i color, Vector2i size) {
-        return new AutoValue_ColorTextureSpec(color, size);
-    }
-
-    ColorTextureSpec() {
-    }
-
-    public abstract Vector4i getColor();
-
-    public abstract Vector2i getSize();
 
 }

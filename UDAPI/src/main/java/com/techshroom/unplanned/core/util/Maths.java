@@ -30,6 +30,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.stream.IntStream;
 
+import com.flowpowered.math.vector.Vector4i;
+
 public final class Maths {
 
     /**
@@ -331,6 +333,47 @@ public final class Maths {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @SuppressWarnings("fallthrough")
+    public static Vector4i getColorVector(String color) {
+        String c;
+        if (color.startsWith("#")) {
+            c = color.substring(1);
+        } else {
+            c = color;
+        }
+        int r;
+        int g;
+        int b;
+        int a = 255;
+        try {
+            switch (c.length()) {
+                case 4:
+                    // RGBA, RGB handled below
+                    a = Integer.parseInt(c.substring(3, 4), 16) * 0x11;
+                case 3:
+                    // RGB
+                    r = Integer.parseInt(c.substring(0, 1), 16) * 0x11;
+                    g = Integer.parseInt(c.substring(1, 2), 16) * 0x11;
+                    b = Integer.parseInt(c.substring(2, 3), 16) * 0x11;
+                    break;
+                case 8:
+                    // RRGGBBAA, RRGGBB handled below
+                    a = Integer.parseInt(c.substring(6, 8), 16);
+                case 6:
+                    // RRGGBB
+                    r = Integer.parseInt(c.substring(0, 2), 16);
+                    g = Integer.parseInt(c.substring(2, 4), 16);
+                    b = Integer.parseInt(c.substring(4, 6), 16);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Not a hex color: " + color);
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Not a hex color: " + color, e);
+        }
+        return new Vector4i(r, g, b, a);
     }
 
 }

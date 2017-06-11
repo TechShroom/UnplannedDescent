@@ -29,10 +29,12 @@ import static org.lwjgl.glfw.GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
+import static org.lwjgl.glfw.GLFW.GLFW_FLOATING;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
@@ -76,10 +78,18 @@ public class GLFWWindowGenerator implements WindowGenerator {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+        // use MSAA?
+        if (settings.isMsaa()) {
+            glfwWindowHint(GLFW_SAMPLES, 4);
+        }
+        if (settings.isAlwaysOnTop()) {
+            glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+        }
+
         Vector2i screenSize = settings.getScreenSize();
         long pointer = glfwCreateWindow(screenSize.getX(), screenSize.getY(), settings.getTitle(),
                 monitorIfNeeded(settings), sharedWindow(settings));
-        return GLFWWindow.get(pointer);
+        return GLFWWindow.get(pointer, settings);
     }
 
     private long monitorIfNeeded(WindowSettings settings) {

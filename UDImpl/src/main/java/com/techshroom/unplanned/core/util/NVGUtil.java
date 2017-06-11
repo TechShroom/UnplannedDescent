@@ -22,36 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.geometry;
+package com.techshroom.unplanned.core.util;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.google.auto.value.AutoValue;
+import static com.google.common.base.Preconditions.checkArgument;
 
-/**
- * Rectangle based on x, y, width and height, rather than 4 points.
- */
-@AutoValue
-public abstract class WHRectangle {
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
-    public static WHRectangle of(int x, int y, int w, int h) {
-        return new AutoValue_WHRectangle(x, y, w, h);
+public final class NVGUtil {
+
+    private static final String FONTS_BASE = "/com/techshroom/unplanned/fonts/";
+    // 1MB is a good size for a font, allocate that
+    private static int EXPECTED_FONT_SIZE = 1 * 1024 * 1024;
+
+    public static ByteBuffer loadFont(String name) throws IOException {
+        final String res = FONTS_BASE + name;
+        try (InputStream stream = NVGUtil.class.getResourceAsStream(res)) {
+            checkArgument(stream != null, "resource %s does not exist", res);
+            return IOUtil.ioResourceToByteBuffer(stream, EXPECTED_FONT_SIZE);
+        }
     }
 
-    WHRectangle() {
+    private NVGUtil() {
+        throw new AssertionError();
     }
-
-    public abstract int getX();
-
-    public abstract int getY();
-
-    public abstract int getWidth();
-
-    public abstract int getHeight();
-
-    public final boolean contains(Vector2i vec) {
-        boolean xIn = getX() <= vec.getX() && vec.getX() <= getX() + getWidth();
-        boolean yIn = getY() <= vec.getY() && vec.getY() <= getY() + getHeight();
-        return xIn && yIn;
-    }
-
 }

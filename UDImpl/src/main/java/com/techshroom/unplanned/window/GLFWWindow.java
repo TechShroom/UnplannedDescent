@@ -79,10 +79,17 @@ public class GLFWWindow implements Window {
         return windows.computeIfAbsent(pointer, GLFWWindow::new);
     }
 
+    public static GLFWWindow get(long pointer, WindowSettings settings) {
+        GLFWWindow window = get(pointer);
+        window.settings = settings;
+        return window;
+    }
+
     private final GLGraphicsContext graphicsContext;
     private final Mouse mouse;
     private final Keyboard keyboard;
     private final long pointer;
+    private WindowSettings settings;
     private String title;
     private boolean vsync;
     private boolean destroyed;
@@ -106,6 +113,10 @@ public class GLFWWindow implements Window {
         glfwSetFramebufferSizeCallback(pointer, (win, w, h) -> {
             Event.BUS.post(WindowResizeEvent.create(this, w, h));
         });
+    }
+
+    public WindowSettings getSettings() {
+        return settings;
     }
 
     @Override
