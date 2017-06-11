@@ -43,7 +43,7 @@ public abstract class WindowSettings {
     public static final Builder builder() {
         Vector2i size = WINDOW_GENERATOR.getDefaultFullscreenSize();
         return new AutoValue_WindowSettings.Builder().screenSize(size).monitor((Monitor) null)
-                .sharedWindow((Window) null).fullScreen(false).resizable(true);
+                .sharedWindow((Window) null).fullScreen(false).resizable(true).msaa(false);
     }
 
     @AutoValue.Builder
@@ -60,6 +60,10 @@ public abstract class WindowSettings {
         public abstract Builder fullScreen(boolean fullscreen);
 
         public abstract Builder resizable(boolean resizable);
+
+        public abstract Builder msaa(boolean msaa);
+
+        public abstract Builder alwaysOnTop(boolean alwaysOnTop);
 
         public final Builder monitor(@Nullable Monitor monitor) {
             return monitor(Optional.ofNullable(monitor));
@@ -100,6 +104,10 @@ public abstract class WindowSettings {
     public abstract boolean isFullScreen();
 
     public abstract boolean isResizable();
+
+    public abstract boolean isMsaa();
+
+    public abstract boolean isAlwaysOnTop();
 
     public abstract Optional<Monitor> getMonitor();
 

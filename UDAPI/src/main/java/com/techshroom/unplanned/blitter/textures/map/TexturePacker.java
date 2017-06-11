@@ -39,12 +39,12 @@ import org.lwjgl.system.MemoryStack;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.techshroom.unplanned.blitter.textures.TextureData;
-import com.techshroom.unplanned.geometry.WHRectangle;
+import com.techshroom.unplanned.geometry.WHRectangleI;
 
 public class TexturePacker {
 
     /* note: packer adds 1px spacing around each texture! */
-    public static Map<String, WHRectangle> pack(int width, int height, TextureCollection individualTextures) {
+    public static Map<String, WHRectangleI> pack(int width, int height, TextureCollection individualTextures) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
 
             // make some rectangles
@@ -69,13 +69,13 @@ public class TexturePacker {
             stbrp_pack_rects(ctx, rects);
 
             // extract settings to map
-            ImmutableMap.Builder<String, WHRectangle> b = ImmutableMap.builder();
+            ImmutableMap.Builder<String, WHRectangleI> b = ImmutableMap.builder();
             while (rects.hasRemaining()) {
                 STBRPRect rect = rects.get();
                 if (rect.was_packed() == 0) {
                     throw new IllegalArgumentException("Unable to pack all rectangles, w/h too small?");
                 }
-                b.put(entriesOrdered.get(rect.id()).getValue(), WHRectangle.of(rect.x(), rect.y(), rect.w(), rect.h()));
+                b.put(entriesOrdered.get(rect.id()).getValue(), WHRectangleI.of(rect.x(), rect.y(), rect.w(), rect.h()));
             }
             return b.build();
         }

@@ -28,6 +28,10 @@ import com.flowpowered.math.vector.Vector2d;
 
 public interface Mouse {
 
+    static int PRIMARY_MOUSE_BUTTON = 0;
+    static int SECONDARY_MOUSE_BUTTON = 1;
+    static int TERTIARY_MOUSE_BUTTON = 2;
+
     Vector2d getPosition();
 
     void activateMouseGrab();
