@@ -22,14 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model;
 
-import com.techshroom.unplanned.gui.model.Label;
+import com.google.auto.value.AutoValue;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+@AutoValue
+public abstract class PropertyKey<T> {
 
-    @Override
-    public void render(RenderJob<Label> job) {
+    public static <T> PropertyKey<T> of(String key) {
+        return new AutoValue_PropertyKey<>(key);
     }
+
+    PropertyKey() {
+    }
+
+    public abstract String getKey();
 
 }

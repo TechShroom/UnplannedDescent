@@ -27,6 +27,8 @@ package com.techshroom.unplanned.window.dialog;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_CENTER;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_LEFT;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_MIDDLE;
@@ -76,9 +78,9 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector4f;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.core.util.Maths;
+import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.core.util.GLErrorCheck;
 import com.techshroom.unplanned.core.util.NVGUtil;
-import com.techshroom.unplanned.event.Event;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.mouse.MouseButtonEvent;
@@ -91,7 +93,7 @@ import com.techshroom.unplanned.window.WindowSettings;
 public class GLOptionPane {
 
     private static NVGColor color(String hex) {
-        Vector4f color = Maths.getColorVector(hex).toFloat().div(255f);
+        Vector4f color = Color.fromString(hex).asVector4f();
         return NVGColor.calloc().r(color.getX()).g(color.getY()).b(color.getZ()).a(color.getW());
     }
 
@@ -144,9 +146,15 @@ public class GLOptionPane {
         int initIndex = choices.indexOf(initial);
         checkArgument(initIndex != -1, "initial not in choices!");
 
+        long openCtx = glfwGetCurrentContext();
         GLOptionPane pane = new GLOptionPane(title, prompt, choices.stream().map(toString).collect(toImmutableList()), initIndex);
-        int resultIndex = pane.show();
-        return resultIndex == -1 ? null : choices.get(resultIndex);
+        try {
+            int resultIndex = pane.show();
+            return resultIndex == -1 ? null : choices.get(resultIndex);
+        } finally {
+            pane.destroy();
+            glfwMakeContextCurrent(openCtx);
+        }
     }
 
     private static float choicePosition(int index) {
@@ -185,13 +193,16 @@ public class GLOptionPane {
 
     private int show() {
         ctx.makeActiveContext();
+        GLErrorCheck.check();
         win.setVsyncOn(true);
         win.setVisible(true);
 
-        Event.BUS.register(this);
+        win.getEventBus().register(this);
 
         glEnable(GL_STENCIL_TEST);
         glDisable(GL_DEPTH_TEST);
+
+        GLErrorCheck.check();
 
         // nano time!
         nvg = nvgCreate(NVG_ANTIALIAS | NVG_DEBUG);
@@ -243,13 +254,13 @@ public class GLOptionPane {
 
                 ctx.swapBuffers();
             }
+            win.setVisible(false);
             if (!selfGeneratedClose) {
                 selected = -1;
             }
         } finally {
             nvgDelete(nvg);
             nvg = 0;
-            win.destroy();
             glDisable(GL_STENCIL_TEST);
             glEnable(GL_DEPTH_TEST);
         }
@@ -364,6 +375,11 @@ public class GLOptionPane {
 
         nvgText(nvg, xMin, rbY, choice);
         nvgFillColor(nvg, NVG_DEFAULT_COLOR);
+    }
+
+    private void destroy() {
+        win.setVisible(false);
+        win.destroy();
     }
 
 }

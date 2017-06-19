@@ -34,8 +34,9 @@ public interface GuiElementRenderer<GE extends GuiElement> {
     /**
      * Renders the entire element at the current position of the element.
      * 
-     * @param element
+     * @param job
+     *            the render job to be executed
      */
-    void render(GE element);
+    void render(RenderJob<GE> job);
 
 }

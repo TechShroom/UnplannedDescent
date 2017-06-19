@@ -57,10 +57,10 @@ import java.util.Map;
 import org.lwjgl.system.MemoryStack;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.core.util.GLFWUtil;
-import com.techshroom.unplanned.event.Event;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
@@ -85,6 +85,7 @@ public class GLFWWindow implements Window {
         return window;
     }
 
+    private final EventBus eventBus;
     private final GLGraphicsContext graphicsContext;
     private final Mouse mouse;
     private final Keyboard keyboard;
@@ -96,9 +97,10 @@ public class GLFWWindow implements Window {
 
     private GLFWWindow(long pointer) {
         this.pointer = pointer;
+        this.eventBus = new EventBus("window-0x" + Long.toHexString(pointer));
         this.graphicsContext = new GLGraphicsContext(this);
-        this.mouse = new GLFWMouse(pointer);
-        this.keyboard = new GLFWKeyboard(pointer);
+        this.mouse = new GLFWMouse(this);
+        this.keyboard = new GLFWKeyboard(this);
 
         setupEventPublishers();
 
@@ -108,15 +110,20 @@ public class GLFWWindow implements Window {
 
     private void setupEventPublishers() {
         glfwSetWindowSizeCallback(pointer, (win, w, h) -> {
-            Event.BUS.post(WindowResizeEvent.create(this, w, h));
+            eventBus.post(WindowResizeEvent.create(this, w, h));
         });
         glfwSetFramebufferSizeCallback(pointer, (win, w, h) -> {
-            Event.BUS.post(WindowResizeEvent.create(this, w, h));
+            eventBus.post(WindowResizeEvent.create(this, w, h));
         });
     }
 
     public WindowSettings getSettings() {
         return settings;
+    }
+
+    @Override
+    public EventBus getEventBus() {
+        return this.eventBus;
     }
 
     @Override

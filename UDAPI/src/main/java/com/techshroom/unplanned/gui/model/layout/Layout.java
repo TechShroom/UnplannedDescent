@@ -22,14 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.layout;
 
-import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+public interface Layout {
 
-    @Override
-    public void render(RenderJob<Label> job) {
-    }
+    void layout(GroupElement element);
 
 }

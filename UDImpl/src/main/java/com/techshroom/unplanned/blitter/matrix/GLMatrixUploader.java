@@ -34,6 +34,12 @@ import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
 
 public class GLMatrixUploader implements MatrixUploader {
 
+    private final ShaderInitialization shaders;
+
+    public GLMatrixUploader(ShaderInitialization shaders) {
+        this.shaders = shaders;
+    }
+
     @Override
     public void upload(Matrix4f model, Matrix4f view, Matrix4f projection) {
         setMat(Uniform.MVP, Matrices.buildMVPMatrix(model, view, projection));
@@ -44,11 +50,11 @@ public class GLMatrixUploader implements MatrixUploader {
     }
 
     private void setMat(Uniform uniform, Matrix4f mat) {
-        glUniformMatrix4fv(ShaderInitialization.getUniform(uniform), false, mat.toArray(true));
+        glUniformMatrix4fv(shaders.getUniform(uniform), false, mat.toArray(true));
     }
 
     private void setMat(Uniform uniform, Matrix3f mat) {
-        glUniformMatrix3fv(ShaderInitialization.getUniform(uniform), false, mat.toArray(true));
+        glUniformMatrix3fv(shaders.getUniform(uniform), false, mat.toArray(true));
     }
 
 }

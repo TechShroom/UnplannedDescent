@@ -32,6 +32,8 @@ import com.techshroom.unplanned.blitter.transform.DefaultTransformer;
 import com.techshroom.unplanned.blitter.transform.TransformStack;
 
 public interface GraphicsContext {
+    
+    String getUniqueId();
 
     void clearGraphicsState();
 

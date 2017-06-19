@@ -110,7 +110,7 @@ public class ClassPathHack {
     public static boolean hasURL(URL u) {
         URLClassLoader sysloader =
                 (URLClassLoader) ClassLoader.getSystemClassLoader();
-        return ImmutableList.of(sysloader.getURLs()).contains(u);
+        return ImmutableList.copyOf(sysloader.getURLs()).contains(u);
     }
 
 }

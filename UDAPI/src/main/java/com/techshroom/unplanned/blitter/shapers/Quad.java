@@ -52,8 +52,8 @@ public interface Quad extends SinglePlaneVertexShaper {
         Vector2i d = new Vector2i(b.getX(), a.getY());
         return shape(ImmutableList.of(
                 Vertex.at(plane.convertToVector3(a).toDouble()).texture(texture.get(0)).build(),
-                Vertex.at(plane.convertToVector3(c).toDouble()).texture(texture.get(1)).build(),
-                Vertex.at(plane.convertToVector3(d).toDouble()).texture(texture.get(2)).build(),
+                Vertex.at(plane.convertToVector3(d).toDouble()).texture(texture.get(1)).build(),
+                Vertex.at(plane.convertToVector3(c).toDouble()).texture(texture.get(2)).build(),
                 Vertex.at(plane.convertToVector3(b).toDouble()).texture(texture.get(3)).build()));
     }
 

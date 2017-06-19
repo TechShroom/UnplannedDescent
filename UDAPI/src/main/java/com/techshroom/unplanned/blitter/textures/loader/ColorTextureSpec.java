@@ -25,38 +25,24 @@
 package com.techshroom.unplanned.blitter.textures.loader;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-import com.flowpowered.math.vector.Vector4i;
 import com.google.auto.value.AutoValue;
-import com.techshroom.unplanned.core.util.Maths;
+import com.techshroom.unplanned.core.util.Color;
 
 @AutoValue
 public abstract class ColorTextureSpec {
 
-    public static ColorTextureSpec create(String color, int w, int h) {
-        return create(Maths.getColorVector(color), new Vector2i(w, h));
-    }
-
-    public static ColorTextureSpec create(Vector3i color, int w, int h) {
+    public static ColorTextureSpec create(Color color, int w, int h) {
         return create(color, new Vector2i(w, h));
     }
 
-    public static ColorTextureSpec create(Vector3i color, Vector2i size) {
-        return create(new Vector4i(color, 255), size);
-    }
-
-    public static ColorTextureSpec create(Vector4i color, int w, int h) {
-        return create(color, new Vector2i(w, h));
-    }
-
-    public static ColorTextureSpec create(Vector4i color, Vector2i size) {
+    public static ColorTextureSpec create(Color color, Vector2i size) {
         return new AutoValue_ColorTextureSpec(color, size);
     }
 
     ColorTextureSpec() {
     }
 
-    public abstract Vector4i getColor();
+    public abstract Color getColor();
 
     public abstract Vector2i getSize();
 

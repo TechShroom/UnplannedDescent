@@ -22,14 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model;
 
-import com.techshroom.unplanned.gui.model.Label;
-
-public class LabelRenderer implements GuiElementRenderer<Label> {
-
-    @Override
-    public void render(RenderJob<Label> job) {
-    }
+/**
+ * Internal GuiElement for supporting draw-caching.
+ */
+public interface GuiElementInternal {
+    
+    boolean internalInvalidatedSinceLastDrawNotification();
+    
+    void internalDrawNotification();
 
 }

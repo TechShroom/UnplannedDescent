@@ -24,14 +24,13 @@
  */
 package com.techshroom.unplanned.blitter.textures.loader;
 
-import com.flowpowered.math.vector.Vector4i;
 import com.techshroom.unplanned.blitter.textures.TextureData;
 
 class SimpleColorLoader implements ColorTextureLoader {
 
     @Override
     public TextureData load(ColorTextureSpec source) {
-        int color = colorFrom4i(source.getColor());
+        int color = source.getColor().asABGRInt();
         int[][] data = new int[source.getSize().getX()][source.getSize().getY()];
         for (int i = 0; i < data.length; i++) {
             int[] js = data[i];
@@ -40,14 +39,6 @@ class SimpleColorLoader implements ColorTextureLoader {
             }
         }
         return TextureData.wrap(data);
-    }
-
-    private int colorFrom4i(Vector4i color) {
-        int r = color.getX() & 0xFF;
-        int g = color.getY() & 0xFF;
-        int b = color.getZ() & 0xFF;
-        int a = color.getW() & 0xFF;
-        return (r << 0) | (g << 8) | (b << 16) | (a << 24);
     }
 
 }

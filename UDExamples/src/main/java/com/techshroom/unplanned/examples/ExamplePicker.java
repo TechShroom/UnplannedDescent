@@ -32,12 +32,24 @@ import java.util.function.Function;
 
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.blitter.matrix.Matrices;
-import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.blitter.transform.TransformStack;
+import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.event.keyboard.KeyState;
+import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.model.layout.FlowLayout;
+import com.techshroom.unplanned.gui.model.layout.FlowLayout.Alignment;
+import com.techshroom.unplanned.gui.model.parent.GroupElement;
+import com.techshroom.unplanned.gui.model.parent.Panel;
+import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
+import com.techshroom.unplanned.gui.view.RenderManager;
+import com.techshroom.unplanned.gui.view.RootGuiElementRender;
+import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.window.Window;
 import com.techshroom.unplanned.window.WindowSettings;
 
@@ -49,6 +61,7 @@ public class ExamplePicker {
                 .collect(toImmutableMap(Example::getName, Function.identity()));
     }
 
+    private Window window;
     private Matrix4f proj;
     private Vector2i windowSize;
 
@@ -57,25 +70,59 @@ public class ExamplePicker {
     }
 
     public void run() {
-        Event.BUS.register(this);
-
-        Window window = WindowSettings.builder()
+        window = WindowSettings.builder()
                 .screenSize(1024, 768)
                 .title("Example Picker")
                 .build().createWindow();
+        window.getEventBus().register(this);
 
         GraphicsContext ctx = window.getGraphicsContext();
 
         ctx.makeActiveContext();
+        ctx.setLight(new Vector3d(0, 0, 10000), Vector3d.ONE);
         window.setVsyncOn(true);
         window.setVisible(true);
 
         Vector2i size = window.getSize();
         resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
 
+        GroupElement base = new Panel();
+        base.setPreferredSize(size);
+        // set up a chill 4 panel layout!
+        Vector2i quarter = size.div(2).sub(8, 8);
+        Panel a = new Panel();
+        Panel b = new Panel();
+        Panel c = new Panel();
+        Panel d = new Panel();
+
+        a.setPreferredSize(quarter);
+        b.setPreferredSize(quarter);
+        b.setRelativePosition(quarter.getX(), 0);
+        c.setPreferredSize(quarter);
+        c.setRelativePosition(0, quarter.getY());
+        d.setPreferredSize(quarter);
+        d.setRelativePosition(quarter);
+
+        a.setBackgroundColor(Color.RED);
+        b.setBackgroundColor(Color.GREEN);
+        c.setBackgroundColor(Color.fromString("#FEFDE7"));
+        d.setBackgroundColor(Color.BLUE);
+
+        base.addChildren(a, b, c, d);
+
+        // base.addChild(new Label("Label! It's like a LABEL!"));
+
+        RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();
+        RenderManager guiRM = new RenderManager(renderer);
+
         while (!window.isCloseRequested()) {
             window.processEvents();
             ctx.clearGraphicsState();
+            try (TransformStack stack = ctx.pushTransformer()) {
+                stack.projection().set(proj);
+
+                guiRM.render(ctx, base);
+            }
 
             ctx.swapBuffers();
         }
@@ -84,11 +131,18 @@ public class ExamplePicker {
     }
 
     @Subscribe
+    public void key(KeyStateEvent event) {
+        if (event.is(Key.ESCAPE, KeyState.PRESSED)) {
+            window.setCloseRequested(true);
+        }
+    }
+
+    @Subscribe
     public void resize(WindowResizeEvent event) {
         windowSize = event.getSize();
         int w = windowSize.getX();
         int h = windowSize.getY();
-        proj = Matrices.orthographicProjection(w, h, -1000, 1000);
+        proj = Matrix4f.createOrthographic(w, 0, 0, h, -1000, 1000);
     }
 
 }

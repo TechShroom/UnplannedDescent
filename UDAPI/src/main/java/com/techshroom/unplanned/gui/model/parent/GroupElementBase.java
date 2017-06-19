@@ -22,14 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.layout.FlowLayout;
+import com.techshroom.unplanned.gui.model.layout.Layout;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+public class GroupElementBase extends ParentElementBase implements GroupElement {
+
+    private Layout layout = new FlowLayout();
 
     @Override
-    public void render(RenderJob<Label> job) {
+    public Layout getLayout() {
+        return this.layout;
+    }
+
+    @Override
+    protected void layoutChildren() {
+        layout.layout(this);
+    }
+
+    @Override
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+        invalidate();
+    }
+
+    @Override
+    public void addChild(GuiElement element) {
+        children.add(element);
+        invalidate();
     }
 
 }

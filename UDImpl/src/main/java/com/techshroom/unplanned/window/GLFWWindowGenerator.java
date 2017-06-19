@@ -89,6 +89,7 @@ public class GLFWWindowGenerator implements WindowGenerator {
         Vector2i screenSize = settings.getScreenSize();
         long pointer = glfwCreateWindow(screenSize.getX(), screenSize.getY(), settings.getTitle(),
                 monitorIfNeeded(settings), sharedWindow(settings));
+        checkState(pointer != 0, "failed to create window");
         return GLFWWindow.get(pointer, settings);
     }
 

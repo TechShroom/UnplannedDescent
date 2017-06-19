@@ -24,6 +24,21 @@
  */
 package com.techshroom.unplanned.blitter.textures.loader;
 
+import com.flowpowered.math.vector.Vector2i;
+import com.techshroom.unplanned.blitter.textures.TextureData;
+import com.techshroom.unplanned.core.util.Color;
+
 public interface ColorTextureLoader extends TextureLoader<ColorTextureSpec, RuntimeException> {
+    
+    /**
+     * Calls {@link #load(ColorTextureSpec)} with the given color and a size of 1x1.
+     * 
+     * @param color the color to pass
+     * @see #load(ColorTextureSpec)
+     * @return the texture data
+     */
+    default TextureData load(Color color) {
+        return load(ColorTextureSpec.create(color, Vector2i.ONE));
+    }
 
 }

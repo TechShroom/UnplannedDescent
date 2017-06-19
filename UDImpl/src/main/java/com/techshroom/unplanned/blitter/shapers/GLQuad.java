@@ -31,7 +31,9 @@ import com.techshroom.unplanned.blitter.Vertex;
 
 public class GLQuad extends ShaperBase implements Quad {
 
-    private static final int[] INDICES = { 0, 1, 2, 2, 3, 0 };
+    // 01
+    // 23
+    private static final int[] INDICES = { 0, 2, 3, 0, 1, 3 };
 
     private static int indiciesVbo;
 
