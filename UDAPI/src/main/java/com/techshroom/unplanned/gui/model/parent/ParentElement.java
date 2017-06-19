@@ -22,14 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.Label;
+import java.util.List;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+import com.techshroom.unplanned.gui.model.GuiElement;
 
-    @Override
-    public void render(RenderJob<Label> job) {
-    }
+/**
+ * Parent of more {@link GuiElement GuiElements}.
+ */
+public interface ParentElement extends GuiElement {
+
+    /**
+     * An unmodifiable list of children. It may be changed by the element itself
+     * via other methods.
+     * 
+     * @return a view into the children of this element
+     */
+    List<GuiElement> getChildren();
 
 }

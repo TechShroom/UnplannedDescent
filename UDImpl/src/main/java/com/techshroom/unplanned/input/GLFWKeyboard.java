@@ -40,9 +40,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.event.Event;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
+import com.techshroom.unplanned.window.GLFWWindow;
 
 public class GLFWKeyboard implements Keyboard {
 
@@ -104,26 +104,29 @@ public class GLFWKeyboard implements Keyboard {
         }
     }
 
-    private final long window;
+    private final GLFWWindow window;
 
-    public GLFWKeyboard(long window) {
+    public GLFWKeyboard(GLFWWindow window) {
         this.window = window;
 
         // register key callback
-        glfwSetKeyCallback(window, this::keyCallback);
+        glfwSetKeyCallback(window.getWindowPointer(), this::keyCallback);
     }
 
     @Override
     public boolean isKeyDown(Key key) {
-        return glfwGetKey(window, UD_KEY_TO_GLFW.get(key)) == GLFW_PRESS;
+        return glfwGetKey(window.getWindowPointer(), UD_KEY_TO_GLFW.get(key)) == GLFW_PRESS;
     }
 
     private void keyCallback(long window, int key, int scancode, int action, int mods) {
+        if (window != this.window.getWindowPointer()) {
+            return;
+        }
         Key k = UD_KEY_TO_GLFW.inverse().get(key);
         KeyState state = getKeyState(action);
         Collection<KeyModifier> modSet = getModifiers(mods);
 
-        Event.BUS.post(KeyStateEvent.create(this, k, state, modSet));
+        this.window.getEventBus().post(KeyStateEvent.create(this, k, state, modSet));
     }
 
 }

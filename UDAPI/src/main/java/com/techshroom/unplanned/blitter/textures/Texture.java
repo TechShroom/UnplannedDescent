@@ -25,7 +25,8 @@
 package com.techshroom.unplanned.blitter.textures;
 
 import com.techshroom.unplanned.blitter.binding.Bindable;
+import com.techshroom.unplanned.core.util.LifecycleObject;
 
-public interface Texture extends Bindable, UVMapper.BySize {
+public interface Texture extends LifecycleObject, Bindable, UVMapper.BySize {
 
 }

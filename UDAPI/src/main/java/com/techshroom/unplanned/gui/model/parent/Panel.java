@@ -22,14 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.Label;
+import javax.swing.JPanel;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
-
-    @Override
-    public void render(RenderJob<Label> job) {
-    }
+/**
+ * Like {@link JPanel}.
+ */
+public class Panel extends GroupElementBase implements GroupElement {
 
 }

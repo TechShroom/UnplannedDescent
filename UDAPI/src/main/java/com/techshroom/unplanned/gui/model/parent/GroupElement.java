@@ -22,15 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model;
+package com.techshroom.unplanned.gui.model.parent;
 
-import com.google.common.collect.ImmutableList;
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.layout.Layout;
 
 /**
- * Parent of more {@link GuiElement GuiElements}.
+ * {@link ParentElement} with the ability to add elements generically, and have
+ * them laid out.
  */
-public interface ParentElement extends GuiElement {
+public interface GroupElement extends ParentElement {
+    
+    Layout getLayout();
 
-    ImmutableList<GuiElement> getChildren();
+    void setLayout(Layout layout);
+
+    void addChild(GuiElement element);
+    
+    default void addChildren(GuiElement... elements) {
+        for (GuiElement e : elements) {
+            addChild(e);
+        }
+    }
 
 }

@@ -52,11 +52,10 @@ import com.techshroom.unplanned.blitter.textures.TextureSettings;
 import com.techshroom.unplanned.blitter.textures.TextureWrap;
 import com.techshroom.unplanned.blitter.textures.Upscaling;
 import com.techshroom.unplanned.blitter.textures.loader.ColorTextureLoader;
-import com.techshroom.unplanned.blitter.textures.loader.ColorTextureSpec;
 import com.techshroom.unplanned.blitter.textures.loader.StandardTextureLoaders;
 import com.techshroom.unplanned.blitter.textures.map.TextureAtlas;
 import com.techshroom.unplanned.blitter.textures.map.TextureCollection;
-import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
@@ -88,12 +87,12 @@ public class SimpleRotatingCube extends Example {
     public void run() {
         // System.setProperty("ud.apitrace",
         // "/home/octy/Documents/GitHub/apitrace/build/wrappers/glxtrace.so");
-        Event.BUS.register(this);
 
         window = WindowSettings.builder()
                 .screenSize(800, 600)
                 .title("SimpleRotatingCube")
                 .build().createWindow();
+        window.getEventBus().register(this);
         GraphicsContext ctx = window.getGraphicsContext();
 
         ctx.makeActiveContext();
@@ -105,12 +104,12 @@ public class SimpleRotatingCube extends Example {
 
         ColorTextureLoader loader = StandardTextureLoaders.RGBA_COLOR_LOADER;
 
-        TextureData red = loader.load(ColorTextureSpec.create("F00", 1, 1));
-        TextureData green = loader.load(ColorTextureSpec.create("0F0", 1, 1));
-        TextureData blue = loader.load(ColorTextureSpec.create("00F", 1, 1));
-        TextureData vinyl1 = loader.load(ColorTextureSpec.create("3366CC", 1, 1));
-        TextureData vinyl2 = loader.load(ColorTextureSpec.create("FEFDE7", 1, 1));
-        TextureData vinyl3 = loader.load(ColorTextureSpec.create("18E7E7", 1, 1));
+        TextureData red = loader.load(Color.fromString("F00"));
+        TextureData green = loader.load(Color.fromString("0F0"));
+        TextureData blue = loader.load(Color.fromString("00F"));
+        TextureData vinyl1 = loader.load(Color.fromString("3366CC"));
+        TextureData vinyl2 = loader.load(Color.fromString("FEFDE7"));
+        TextureData vinyl3 = loader.load(Color.fromString("18E7E7"));
 
         // setup map...
         TextureCollection base = TextureCollection.of();
@@ -131,11 +130,14 @@ public class SimpleRotatingCube extends Example {
 
         // load atlas into card
         Texture texture = ctx.getTextureProvider().load(atlas.getData(), settings);
+        texture.initialize();
         Texture redTex = ctx.getTextureProvider().load(red, settings);
+        redTex.initialize();
 
         // load secondary atlases
         List<Texture> textures = getColors(settings).stream()
                 .map(t -> ctx.getTextureProvider().load(t.getData(), settings))
+                .peek(Texture::initialize)
                 .collect(toImmutableList());
 
         cubeLayout = new CubeLayout(atlas, base)
@@ -229,8 +231,7 @@ public class SimpleRotatingCube extends Example {
         TextureCollection coll = TextureCollection.of();
         for (int i = 0; i < 6; i++) {
             String hex = generateHex();
-            coll.put(StandardTextureLoaders.RGBA_COLOR_LOADER.load(
-                    ColorTextureSpec.create(hex, 1, 1)), hex);
+            coll.put(StandardTextureLoaders.RGBA_COLOR_LOADER.load(Color.fromString(hex)), hex);
         }
         return TextureAtlas.create(512, 512, coll);
     }

@@ -70,29 +70,29 @@ public class ShaderInitialization {
         }
     }
 
-    private static int vertexShaderId;
-    private static int fragShaderId;
-    private static int programId;
+    private int vertexShaderId;
+    private int fragShaderId;
+    private int programId;
 
-    private static final Map<Uniform, Integer> uniforms = new EnumMap<>(Uniform.class);
+    private final Map<Uniform, Integer> uniforms = new EnumMap<>(Uniform.class);
 
-    private static void checkInit() {
+    private void checkInit() {
         checkState(programId != 0, "setupShaders not called yet");
     }
 
-    public static int getProgram() {
+    public int getProgram() {
         checkInit();
         return programId;
     }
 
-    public static int getUniform(Uniform uniform) {
+    public int getUniform(Uniform uniform) {
         checkInit();
         Integer id = uniforms.get(uniform);
         checkState(id != null, "missing uniform %s", uniform);
         return id;
     }
 
-    public static void setupShaders() {
+    public void setupShaders() {
         if (programId != 0) {
             return;
         }
@@ -108,13 +108,13 @@ public class ShaderInitialization {
         }
     }
 
-    private static void initIds() {
+    private void initIds() {
         vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
         fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
         programId = glCreateProgram();
     }
 
-    private static void compileShaders() throws IOException {
+    private void compileShaders() throws IOException {
         String vertexShader = loadFile("/com/techshroom/unplanned/shaders/vertex.glsl");
         String fragmentShader = loadFile("/com/techshroom/unplanned/shaders/fragment.glsl");
 
@@ -122,7 +122,7 @@ public class ShaderInitialization {
         compileShader("fragment", fragShaderId, fragmentShader);
     }
 
-    private static void compileShader(String label, int shader, String data) {
+    private void compileShader(String label, int shader, String data) {
         glShaderSource(shader, data);
         glCompileShader(shader);
 
@@ -131,7 +131,7 @@ public class ShaderInitialization {
         }
     }
 
-    private static void linkShaders() {
+    private void linkShaders() {
         glAttachShader(programId, vertexShaderId);
         glAttachShader(programId, fragShaderId);
         glLinkProgram(programId);
@@ -154,7 +154,7 @@ public class ShaderInitialization {
         GLErrorCheck.check();
     }
 
-    private static void setBindings() {
+    private void setBindings() {
         for (Uniform u : Uniform.values()) {
             uniforms.put(u, glGetUniformLocation(programId, u.shaderName));
         }

@@ -30,7 +30,7 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -52,7 +52,7 @@ import com.techshroom.unplanned.blitter.shapers.GLShapes;
 import com.techshroom.unplanned.blitter.shapers.Shapes;
 import com.techshroom.unplanned.blitter.textures.GLTextureProvider;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
-import com.techshroom.unplanned.event.Event;
+import com.techshroom.unplanned.core.util.GLErrorCheck;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.window.GLFWWindow;
 import com.techshroom.unplanned.window.ShaderInitialization;
@@ -60,9 +60,11 @@ import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
 
 public class GLGraphicsContext implements GraphicsContext {
 
+    private final ShaderInitialization shaders = new ShaderInitialization();
+
     private final TextureProvider textureProvider = new GLTextureProvider();
     private final Shapes shapes = new GLShapes();
-    private final MatrixUploader matUpload = new GLMatrixUploader();
+    private final MatrixUploader matUpload = new GLMatrixUploader(shaders);
 
     private final GLFWWindow window;
 
@@ -71,11 +73,16 @@ public class GLGraphicsContext implements GraphicsContext {
     }
 
     @Override
+    public String getUniqueId() {
+        return Long.toHexString(this.window.getWindowPointer());
+    }
+
+    @Override
     public void clearGraphicsState() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // choose our program again
-        glUseProgram(ShaderInitialization.getProgram());
+        glUseProgram(shaders.getProgram());
     }
 
     @Override
@@ -85,17 +92,21 @@ public class GLGraphicsContext implements GraphicsContext {
 
         if (window.getSettings().isMsaa()) {
             glEnable(GL_MULTISAMPLE);
+            GLErrorCheck.check();
         }
         // setup GL context
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        ShaderInitialization.setupShaders();
+        glDepthFunc(GL_LEQUAL);
+        GLErrorCheck.check();
+        shaders.setupShaders();
+        glUseProgram(shaders.getProgram());
         glClearColor(0, 0, 0, 1);
         setLight(Vector3d.ZERO, Vector3d.ONE);
 
-        Event.BUS.register(this);
+        window.getEventBus().register(this);
         Vector2i size = window.getSize();
         onResize(WindowResizeEvent.create(window, size.getX(), size.getY()));
+        GLErrorCheck.check();
     }
 
     @Subscribe
@@ -119,7 +130,11 @@ public class GLGraphicsContext implements GraphicsContext {
     }
 
     private void setVec3(Uniform uniform, Vector3d vec) {
-        glUniform3f(ShaderInitialization.getUniform(uniform), (float) vec.getX(), (float) vec.getY(), (float) vec.getZ());
+        glUniform3f(shaders.getUniform(uniform), (float) vec.getX(), (float) vec.getY(), (float) vec.getZ());
+    }
+
+    public ShaderInitialization getShaders() {
+        return shaders;
     }
 
     @Override

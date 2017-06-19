@@ -22,14 +22,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.Label;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.GuiElementBase;
+
+public class ParentElementBase extends GuiElementBase implements ParentElement {
+
+    protected final List<GuiElement> children = new ArrayList<>();
+    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
 
     @Override
-    public void render(RenderJob<Label> job) {
+    public List<GuiElement> getChildren() {
+        return childrenView;
+    }
+    
+    @Override
+    protected void onRevalidation() {
+        super.onRevalidation();
+        layout();
+    }
+
+    /**
+     * Perform the layout of all the children. Should not perform any special
+     * layouts, like for child {@link ParentElement ParentElements}. This is
+     * handled in {@link #layout()}.
+     */
+    protected void layoutChildren() {
+    }
+
+    private void layout() {
+        for (GuiElement child : children) {
+            if (child instanceof ParentElement) {
+                ((ParentElement) child).validate();
+            }
+        }
+        layoutChildren();
     }
 
 }

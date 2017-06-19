@@ -22,13 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model;
+package com.techshroom.unplanned.gui.view;
 
-/**
- * {@link ParentElement} with the ability to add elements generically.
- */
-public interface GroupElement extends ParentElement {
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.parent.ParentElement;
 
-    void addChild(GuiElement element);
+public class ParentElementRenderer extends SimpleGuiElementRenderer<ParentElement> {
+
+    private final SimpleRootGuiElementRenderer delegate;
+
+    ParentElementRenderer(SimpleRootGuiElementRenderer delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public void render(RenderJob<ParentElement> job) {
+        super.render(job);
+        job.getElement().getChildren().forEach(c -> {
+            if (c.isVisible()) {
+                try (RenderJob<GuiElement> child = job.createSubRenderJob(c)) {
+                    delegate.render(child);
+                }
+            }
+        });
+    }
 
 }

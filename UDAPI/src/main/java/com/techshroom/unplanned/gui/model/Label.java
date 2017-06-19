@@ -27,6 +27,14 @@ package com.techshroom.unplanned.gui.model;
 public class Label extends GuiElementBase implements Labeled {
 
     private String text;
+    
+    public Label() {
+        this("");
+    }
+    
+    public Label(String text) {
+        this.text = text;
+    }
 
     @Override
     public String getText() {

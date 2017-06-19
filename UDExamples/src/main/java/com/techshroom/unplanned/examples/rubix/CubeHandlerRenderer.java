@@ -26,8 +26,6 @@ package com.techshroom.unplanned.examples.rubix;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.techshroom.unplanned.blitter.Drawable;
@@ -39,13 +37,11 @@ import com.techshroom.unplanned.blitter.textures.TextureSettings;
 import com.techshroom.unplanned.blitter.textures.TextureWrap;
 import com.techshroom.unplanned.blitter.textures.Upscaling;
 import com.techshroom.unplanned.blitter.textures.loader.ColorTextureLoader;
-import com.techshroom.unplanned.blitter.textures.loader.ColorTextureSpec;
 import com.techshroom.unplanned.blitter.textures.loader.StandardTextureLoaders;
 import com.techshroom.unplanned.blitter.textures.map.TextureAtlas;
 import com.techshroom.unplanned.blitter.textures.map.TextureCollection;
+import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.core.util.LifecycleObject;
-import com.techshroom.unplanned.geometry.Direction;
-import com.techshroom.unplanned.geometry.Plane;
 
 public class CubeHandlerRenderer implements Drawable, LifecycleObject {
 
@@ -82,7 +78,7 @@ public class CubeHandlerRenderer implements Drawable, LifecycleObject {
             Vector3i color = c.getColor();
             String colorKey = colorKey(color);
             if (!textures.getData().containsValue(colorKey)) {
-                textures.put(ctl.load(ColorTextureSpec.create(color, 1, 1)), colorKey);
+                textures.put(ctl.load(Color.fromInt(color.getX(), color.getY(), color.getZ(), 0xFF)), colorKey);
             }
         });
         TextureAtlas atlas = TextureAtlas.create(512, 512, textures);
@@ -92,6 +88,7 @@ public class CubeHandlerRenderer implements Drawable, LifecycleObject {
                 .upscaling(Upscaling.NEAREST)
                 .textureWrapping(TextureWrap.CLAMP_TO_EDGE)
                 .build());
+        colorTexture.initialize();
 
         model.getQuads().forEach(quad -> {
             // shapes.put(quad, ctx.getShapes().quad().shape(Plane.XY, a, b,
@@ -101,6 +98,7 @@ public class CubeHandlerRenderer implements Drawable, LifecycleObject {
 
     @Override
     public void destroy() {
+        colorTexture.destroy();
     }
 
     @Override

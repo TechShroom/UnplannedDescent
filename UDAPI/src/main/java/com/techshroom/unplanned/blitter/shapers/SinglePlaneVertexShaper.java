@@ -48,7 +48,7 @@ public interface SinglePlaneVertexShaper extends VertexShaper {
 
         Vector3d v1 = vertices.get(0).getPosition().sub(vertices.get(1).getPosition());
         Vector3d v2 = vertices.get(0).getPosition().sub(vertices.get(2).getPosition());
-        Vector3d normal = v1.cross(v2);
+        Vector3d normal = v1.cross(v2).normalize();
 
         List<Vertex> normalized = vertices.stream()
                 .map(Vertex::toBuilder)

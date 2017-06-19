@@ -39,26 +39,38 @@ import java.nio.DoubleBuffer;
 import org.lwjgl.system.MemoryStack;
 
 import com.flowpowered.math.vector.Vector2d;
-import com.techshroom.unplanned.event.Event;
+import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.event.mouse.MouseButtonEvent;
 import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
 import com.techshroom.unplanned.event.mouse.MouseScrollEvent;
+import com.techshroom.unplanned.window.GLFWWindow;
 
 public class GLFWMouse implements Mouse {
 
-    private final long window;
+    private final GLFWWindow window;
 
-    public GLFWMouse(long window) {
+    public GLFWMouse(GLFWWindow window) {
         this.window = window;
 
-        glfwSetCursorPosCallback(window, (win, x, y) -> {
-            Event.BUS.post(MouseMoveEvent.create(this, x, y));
+        EventBus bus = this.window.getEventBus();
+        long ptr = window.getWindowPointer();
+        glfwSetCursorPosCallback(ptr, (win, x, y) -> {
+            if (win != this.window.getWindowPointer()) {
+                return;
+            }
+            bus.post(MouseMoveEvent.create(this, x, y));
         });
-        glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
-            Event.BUS.post(MouseButtonEvent.create(this, button, action == GLFW_PRESS, GLFWKeyboard.getModifiers(mods)));
+        glfwSetMouseButtonCallback(ptr, (win, button, action, mods) -> {
+            if (win != this.window.getWindowPointer()) {
+                return;
+            }
+            bus.post(MouseButtonEvent.create(this, button, action == GLFW_PRESS, GLFWKeyboard.getModifiers(mods)));
         });
-        glfwSetScrollCallback(window, (win, dx, dy) -> {
-            Event.BUS.post(MouseScrollEvent.create(this, dx, dy));
+        glfwSetScrollCallback(ptr, (win, dx, dy) -> {
+            if (win != this.window.getWindowPointer()) {
+                return;
+            }
+            bus.post(MouseScrollEvent.create(this, dx, dy));
         });
     }
 
@@ -67,19 +79,19 @@ public class GLFWMouse implements Mouse {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             DoubleBuffer xpos = stack.mallocDouble(1);
             DoubleBuffer ypos = stack.mallocDouble(1);
-            glfwGetCursorPos(window, xpos, ypos);
+            glfwGetCursorPos(window.getWindowPointer(), xpos, ypos);
             return new Vector2d(xpos.get(0), ypos.get(0));
         }
     }
 
     @Override
     public void activateMouseGrab() {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(window.getWindowPointer(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
     @Override
     public void deactivateMouseGrab() {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(window.getWindowPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
 }

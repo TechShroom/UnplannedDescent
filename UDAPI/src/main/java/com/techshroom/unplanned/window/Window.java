@@ -25,6 +25,7 @@
 package com.techshroom.unplanned.window;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.input.Mouse;
@@ -33,6 +34,8 @@ import com.techshroom.unplanned.input.Mouse;
  * Window API.
  */
 public interface Window {
+
+    EventBus getEventBus();
 
     Vector2i getSize();
 
