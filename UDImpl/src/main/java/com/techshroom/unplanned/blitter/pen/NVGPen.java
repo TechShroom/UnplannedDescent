@@ -22,46 +22,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.pen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.techshroom.unplanned.blitter.GLGraphicsContext;
+import com.techshroom.unplanned.blitter.font.Font;
+import com.techshroom.unplanned.blitter.font.FontDefault;
+import com.techshroom.unplanned.core.util.Color;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+public class NVGPen implements DigitalPen {
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
+    private final GLGraphicsContext graphics;
+    private Color color = Color.BLACK;
+    private Font font;
 
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
+    public NVGPen(GLGraphicsContext graphics) {
+        this.graphics = graphics;
+    }
 
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
+    public void initialize() {
+        this.font = FontDefault.loadPlain(graphics);
+    }
+
+    public void destroy() {
+        this.font.delete();
+        this.font = null;
+    }
+
+    private long ctx() {
+        return this.graphics.getNanoVgContext();
     }
 
     @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
+    public void setColor(Color color) {
+        this.color = color;
     }
 
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
+    @Override
+    public Color getColor() {
+        return color;
     }
 
-    private void layout() {
-        for (GuiElement child : children) {
-            if (child instanceof ParentElement) {
-                ((ParentElement) child).validate();
-            }
-        }
-        layoutChildren();
+    @Override
+    public void setFont(Font font) {
+        this.font = font;
+    }
+
+    @Override
+    public Font getFont() {
+        return font;
     }
 
 }

@@ -29,7 +29,7 @@ import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector3f;
 
 public interface MatrixTransformer {
-    
+
     default MatrixTransformer reset() {
         set(Matrix4f.IDENTITY);
         return this;

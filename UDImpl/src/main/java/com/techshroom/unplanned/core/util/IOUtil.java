@@ -26,7 +26,6 @@
 package com.techshroom.unplanned.core.util;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.BufferUtils.createByteBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 
-import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryUtil;
 
 /* Also copyright:
  * Copyright LWJGL. All rights reserved.
@@ -47,14 +46,25 @@ public final class IOUtil {
     }
 
     private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
-        ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
-        buffer.flip();
-        newBuffer.put(buffer);
+        ByteBuffer newBuffer = MemoryUtil.memRealloc(buffer, newCapacity);
+        if (newBuffer == null) {
+            throw new OutOfMemoryError("Failed to reallocate buffer: newCapacity=" + newCapacity);
+        }
+        return newBuffer;
+    }
+
+    private static ByteBuffer createByteBuffer(int capacity) {
+        ByteBuffer newBuffer = MemoryUtil.memAlloc(capacity);
+        if (newBuffer == null) {
+            throw new OutOfMemoryError("Failed to allocate buffer: capacity=" + capacity);
+        }
         return newBuffer;
     }
 
     /**
      * Reads the specified resource and returns the raw data as a ByteBuffer.
+     * THIS BUFFER IS ALLOCATTED USING {@link MemoryUtil} AND MUST BE EXPLICITLY
+     * FREED!!!
      *
      * @param resource
      *            the resource to read
@@ -67,7 +77,7 @@ public final class IOUtil {
      *             if an IO error occurs
      */
     public static ByteBuffer ioResourceToByteBuffer(InputStream resource, int bufferSize) throws IOException {
-        ByteBuffer buffer;
+        ByteBuffer buffer = null;
 
         try (ReadableByteChannel rbc = Channels.newChannel(resource)) {
             int size = bufferSize;
@@ -87,6 +97,9 @@ public final class IOUtil {
                     buffer = resizeBuffer(buffer, buffer.capacity() * 2);
                 }
             }
+        } catch (Throwable t) {
+            MemoryUtil.memFree(buffer);
+            throw t;
         }
 
         buffer.flip();

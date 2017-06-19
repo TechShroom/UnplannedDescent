@@ -54,7 +54,7 @@ import java.nio.IntBuffer;
 import com.techshroom.unplanned.core.util.GLErrorCheck;
 
 public class GLTexture implements Texture {
-    
+
     private static final int NO_TEXTURE = -1;
 
     private static int getMagFilter(Upscaling upscaling) {

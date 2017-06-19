@@ -24,9 +24,13 @@
  */
 package com.techshroom.unplanned.blitter;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_DEBUG;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -46,12 +50,17 @@ import org.lwjgl.opengl.GL;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.eventbus.Subscribe;
+import com.techshroom.unplanned.blitter.font.FontLoader;
+import com.techshroom.unplanned.blitter.font.NVGFontLoader;
 import com.techshroom.unplanned.blitter.matrix.GLMatrixUploader;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
+import com.techshroom.unplanned.blitter.pen.NVGPen;
 import com.techshroom.unplanned.blitter.shapers.GLShapes;
 import com.techshroom.unplanned.blitter.shapers.Shapes;
 import com.techshroom.unplanned.blitter.textures.GLTextureProvider;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
+import com.techshroom.unplanned.core.Settings;
 import com.techshroom.unplanned.core.util.GLErrorCheck;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.window.GLFWWindow;
@@ -67,6 +76,9 @@ public class GLGraphicsContext implements GraphicsContext {
     private final MatrixUploader matUpload = new GLMatrixUploader(shaders);
 
     private final GLFWWindow window;
+    private final FontLoader fontLoader = new NVGFontLoader(this);
+    private final NVGPen pen = new NVGPen(this);
+    private long nanoVgContext;
 
     public GLGraphicsContext(GLFWWindow window) {
         this.window = window;
@@ -107,6 +119,23 @@ public class GLGraphicsContext implements GraphicsContext {
         Vector2i size = window.getSize();
         onResize(WindowResizeEvent.create(window, size.getX(), size.getY()));
         GLErrorCheck.check();
+
+        if (nanoVgContext == 0) {
+            int nvgFlags = 0;
+            if (window.getSettings().isMsaa()) {
+                nvgFlags |= NVG_ANTIALIAS;
+            }
+            if (Settings.GRAPHICS_DEBUG) {
+                nvgFlags |= NVG_DEBUG;
+            }
+            nanoVgContext = nvgCreate(nvgFlags);
+            checkState(nanoVgContext != 0, "failed to initialize NanoVG");
+            pen.initialize();
+        }
+    }
+
+    public long getNanoVgContext() {
+        return nanoVgContext;
     }
 
     @Subscribe
@@ -150,6 +179,16 @@ public class GLGraphicsContext implements GraphicsContext {
     @Override
     public MatrixUploader getMatrixUploader() {
         return matUpload;
+    }
+
+    @Override
+    public FontLoader getFontLoader() {
+        return fontLoader;
+    }
+
+    @Override
+    public DigitalPen getPen() {
+        return pen;
     }
 
 }
