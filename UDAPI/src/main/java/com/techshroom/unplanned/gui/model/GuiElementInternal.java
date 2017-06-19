@@ -28,9 +28,9 @@ package com.techshroom.unplanned.gui.model;
  * Internal GuiElement for supporting draw-caching.
  */
 public interface GuiElementInternal {
-    
+
     boolean internalInvalidatedSinceLastDrawNotification();
-    
+
     void internalDrawNotification();
 
 }

@@ -142,7 +142,8 @@ public abstract class Color {
     public abstract int getAlpha();
 
     /**
-     * @return an integer with the colors order (least significant to most) ABGR.
+     * @return an integer with the colors order (least significant to most)
+     *         ABGR.
      */
     public final int asABGRInt() {
         int red = getRed();

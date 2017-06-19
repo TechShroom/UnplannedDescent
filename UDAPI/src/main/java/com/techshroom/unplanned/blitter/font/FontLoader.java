@@ -22,46 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.font;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import static com.google.common.base.Preconditions.checkArgument;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
+import com.google.common.io.Resources;
 
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
+public interface FontLoader {
 
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
-    }
-
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
-    }
-
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
-    }
-
-    private void layout() {
-        for (GuiElement child : children) {
-            if (child instanceof ParentElement) {
-                ((ParentElement) child).validate();
-            }
+    default Font loadFontFromFileSystem(String name, String ttf) throws IOException {
+        try (InputStream stream = Files.newInputStream(Paths.get(ttf))) {
+            return loadFont(name, stream);
         }
-        layoutChildren();
     }
+
+    default Font loadFontFromClasspath(String name, String ttf) throws IOException {
+        URL cpLocation = Resources.getResource(ttf);
+        checkArgument(cpLocation != null, "Resource '%s' does not exist.", ttf);
+        try (InputStream stream = Resources.asByteSource(cpLocation).openBufferedStream()) {
+            return loadFont(name, stream);
+        }
+    }
+
+    Font loadFont(String name, InputStream ttf) throws IOException;
 
 }

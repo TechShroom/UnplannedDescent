@@ -22,46 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.pen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.techshroom.unplanned.blitter.font.Font;
+import com.techshroom.unplanned.core.util.Color;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+public interface DigitalPen {
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
+    void setColor(Color color);
 
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
+    Color getColor();
 
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
-    }
+    void setFont(Font font);
 
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
-    }
-
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
-    }
-
-    private void layout() {
-        for (GuiElement child : children) {
-            if (child instanceof ParentElement) {
-                ((ParentElement) child).validate();
-            }
-        }
-        layoutChildren();
-    }
+    Font getFont();
 
 }

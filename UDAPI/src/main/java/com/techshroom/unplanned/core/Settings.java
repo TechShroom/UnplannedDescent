@@ -24,12 +24,10 @@
  */
 package com.techshroom.unplanned.core;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 
 public final class Settings {
 
@@ -45,13 +43,9 @@ public final class Settings {
         return load(property, defaultVal, Function.identity());
     }
 
-    private static final Set<String> TRUE;
-    static {
-        ImmutableSet<String> base = ImmutableSet.of("y", "yes", "true", "1");
-        TreeSet<String> caseInsensSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        caseInsensSet.addAll(base);
-        TRUE = Collections.unmodifiableSet(caseInsensSet);
-    }
+    private static final Set<String> TRUE = ImmutableSortedSet.orderedBy(String.CASE_INSENSITIVE_ORDER)
+            .add("y", "yes", "true", "1")
+            .build();
 
     private static boolean load(String property, boolean defaultVal) {
         return load(property, defaultVal, TRUE::contains);
@@ -59,6 +53,7 @@ public final class Settings {
 
     public static final String APITRACE = load("ud.apitrace", "");
     public static final boolean FILL_TEXTURES_WITH_DEBUG_COLOR = load("ud.texture.debug.color", false);
+    public static final boolean GRAPHICS_DEBUG = load("ud.graphics.debug", false);
 
     private Settings() {
     }

@@ -25,14 +25,16 @@
 package com.techshroom.unplanned.blitter;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.techshroom.unplanned.blitter.font.FontLoader;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.blitter.shapers.Shapes;
 import com.techshroom.unplanned.blitter.textures.TextureProvider;
 import com.techshroom.unplanned.blitter.transform.DefaultTransformer;
 import com.techshroom.unplanned.blitter.transform.TransformStack;
 
 public interface GraphicsContext {
-    
+
     String getUniqueId();
 
     void clearGraphicsState();
@@ -48,6 +50,10 @@ public interface GraphicsContext {
     Shapes getShapes();
 
     MatrixUploader getMatrixUploader();
+
+    DigitalPen getPen();
+
+    FontLoader getFontLoader();
 
     default TransformStack pushTransformer() {
         return DefaultTransformer.getInstance().push();

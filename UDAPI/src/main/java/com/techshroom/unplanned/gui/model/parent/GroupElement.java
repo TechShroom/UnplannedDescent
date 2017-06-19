@@ -32,13 +32,13 @@ import com.techshroom.unplanned.gui.model.layout.Layout;
  * them laid out.
  */
 public interface GroupElement extends ParentElement {
-    
+
     Layout getLayout();
 
     void setLayout(Layout layout);
 
     void addChild(GuiElement element);
-    
+
     default void addChildren(GuiElement... elements) {
         for (GuiElement e : elements) {
             addChild(e);

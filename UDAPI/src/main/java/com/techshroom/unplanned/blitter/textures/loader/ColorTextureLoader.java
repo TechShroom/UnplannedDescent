@@ -29,11 +29,13 @@ import com.techshroom.unplanned.blitter.textures.TextureData;
 import com.techshroom.unplanned.core.util.Color;
 
 public interface ColorTextureLoader extends TextureLoader<ColorTextureSpec, RuntimeException> {
-    
+
     /**
-     * Calls {@link #load(ColorTextureSpec)} with the given color and a size of 1x1.
+     * Calls {@link #load(ColorTextureSpec)} with the given color and a size of
+     * 1x1.
      * 
-     * @param color the color to pass
+     * @param color
+     *            the color to pass
      * @see #load(ColorTextureSpec)
      * @return the texture data
      */

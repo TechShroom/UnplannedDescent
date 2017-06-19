@@ -22,46 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.font;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.flowpowered.math.vector.Vector2f;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
-
-public class ParentElementBase extends GuiElementBase implements ParentElement {
-
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
-
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
-    }
-
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
-    }
+public interface Font {
 
     /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
+     * Name of the font, as provided when loading the font.
+     *
+     * @return the provided name for the font
      */
-    protected void layoutChildren() {
-    }
+    String getProvidedName();
 
-    private void layout() {
-        for (GuiElement child : children) {
-            if (child instanceof ParentElement) {
-                ((ParentElement) child).validate();
-            }
-        }
-        layoutChildren();
-    }
+    float getSize();
+
+    Font withSize(float size);
+
+    // font properties
+    float getAscent();
+
+    float getDescent();
+
+    float getHeight();
+
+    // expensive!!
+    Vector2f getBoundingBox(String text);
+
+    /**
+     * Instructs the font to release any resources. It must not be used after
+     * this, and should be GC'd.
+     */
+    void delete();
 
 }
