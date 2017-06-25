@@ -29,6 +29,17 @@ import com.techshroom.unplanned.core.util.Color;
 
 public interface DigitalPen {
 
+    /**
+     * Start a frame for the pen. Must be called before any draw calls.
+     */
+    void uncap();
+
+    /**
+     * End a frame for the pen. Must be called after all draw calls (for the
+     * frame).
+     */
+    void cap();
+
     void setColor(Color color);
 
     Color getColor();
@@ -36,5 +47,15 @@ public interface DigitalPen {
     void setFont(Font font);
 
     Font getFont();
+    
+    void begin();
+    
+    void fill();
+    
+    void stroke();
+    
+    void rect(float x, float y, float w, float h);
+    
+    void roundedRect(float x, float y, float w, float h, float r);
 
 }

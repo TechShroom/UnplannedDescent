@@ -24,19 +24,57 @@
  */
 package com.techshroom.unplanned.blitter.pen;
 
+import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
+import static org.lwjgl.nanovg.NanoVG.nvgBeginPath;
+import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
+import static org.lwjgl.nanovg.NanoVG.nvgFill;
+import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
+import static org.lwjgl.nanovg.NanoVG.nvgRect;
+import static org.lwjgl.nanovg.NanoVG.nvgRoundedRect;
+import static org.lwjgl.nanovg.NanoVG.nvgStroke;
+import static org.lwjgl.nanovg.NanoVG.nvgStrokeColor;
+
+import org.lwjgl.nanovg.NVGColor;
+
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector4f;
+import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
 import com.techshroom.unplanned.blitter.font.Font;
 import com.techshroom.unplanned.blitter.font.FontDefault;
 import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
+import com.techshroom.unplanned.event.window.WindowResizeEvent;
 
 public class NVGPen implements DigitalPen {
 
+    private static NVGColor allocateNvgColor(Color color) {
+        Vector4f c = color.asVector4f();
+        return NVGColor.calloc().r(c.getX()).g(c.getY()).b(c.getZ()).a(c.getW());
+    }
+
     private final GLGraphicsContext graphics;
+    private Vector2i winSize;
+    private Vector2i fbSize;
     private Color color = Color.BLACK;
+    private NVGColor nvgColor = allocateNvgColor(color);
     private Font font;
 
     public NVGPen(GLGraphicsContext graphics) {
         this.graphics = graphics;
+        winSize = graphics.getWindow().getSize();
+        fbSize = graphics.getWindow().getFramebufferSize();
+        this.graphics.getWindow().getEventBus().register(this);
+    }
+
+    @Subscribe
+    public void onWindowResize(WindowResizeEvent event) {
+        winSize = event.getSize();
+    }
+
+    @Subscribe
+    public void onFramebufferResize(WindowFramebufferResizeEvent event) {
+        fbSize = event.getSize();
     }
 
     public void initialize() {
@@ -53,8 +91,20 @@ public class NVGPen implements DigitalPen {
     }
 
     @Override
+    public void uncap() {
+        nvgBeginFrame(ctx(), winSize.getX(), winSize.getY(), fbSize.getX() / winSize.getX());
+    }
+
+    @Override
+    public void cap() {
+        nvgEndFrame(ctx());
+    }
+
+    @Override
     public void setColor(Color color) {
         this.color = color;
+        this.nvgColor.free();
+        this.nvgColor = allocateNvgColor(color);
     }
 
     @Override
@@ -70,6 +120,33 @@ public class NVGPen implements DigitalPen {
     @Override
     public Font getFont() {
         return font;
+    }
+
+    @Override
+    public void begin() {
+        nvgBeginPath(ctx());
+    }
+
+    @Override
+    public void fill() {
+        nvgFillColor(ctx(), nvgColor);
+        nvgFill(ctx());
+    }
+
+    @Override
+    public void stroke() {
+        nvgStrokeColor(ctx(), nvgColor);
+        nvgStroke(ctx());
+    }
+    
+    @Override
+    public void rect(float x, float y, float w, float h) {
+        nvgRect(ctx(), x, y, w, h);
+    }
+    
+    @Override
+    public void roundedRect(float x, float y, float w, float h, float r) {
+        nvgRoundedRect(ctx(), x, y, w, h, r);
     }
 
 }

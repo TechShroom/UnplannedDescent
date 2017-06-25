@@ -129,30 +129,27 @@ public class GLFWWindow implements Window {
     @Override
     public Vector2i getSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer width = stack.mallocInt(1);
-            IntBuffer height = stack.mallocInt(1);
-            glfwGetWindowSize(pointer, width, height);
-            return new Vector2i(width.get(0), height.get(0));
+            IntBuffer size = stack.mallocInt(2);
+            glfwGetWindowSize(pointer, (IntBuffer) size.duplicate().position(0), (IntBuffer) size.duplicate().position(1));
+            return new Vector2i(size.get(0), size.get(1));
         }
     }
 
     @Override
     public Vector2i getFramebufferSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer width = stack.mallocInt(1);
-            IntBuffer height = stack.mallocInt(1);
-            glfwGetFramebufferSize(pointer, width, height);
-            return new Vector2i(width.get(0), height.get(0));
+            IntBuffer size = stack.mallocInt(2);
+            glfwGetFramebufferSize(pointer, (IntBuffer) size.duplicate().position(0), (IntBuffer) size.duplicate().position(1));
+            return new Vector2i(size.get(0), size.get(1));
         }
     }
 
     @Override
     public Vector2i getLocation() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer x = stack.mallocInt(1);
-            IntBuffer y = stack.mallocInt(1);
-            glfwGetWindowPos(pointer, x, y);
-            return new Vector2i(x.get(0), y.get(0));
+            IntBuffer l = stack.mallocInt(2);
+            glfwGetWindowPos(pointer, (IntBuffer) l.duplicate().position(0), (IntBuffer) l.duplicate().position(1));
+            return new Vector2i(l.get(0), l.get(1));
         }
     }
 

@@ -59,7 +59,7 @@ public class FontDefault {
 
     private static Font load(GraphicsContext ctx, String style) {
         String name = FAMILY + "-" + style;
-        String ttf = LOCATION + name + ".ttf";
+        String ttf = LOCATION + "/" + name + ".ttf";
         try {
             return ctx.getFontLoader().loadFontFromClasspath(name, ttf);
         } catch (IOException e) {
