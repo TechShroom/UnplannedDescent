@@ -76,12 +76,14 @@ public class GLGraphicsContext implements GraphicsContext {
     private final MatrixUploader matUpload = new GLMatrixUploader(shaders);
 
     private final GLFWWindow window;
-    private final FontLoader fontLoader = new NVGFontLoader(this);
-    private final NVGPen pen = new NVGPen(this);
+    private final FontLoader fontLoader;
+    private final NVGPen pen;
     private long nanoVgContext;
 
     public GLGraphicsContext(GLFWWindow window) {
         this.window = window;
+        fontLoader = new NVGFontLoader(this);
+        this.pen = new NVGPen(this);
     }
 
     @Override
@@ -132,6 +134,10 @@ public class GLGraphicsContext implements GraphicsContext {
             checkState(nanoVgContext != 0, "failed to initialize NanoVG");
             pen.initialize();
         }
+    }
+
+    public GLFWWindow getWindow() {
+        return window;
     }
 
     public long getNanoVgContext() {

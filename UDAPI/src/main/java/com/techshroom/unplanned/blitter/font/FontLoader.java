@@ -24,8 +24,6 @@
  */
 package com.techshroom.unplanned.blitter.font;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -44,7 +42,6 @@ public interface FontLoader {
 
     default Font loadFontFromClasspath(String name, String ttf) throws IOException {
         URL cpLocation = Resources.getResource(ttf);
-        checkArgument(cpLocation != null, "Resource '%s' does not exist.", ttf);
         try (InputStream stream = Resources.asByteSource(cpLocation).openBufferedStream()) {
             return loadFont(name, stream);
         }
