@@ -126,7 +126,7 @@ public class GLOptionPane {
     private static final ByteBuffer SANS_DATA;
     static {
         try {
-            SANS_DATA = NVGUtil.loadFont("FreeSans.ttf");
+            SANS_DATA = NVGUtil.loadFont("noto/NotoSansUI-Regular.ttf");
         } catch (IOException e) {
             throw new Error("failed to load GLOptionPane font", e);
         }
