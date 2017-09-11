@@ -22,47 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.gui.model;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.flowpowered.math.vector.Vector2i;
 
 /**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
+ * Quick assist for some parts used in the GUI.
  */
-public interface GroupElement extends ParentElement {
+public final class GuiAssist {
 
-    void layoutIfNeeded();
-
-    void markLayoutDirty();
-
-    Layout getLayout();
-
-    void setLayout(Layout layout);
-
-    // for convenient init
-    default <L extends Layout> void setLayout(Supplier<L> initLayout, @Nullable Consumer<L> postEditLayout) {
-        L res = initLayout.get();
-        setLayout(res);
-        if (postEditLayout != null) {
-            postEditLayout.accept(res);
-        }
+    public static Size<SizeValue> sizeFrom(Vector2i vec) {
+        return sizeFrom(vec.getX(), vec.getY());
     }
 
-    void addChild(GuiElement element);
-
-    void removeChild(GuiElement element);
-
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    public static Size<SizeValue> sizeFrom(int width, int height) {
+        return Size.of(SizeValue.integer(width), SizeValue.integer(height));
     }
 
+    private GuiAssist() {
+    }
 }

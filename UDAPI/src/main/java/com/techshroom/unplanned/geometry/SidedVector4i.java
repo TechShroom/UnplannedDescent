@@ -32,14 +32,18 @@ import com.flowpowered.math.vector.VectorNi;
 // css order, top-right-bottom-left
 public class SidedVector4i extends Vector4i {
 
+    public static SidedVector4i all(int value) {
+        return new SidedVector4i(value, value, value, value);
+    }
+
     private static final long serialVersionUID = -5860154702722742447L;
 
-    public static final SidedVector4i ZERO = new SidedVector4i(0, 0, 0, 0);
+    public static final SidedVector4i ZERO = all(0);
     public static final SidedVector4i UNIT_TOP = new SidedVector4i(1, 0, 0, 0);
     public static final SidedVector4i UNIT_RIGHT = new SidedVector4i(0, 1, 0, 0);
     public static final SidedVector4i UNIT_BOTTOM = new SidedVector4i(0, 0, 1, 0);
     public static final SidedVector4i UNIT_LEFT = new SidedVector4i(0, 0, 0, 1);
-    public static final SidedVector4i ONE = new SidedVector4i(1, 1, 1, 1);
+    public static final SidedVector4i ONE = all(1);
 
     public SidedVector4i() {
     }

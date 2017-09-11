@@ -33,6 +33,10 @@ public abstract class PropertyKey<T> {
         return new AutoValue_PropertyKey<>(key);
     }
 
+    public static <T> PropertyKey<T> unique(String key) {
+        return of(key + System.nanoTime());
+    }
+
     PropertyKey() {
     }
 

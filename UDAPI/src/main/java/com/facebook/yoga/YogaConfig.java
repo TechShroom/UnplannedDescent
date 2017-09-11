@@ -75,18 +75,21 @@ public class YogaConfig {
     public void setLogger(YogaLogger logger) {
         mLogger = logger;
 
-        YGLoggerI impl = (long config, long node, int level, long format, long args) -> {
-            int remaining;
-            String message;
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                ByteBuffer buf = stack.calloc(256);
-                remaining = LibCStdio.nvsnprintf(MemoryUtil.memAddress(buf), buf.remaining(), format, args);
-                message = MemoryUtil.memUTF8(buf);
-            }
-            logger.log(new YogaNode(node), YogaLogLevel.fromInt(level), message);
+        YGLoggerI impl = null;
+        if (logger != null) {
+            impl = (long config, long node, int level, long format, long args) -> {
+                int remaining;
+                String message;
+                try (MemoryStack stack = MemoryStack.stackPush()) {
+                    ByteBuffer buf = stack.calloc(256);
+                    remaining = LibCStdio.nvsnprintf(MemoryUtil.memAddress(buf), buf.remaining(), format, args);
+                    message = MemoryUtil.memUTF8(buf, remaining);
+                }
+                logger.log(new YogaNode(node), YogaLogLevel.fromInt(level), message);
 
-            return remaining;
-        };
+                return remaining;
+            };
+        }
         YGConfigSetLogger(mNativePointer, impl);
     }
 

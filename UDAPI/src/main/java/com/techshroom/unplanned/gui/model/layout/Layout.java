@@ -24,9 +24,16 @@
  */
 package com.techshroom.unplanned.gui.model.layout;
 
+import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
 public interface Layout {
+
+    default void onChildAdded(GuiElement element, int index) {
+    }
+
+    default void onChildRemoved(GuiElement element, int index) {
+    }
 
     void layout(GroupElement element);
 

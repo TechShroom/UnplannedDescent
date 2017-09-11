@@ -29,8 +29,10 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.SidedVector4i;
+import com.techshroom.unplanned.gui.model.SizeValue.SVType;
 import com.techshroom.unplanned.gui.model.parent.ParentElement;
 
 /**
@@ -40,6 +42,8 @@ import com.techshroom.unplanned.gui.model.parent.ParentElement;
  * {@link #getProperty(PropertyKey)}.
  */
 public interface GuiElement {
+
+    EventBus getEventBus();
 
     /**
      * Mark the element as in potential need of re-layout. This automatically
@@ -56,9 +60,13 @@ public interface GuiElement {
 
     // generic properties
 
+    boolean hasProperty(PropertyKey<?> key);
+
     <T> T getProperty(PropertyKey<T> key);
 
     <T> void setProperty(PropertyKey<T> key, T value);
+
+    void removeProperty(PropertyKey<?> key);
 
     // visible
     boolean isVisible();
@@ -75,47 +83,62 @@ public interface GuiElement {
     }
 
     // size
+    // this function is mostly internal
+    boolean hasSize();
+
     Vector2i getSize();
 
     void setSize(Vector2i size);
 
     default void setSize(int width, int height) {
-        setSize(new Vector2i(width, height));
+        setSize(Vector2i.from(width, height));
     }
 
     // preferredSize
-    Vector2i getPreferredSize();
+    Size<SizeValue> getPreferredSize();
 
-    void setPreferredSize(Vector2i size);
+    void setPreferredSize(Size<SizeValue> size);
+
+    default void setPreferredSize(Vector2i size) {
+        setPreferredSize(size.getX(), size.getY());
+    }
 
     default void setPreferredSize(int width, int height) {
-        setPreferredSize(new Vector2i(width, height));
+        setPreferredSize(GuiAssist.sizeFrom(width, height));
     }
 
     // maxSize
-    Vector2i getMaxSize();
+    Size<SizeValue> getMaxSize();
 
-    void setMaxSize(Vector2i size);
+    void setMaxSize(Size<SizeValue> size);
+
+    default void setMaxSize(Vector2i size) {
+        setMaxSize(size.getX(), size.getY());
+    }
 
     default void setMaxSize(int width, int height) {
-        setMaxSize(new Vector2i(width, height));
+        setMaxSize(GuiAssist.sizeFrom(width, height));
     }
 
     default void setNoMaxSize() {
-        setMaxSize(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        setMaxSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     // minSize
-    Vector2i getMinSize();
+    Size<SizeValue> getMinSize();
 
-    void setMinSize(Vector2i size);
+    void setMinSize(Size<SizeValue> size);
+
+    default void setMinSize(Vector2i size) {
+        setMinSize(size.getX(), size.getY());
+    }
 
     default void setMinSize(int width, int height) {
-        setMinSize(new Vector2i(width, height));
+        setMinSize(GuiAssist.sizeFrom(width, height));
     }
 
     default void setNoMinSize() {
-        setMinSize(new Vector2i(Integer.MIN_VALUE, Integer.MIN_VALUE));
+        setMinSize(Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
     // padding
@@ -171,6 +194,35 @@ public interface GuiElement {
             return getRelativePosition();
         }
         return e.getAbsolutePosition().add(getRelativePosition());
+    }
+
+    /**
+     * Calculates the generic layout size. This is the {@link #getSize() size}
+     * if set, otherwise it is the preferred size.
+     * 
+     * @return the layout size
+     */
+    default Size<SizeValue> getLayoutSize() {
+        Size<SizeValue> pref = getPreferredSize();
+        if (!hasSize()) {
+            return pref;
+        }
+
+        // prefer preferred if it uses percentages
+        if (pref.width().type() == SVType.PERCENT || pref.height().type() == SVType.PERCENT) {
+            return pref;
+        }
+
+        return GuiAssist.sizeFrom(getSize());
+    }
+
+    default Vector2i solidifySize(Size<SizeValue> size) {
+        ParentElement parent = getParent();
+        Vector2i parentSize = parent == null || !parent.hasSize() ? Vector2i.from(Integer.MAX_VALUE)
+                : parent.getSize();
+        int computedX = size.width().computeInteger(parentSize.getX(), parentSize.getY());
+        int computedY = size.height().computeInteger(parentSize.getY(), parentSize.getX());
+        return Vector2i.from(computedX, computedY);
     }
 
 }
