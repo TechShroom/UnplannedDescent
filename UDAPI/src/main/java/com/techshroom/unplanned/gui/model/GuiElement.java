@@ -128,11 +128,6 @@ public interface GuiElement {
 
     void setMargin(SidedVector4i margin);
 
-    // insets
-    SidedVector4i getInsets();
-
-    void setInsets(SidedVector4i insets);
-
     // baseline
     OptionalInt getBaseline(int width, int height);
 

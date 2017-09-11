@@ -24,10 +24,21 @@
  */
 package com.techshroom.unplanned.gui.model;
 
+import com.techshroom.unplanned.blitter.font.FontDescriptor;
+import com.techshroom.unplanned.gui.hooks.TextSizer;
+
 public interface Labeled extends GuiElement {
 
     String getText();
 
     void setText(String text);
+
+    FontDescriptor getFont();
+
+    void setFont(FontDescriptor font);
+    
+    TextSizer getTextSizer();
+    
+    void setTextSizer(TextSizer textSizer);
 
 }

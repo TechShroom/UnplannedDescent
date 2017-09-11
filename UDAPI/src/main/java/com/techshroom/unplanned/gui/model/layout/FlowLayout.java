@@ -284,12 +284,12 @@ public class FlowLayout implements Layout {
      */
     @Override
     public void layout(GroupElement target) {
-        SidedVector4i insets = target.getInsets();
+        SidedVector4i padding = target.getPadding();
         Vector2i size = target.getSize();
-        int maxwidth = size.getX() - (insets.getLeft() + insets.getRight() + hgap * 2);
+        int maxwidth = size.getX() - (padding.getLeft() + padding.getRight() + hgap * 2);
         int nmembers = target.getChildren().size();
         int x = 0;
-        int y = insets.getTop() + vgap;
+        int y = padding.getTop() + vgap;
         int rowh = 0;
         int start = 0;
 
@@ -327,7 +327,7 @@ public class FlowLayout implements Layout {
                     x += d.getX();
                     rowh = Math.max(rowh, d.getY());
                 } else {
-                    rowh = moveComponents(target, insets.getLeft() + hgap, y,
+                    rowh = moveComponents(target, padding.getLeft() + hgap, y,
                             maxwidth - x, rowh, start, i, ltr,
                             useBaseline, ascent, descent);
                     x = d.getX();
@@ -337,7 +337,7 @@ public class FlowLayout implements Layout {
                 }
             }
         }
-        moveComponents(target, insets.getLeft() + hgap, y, maxwidth - x, rowh,
+        moveComponents(target, padding.getLeft() + hgap, y, maxwidth - x, rowh,
                 start, nmembers, ltr, useBaseline, ascent, descent);
     }
 

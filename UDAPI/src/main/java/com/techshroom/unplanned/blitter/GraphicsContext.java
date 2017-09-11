@@ -25,6 +25,7 @@
 package com.techshroom.unplanned.blitter;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.techshroom.unplanned.blitter.font.FontCache;
 import com.techshroom.unplanned.blitter.font.FontLoader;
 import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
@@ -54,6 +55,8 @@ public interface GraphicsContext {
     DigitalPen getPen();
 
     FontLoader getFontLoader();
+    
+    FontCache getFontCache();
 
     default TransformStack pushTransformer() {
         return DefaultTransformer.getInstance().push();

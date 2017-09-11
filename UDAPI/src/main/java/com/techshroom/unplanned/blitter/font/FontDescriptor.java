@@ -22,44 +22,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.font;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.google.auto.value.AutoValue;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+@AutoValue
+public abstract class FontDescriptor {
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
-
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
-
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
+    public enum Type {
+        FILESYSTEM, CLASSPATH
     }
 
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
+    public static FontDescriptor describe(String name, String location, int size, Type type) {
+        return new AutoValue_FontDescriptor.Builder()
+                .name(name)
+                .location(location)
+                .size(size)
+                .type(type)
+                .build();
     }
 
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
+    @AutoValue.Builder
+    interface Builder {
+
+        Builder name(String name);
+
+        Builder location(String location);
+
+        Builder size(int size);
+
+        Builder type(Type type);
+
+        FontDescriptor build();
+
     }
 
-    private void layout() {
-        for (GuiElement child : children) {
-            child.validate();
-        }
-        layoutChildren();
+    FontDescriptor() {
+    }
+
+    public abstract String getName();
+
+    public abstract String getLocation();
+
+    public abstract int getSize();
+
+    public abstract Type getType();
+
+    abstract Builder toBuilder();
+
+    public final FontDescriptor withSize(int size) {
+        return toBuilder().size(size).build();
     }
 
 }

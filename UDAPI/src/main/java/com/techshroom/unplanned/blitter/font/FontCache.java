@@ -22,44 +22,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.font;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+public class FontCache {
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
-
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
-
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
+    private static String key(FontDescriptor fd) {
+        return fd.getName() + "@" + fd.getLocation();
     }
 
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
+    private final Map<String, Font> loadedFonts = new HashMap<>();
+    private final FontLoader loader;
+
+    public FontCache(FontLoader loader) {
+        this.loader = loader;
     }
 
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
-    }
-
-    private void layout() {
-        for (GuiElement child : children) {
-            child.validate();
+    public Font getOrLoadFont(FontDescriptor fd) {
+        String key = key(fd);
+        Font font = loadedFonts.get(key);
+        if (font == null) {
+            try {
+                font = loader.loadFont(fd);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+            loadedFonts.put(key, font);
         }
-        layoutChildren();
+        return font;
+    }
+
+    public void deleteFont(FontDescriptor fd) {
+        Font font = loadedFonts.remove(key(fd));
+        if (font != null) {
+            font.delete();
+        }
+    }
+
+    public void deleteFont(Font font) {
+        loadedFonts.values().remove(font);
+        font.delete();
     }
 
 }

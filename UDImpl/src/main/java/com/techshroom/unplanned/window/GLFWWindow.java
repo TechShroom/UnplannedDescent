@@ -61,6 +61,7 @@ import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.core.util.GLFWUtil;
+import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
@@ -113,7 +114,7 @@ public class GLFWWindow implements Window {
             eventBus.post(WindowResizeEvent.create(this, w, h));
         });
         glfwSetFramebufferSizeCallback(pointer, (win, w, h) -> {
-            eventBus.post(WindowResizeEvent.create(this, w, h));
+            eventBus.post(WindowFramebufferResizeEvent.create(this, w, h));
         });
     }
 

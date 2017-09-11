@@ -22,44 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.blitter.font;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+import com.google.common.io.Resources;
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
+class FontLoaderStatic {
 
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
-
-    @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
-    }
-
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
-    }
-
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
-    }
-
-    private void layout() {
-        for (GuiElement child : children) {
-            child.validate();
+    static InputStream getFdInputStream(FontDescriptor fd) throws IOException {
+        switch (fd.getType()) {
+            case FILESYSTEM:
+                return new BufferedInputStream(Files.newInputStream(Paths.get(fd.getLocation())));
+            case CLASSPATH:
+                URL cpLocation = Resources.getResource(fd.getLocation());
+                return Resources.asByteSource(cpLocation).openBufferedStream();
+            default:
+                throw new IllegalArgumentException("Unknown type: " + fd.getType());
         }
-        layoutChildren();
     }
 
 }

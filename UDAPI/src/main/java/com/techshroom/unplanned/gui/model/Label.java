@@ -24,16 +24,70 @@
  */
 package com.techshroom.unplanned.gui.model;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
+
+import com.flowpowered.math.vector.Vector2d;
+import com.techshroom.unplanned.blitter.font.FontDefault;
+import com.techshroom.unplanned.blitter.font.FontDescriptor;
+import com.techshroom.unplanned.gui.hooks.TextSizer;
+
 public class Label extends GuiElementBase implements Labeled {
 
-    private String text;
-
-    public Label() {
-        this("");
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public Label(String text) {
+    public static final class Builder {
+
+        private FontDescriptor font = FontDefault.getPlainDescriptor();
+        private String text = "";
+        @Nullable
+        private TextSizer textSizer;
+
+        public Builder font(FontDescriptor font) {
+            this.font = font;
+            return this;
+        }
+
+        public Builder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+        public Builder textSizer(TextSizer textSizer) {
+            this.textSizer = textSizer;
+            return this;
+        }
+
+        public Label build() {
+            return new Label(font, text, textSizer);
+        }
+
+    }
+
+    private FontDescriptor font = FontDefault.getPlainDescriptor();
+    private String text;
+    @Nullable
+    private TextSizer textSizer;
+
+    private Label(FontDescriptor font, String text, @Nullable TextSizer textSizer) {
+        this.font = font;
         this.text = text;
+        this.textSizer = textSizer;
+    }
+
+    @Override
+    protected void onRevalidation() {
+        if (textSizer != null) {
+            // bind size to textSizer
+            Vector2d textSize = textSizer.sizeText(text, font);
+            Vector2d actualSize = textSize.add(getPadding().getAsWidthHeight().toDouble());
+            setPreferredSize(actualSize.toInt());
+            // this will be transferred to size in super, if it's not set...
+        }
+        super.onRevalidation();
     }
 
     @Override
@@ -43,7 +97,32 @@ public class Label extends GuiElementBase implements Labeled {
 
     @Override
     public void setText(String text) {
+        checkNotNull(text);
         this.text = text;
+        invalidate();
+    }
+
+    @Override
+    public FontDescriptor getFont() {
+        return font;
+    }
+
+    @Override
+    public void setFont(FontDescriptor font) {
+        checkNotNull(font);
+        this.font = font;
+        invalidate();
+    }
+
+    @Override
+    public TextSizer getTextSizer() {
+        return textSizer;
+    }
+
+    @Override
+    public void setTextSizer(TextSizer textSizer) {
+        this.textSizer = textSizer;
+        invalidate();
     }
 
 }

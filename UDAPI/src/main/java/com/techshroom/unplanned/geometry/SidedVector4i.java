@@ -100,4 +100,29 @@ public class SidedVector4i extends Vector4i {
         return getW();
     }
 
+    public Vector2i getTopLeft() {
+        return new Vector2i(getLeft(), getTop());
+    }
+
+    public Vector2i getTopRight() {
+        return new Vector2i(getRight(), getTop());
+    }
+
+    public Vector2i getBottomRight() {
+        return new Vector2i(getRight(), getBottom());
+    }
+
+    public Vector2i getBottomLeft() {
+        return new Vector2i(getLeft(), getBottom());
+    }
+
+    public Vector2i getAsWidthHeight() {
+        return new Vector2i(getLeft() + getRight(), getTop() + getBottom());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[top=%s,right=%s,bottom=%s,left=%s]", getTop(), getRight(), getBottom(), getLeft());
+    }
+
 }

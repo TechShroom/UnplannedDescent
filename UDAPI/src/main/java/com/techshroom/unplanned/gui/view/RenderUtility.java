@@ -37,6 +37,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.Maps;
 import com.techshroom.unplanned.blitter.GraphicsContext;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.blitter.textures.Downscaling;
 import com.techshroom.unplanned.blitter.textures.Texture;
 import com.techshroom.unplanned.blitter.textures.TextureData;
@@ -45,6 +46,7 @@ import com.techshroom.unplanned.blitter.textures.TextureWrap;
 import com.techshroom.unplanned.blitter.textures.Upscaling;
 import com.techshroom.unplanned.blitter.textures.loader.StandardTextureLoaders;
 import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.gui.model.GuiElement;
 
 public final class RenderUtility {
 
@@ -95,6 +97,13 @@ public final class RenderUtility {
             Texture texture = iterator.next();
             texture.destroy();
             iterator.remove();
+        }
+    }
+
+    public static void applyStandardTransform(GuiElement e, DigitalPen pen, boolean forContent) {
+        pen.translate(e.getRelativePosition().toDouble());
+        if (forContent) {
+            pen.translate(e.getPadding().getTopLeft().toDouble());
         }
     }
 

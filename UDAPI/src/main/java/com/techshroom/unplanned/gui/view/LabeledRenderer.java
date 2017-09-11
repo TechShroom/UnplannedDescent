@@ -22,44 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.gui.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.techshroom.unplanned.blitter.pen.TextAlignmentH;
+import com.techshroom.unplanned.blitter.pen.TextAlignmentV;
+import com.techshroom.unplanned.gui.model.Labeled;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.GuiElementBase;
+public class LabeledRenderer implements GuiElementRenderer<Labeled> {
 
-public class ParentElementBase extends GuiElementBase implements ParentElement {
-
-    protected final List<GuiElement> children = new ArrayList<>();
-    private final List<GuiElement> childrenView = Collections.unmodifiableList(children);
+    private final SimpleGuiElementRenderer<Labeled> bgDrawer = new SimpleGuiElementRenderer<>();
 
     @Override
-    public List<GuiElement> getChildren() {
-        return childrenView;
-    }
+    public void render(RenderJob<Labeled> job) {
+        bgDrawer.render(job);
+        Labeled e = job.getElement();
+        job.getContext().getPen().draw(pen -> {
+            pen.setColor(e.getForegroundColor());
+            pen.setFont(job.getContext().getFontCache().getOrLoadFont(e.getFont()));
+            RenderUtility.applyStandardTransform(e, pen, true);
 
-    @Override
-    protected void onRevalidation() {
-        super.onRevalidation();
-        layout();
-    }
+            pen.textAlignment(TextAlignmentH.LEFT, TextAlignmentV.TOP);
 
-    /**
-     * Perform the layout of all the children. Should not perform any special
-     * layouts, like for child {@link ParentElement ParentElements}. This is
-     * handled in {@link #layout()}.
-     */
-    protected void layoutChildren() {
-    }
-
-    private void layout() {
-        for (GuiElement child : children) {
-            child.validate();
-        }
-        layoutChildren();
+            pen.fillText(0, 0, e.getText());
+        });
     }
 
 }

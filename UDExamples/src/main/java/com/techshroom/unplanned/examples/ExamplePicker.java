@@ -36,14 +36,14 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
+import com.techshroom.unplanned.blitter.font.FontDefault;
 import com.techshroom.unplanned.blitter.transform.TransformStack;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.model.Label;
-import com.techshroom.unplanned.gui.model.layout.FlowLayout;
-import com.techshroom.unplanned.gui.model.layout.FlowLayout.Alignment;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 import com.techshroom.unplanned.gui.model.parent.Panel;
 import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
@@ -61,9 +61,12 @@ public class ExamplePicker {
                 .collect(toImmutableMap(Example::getName, Function.identity()));
     }
 
+    private static final Vector2i UI_SIZE = new Vector2i(1024, 768);
+
     private Window window;
     private Matrix4f proj;
     private Vector2i windowSize;
+    private RenderManager renderManager;
 
     public static void main(String[] args) {
         new ExamplePicker().run();
@@ -71,8 +74,9 @@ public class ExamplePicker {
 
     public void run() {
         window = WindowSettings.builder()
-                .screenSize(1024, 768)
+                .screenSize(UI_SIZE)
                 .title("Example Picker")
+                .msaa(true)
                 .build().createWindow();
         window.getEventBus().register(this);
 
@@ -84,36 +88,40 @@ public class ExamplePicker {
         window.setVisible(true);
 
         Vector2i size = window.getSize();
-        resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
 
         GroupElement base = new Panel();
         base.setPreferredSize(size);
         // set up a chill 4 panel layout!
-        Vector2i quarter = size.div(2).sub(8, 8);
+        Vector2i quarter = size.div(2).sub(10, 10);
+        Vector2i eighth = quarter.div(2).sub(10, 10);
+        Vector2i sixteenth = eighth.div(2).sub(10, 10);
+        Vector2i thirtySecondth = sixteenth.div(2).sub(10, 10);
         Panel a = new Panel();
         Panel b = new Panel();
         Panel c = new Panel();
         Panel d = new Panel();
 
         a.setPreferredSize(quarter);
-        b.setPreferredSize(quarter);
-        b.setRelativePosition(quarter.getX(), 0);
-        c.setPreferredSize(quarter);
-        c.setRelativePosition(0, quarter.getY());
-        d.setPreferredSize(quarter);
-        d.setRelativePosition(quarter);
+        b.setPreferredSize(eighth);
+        c.setPreferredSize(sixteenth);
+        d.setPreferredSize(thirtySecondth);
 
         a.setBackgroundColor(Color.RED);
         b.setBackgroundColor(Color.GREEN);
         c.setBackgroundColor(Color.fromString("#FEFDE7"));
         d.setBackgroundColor(Color.BLUE);
 
-        base.addChildren(a, b, c, d);
-
-        // base.addChild(new Label("Label! It's like a LABEL!"));
+        Label label = Label.builder()
+                .text("Whatever!")
+                .font(FontDefault.getPlainDescriptor().withSize(50))
+                .textSizer(ctx.getPen()).build();
+        label.setPadding(new SidedVector4i(5, 5, 5, 5));
+        label.setBackgroundColor(Color.RED);
+        base.addChild(label);
 
         RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();
-        RenderManager guiRM = new RenderManager(renderer);
+        RenderManager guiRM = renderManager = new RenderManager(renderer, ctx);
+        resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
 
         while (!window.isCloseRequested()) {
             window.processEvents();
@@ -121,7 +129,7 @@ public class ExamplePicker {
             try (TransformStack stack = ctx.pushTransformer()) {
                 stack.projection().set(proj);
 
-                guiRM.render(ctx, base);
+                guiRM.render(base);
             }
 
             ctx.swapBuffers();
@@ -142,6 +150,7 @@ public class ExamplePicker {
         windowSize = event.getSize();
         int w = windowSize.getX();
         int h = windowSize.getY();
+        renderManager.setScale(windowSize.toDouble().div(UI_SIZE.toDouble()));
         proj = Matrix4f.createOrthographic(w, 0, 0, h, -1000, 1000);
     }
 

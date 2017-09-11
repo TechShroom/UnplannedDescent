@@ -36,9 +36,9 @@ public abstract class RenderJob<GE extends GuiElement> implements AutoCloseable 
     private final GraphicsContext context;
     private final GE element;
     private final Map<String, Object> state;
-    private final Map<String, Object> renderCache;
+    private final Map<String, RCache<Object>> renderCache;
 
-    public RenderJob(GraphicsContext context, GE element, Map<String, Object> state, Map<String, Object> renderCache) {
+    public RenderJob(GraphicsContext context, GE element, Map<String, Object> state, Map<String, RCache<Object>> renderCache) {
         this.context = context;
         this.element = element;
         this.state = state;
@@ -66,7 +66,7 @@ public abstract class RenderJob<GE extends GuiElement> implements AutoCloseable 
         state.put(key, value);
     }
 
-    public Map<String, Object> getRenderCache() {
+    public Map<String, RCache<Object>> getRenderCache() {
         return renderCache;
     }
 
@@ -75,7 +75,7 @@ public abstract class RenderJob<GE extends GuiElement> implements AutoCloseable 
         return type.cast(renderCache.get(key));
     }
 
-    public void putRenderCache(String key, Object value) {
+    public void putRenderCache(String key, RCache<Object> value) {
         renderCache.put(key, value);
     }
 
