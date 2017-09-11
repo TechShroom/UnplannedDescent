@@ -33,7 +33,7 @@ import com.techshroom.unplanned.gui.model.Label;
 public class DefaultRootGuiElementRenderer extends SimpleRootGuiElementRenderer {
 
     {
-        addRenderer(new LabelRenderer(), Label.class);
+        addRenderer(new LabeledRenderer(), Label.class);
     }
 
 }

@@ -38,12 +38,15 @@ public class ParentElementRenderer extends SimpleGuiElementRenderer<ParentElemen
     @Override
     public void render(RenderJob<ParentElement> job) {
         super.render(job);
-        job.getElement().getChildren().forEach(c -> {
-            if (c.isVisible()) {
-                try (RenderJob<GuiElement> child = job.createSubRenderJob(c)) {
-                    delegate.render(child);
+        job.getContext().getPen().draw(pen -> {
+            pen.translate(job.getElement().getRelativePosition().toDouble());
+            job.getElement().getChildren().forEach(c -> {
+                if (c.isVisible()) {
+                    try (RenderJob<GuiElement> child = job.createSubRenderJob(c)) {
+                        delegate.render(child);
+                    }
                 }
-            }
+            });
         });
     }
 

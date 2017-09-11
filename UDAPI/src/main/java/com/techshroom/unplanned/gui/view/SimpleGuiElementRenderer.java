@@ -24,16 +24,9 @@
  */
 package com.techshroom.unplanned.gui.view;
 
-import java.util.List;
-
-import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
-import com.google.common.collect.ImmutableList;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.blitter.Shape;
-import com.techshroom.unplanned.blitter.binding.Bindable;
-import com.techshroom.unplanned.blitter.transform.TransformStack;
-import com.techshroom.unplanned.geometry.Plane;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.gui.model.GuiElement;
 
 /**
@@ -45,36 +38,23 @@ import com.techshroom.unplanned.gui.model.GuiElement;
  */
 public class SimpleGuiElementRenderer<E extends GuiElement> implements GuiElementRenderer<E> {
 
-    private static final String FILL_SHAPE = RenderUtility.key(SimpleGuiElementRenderer.class, "FILL_SHAPE");
-    private static final List<Vector2d> FULL_TEXTURE = ImmutableList.of(
-            new Vector2d(0, 0),
-            new Vector2d(0, 1),
-            new Vector2d(1, 0),
-            new Vector2d(1, 1));
-
     @Override
     public void render(RenderJob<E> job) {
         E e = job.getElement();
-        GraphicsContext ctx = job.getContext();
-        Shape fillShape = getShape(job);
-        try (TransformStack stack = ctx.pushTransformer();
-                Bindable color = RenderUtility.getColorTexture(ctx, e.getBackgroundColor()).bind()) {
-            stack.model().translate(e.getRelativePosition().toVector3().toFloat());
-            stack.apply(ctx.getMatrixUploader());
 
-            fillShape.draw();
+        // shortcut if there's no color to draw
+        if (e.getBackgroundColor().getAlpha() == 0) {
+            return;
         }
-    }
+        GraphicsContext ctx = job.getContext();
+        DigitalPen pen = ctx.getPen();
 
-    private Shape getShape(RenderJob<E> job) {
-        return (Shape) job.getRenderCache()
-                .computeIfAbsent(FILL_SHAPE, k -> initializeShape(job.getContext(), job.getElement()));
-    }
-
-    private Shape initializeShape(GraphicsContext ctx, E element) {
-        Shape shape = ctx.getShapes().quad().shape(Plane.XY, Vector2i.ZERO, element.getSize(), FULL_TEXTURE);
-        shape.initialize();
-        return shape;
+        pen.draw(() -> {
+            pen.setColor(e.getBackgroundColor());
+            RenderUtility.applyStandardTransform(e, pen, false);
+            Vector2i size = e.getSize();
+            pen.fill(() -> pen.rect(0, 0, size.getX(), size.getY()));
+        });
     }
 
 }

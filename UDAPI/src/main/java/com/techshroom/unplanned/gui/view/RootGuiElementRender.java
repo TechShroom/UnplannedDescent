@@ -34,6 +34,6 @@ import com.techshroom.unplanned.gui.model.GuiElement;
  */
 public interface RootGuiElementRender extends GuiElementRenderer<GuiElement> {
 
-    <GE extends GuiElement> void addRenderer(GuiElementRenderer<GE> renderer, Class<GE> type);
+    <GE extends GuiElement> void addRenderer(GuiElementRenderer<? super GE> renderer, Class<GE> type);
 
 }

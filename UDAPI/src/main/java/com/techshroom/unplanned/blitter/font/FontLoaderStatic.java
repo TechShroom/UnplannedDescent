@@ -22,13 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.blitter.font;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-public class MidiSoundfont {
+import com.google.common.io.Resources;
 
-    public static MidiSoundfont getDefault() {
-        return null;
+class FontLoaderStatic {
+
+    static InputStream getFdInputStream(FontDescriptor fd) throws IOException {
+        switch (fd.getType()) {
+            case FILESYSTEM:
+                return new BufferedInputStream(Files.newInputStream(Paths.get(fd.getLocation())));
+            case CLASSPATH:
+                URL cpLocation = Resources.getResource(fd.getLocation());
+                return Resources.asByteSource(cpLocation).openBufferedStream();
+            default:
+                throw new IllegalArgumentException("Unknown type: " + fd.getType());
+        }
     }
 
 }

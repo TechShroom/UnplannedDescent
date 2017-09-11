@@ -50,6 +50,7 @@ import org.lwjgl.opengl.GL;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.eventbus.Subscribe;
+import com.techshroom.unplanned.blitter.font.FontCache;
 import com.techshroom.unplanned.blitter.font.FontLoader;
 import com.techshroom.unplanned.blitter.font.NVGFontLoader;
 import com.techshroom.unplanned.blitter.matrix.GLMatrixUploader;
@@ -77,12 +78,14 @@ public class GLGraphicsContext implements GraphicsContext {
 
     private final GLFWWindow window;
     private final FontLoader fontLoader;
+    private final FontCache fontCache;
     private final NVGPen pen;
     private long nanoVgContext;
 
     public GLGraphicsContext(GLFWWindow window) {
         this.window = window;
         fontLoader = new NVGFontLoader(this);
+        fontCache = new FontCache(fontLoader);
         this.pen = new NVGPen(this);
     }
 
@@ -190,6 +193,11 @@ public class GLGraphicsContext implements GraphicsContext {
     @Override
     public FontLoader getFontLoader() {
         return fontLoader;
+    }
+
+    @Override
+    public FontCache getFontCache() {
+        return fontCache;
     }
 
     @Override

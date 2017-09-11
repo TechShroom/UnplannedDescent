@@ -67,6 +67,9 @@ public abstract class NVGFont implements Font {
 
     }
 
+    // this is kinda violating the value class principle...
+    private boolean deleted = false;
+
     NVGFont() {
     }
 
@@ -100,7 +103,10 @@ public abstract class NVGFont implements Font {
 
     @Override
     public void delete() {
-        MemoryUtil.memFree(getFontData());
+        if (!deleted) {
+            MemoryUtil.memFree(getFontData());
+            deleted = true;
+        }
     }
 
 }

@@ -158,7 +158,7 @@ public abstract class Color {
     }
 
     public final Vector4f asVector4f() {
-        return asVector4i().toFloat().div(256);
+        return asVector4i().toFloat().div(255);
     }
 
     @Override

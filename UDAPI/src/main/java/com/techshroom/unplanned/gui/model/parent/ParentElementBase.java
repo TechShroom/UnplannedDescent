@@ -57,9 +57,7 @@ public class ParentElementBase extends GuiElementBase implements ParentElement {
 
     private void layout() {
         for (GuiElement child : children) {
-            if (child instanceof ParentElement) {
-                ((ParentElement) child).validate();
-            }
+            child.validate();
         }
         layoutChildren();
     }

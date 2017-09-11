@@ -22,32 +22,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.blitter.font;
 
-import java.nio.file.Path;
+import com.google.auto.value.AutoValue;
 
-public interface MidiSoundPlayer extends MidiEventChainLink, AutoCloseable {
+@AutoValue
+public abstract class FontDescriptor {
 
-    static MidiSoundPlayer getDefault() {
-        return JavaxSoundPlayer.getInstance();
+    public enum Type {
+        FILESYSTEM, CLASSPATH
     }
 
-    /**
-     * Called upon when the model wants settings changed for the player.
-     */
-    void openSettingsPanel();
+    public static FontDescriptor describe(String name, String location, int size, Type type) {
+        return new AutoValue_FontDescriptor.Builder()
+                .name(name)
+                .location(location)
+                .size(size)
+                .type(type)
+                .build();
+    }
 
-    /**
-     * Called upon when the model has a new SF2 to hook up.
-     * 
-     * @param sf2File
-     *            the file to use as the soundfont
-     */
-    void setSoundfont(Path sf2File);
+    @AutoValue.Builder
+    interface Builder {
 
-    MidiSoundPlayer open();
+        Builder name(String name);
 
-    @Override
-    void close();
+        Builder location(String location);
+
+        Builder size(int size);
+
+        Builder type(Type type);
+
+        FontDescriptor build();
+
+    }
+
+    FontDescriptor() {
+    }
+
+    public abstract String getName();
+
+    public abstract String getLocation();
+
+    public abstract int getSize();
+
+    public abstract Type getType();
+
+    abstract Builder toBuilder();
+
+    public final FontDescriptor withSize(int size) {
+        return toBuilder().size(size).build();
+    }
 
 }

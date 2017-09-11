@@ -45,7 +45,6 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     private Vector2i pos = Vector2i.ZERO;
     private SidedVector4i padding = SidedVector4i.ZERO;
     private SidedVector4i margin = SidedVector4i.ZERO;
-    private SidedVector4i insets = SidedVector4i.ZERO;
     @Nullable
     private Vector2i size;
     private Vector2i minSize = Vector2i.ZERO;
@@ -152,17 +151,6 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     @Override
     public void setMargin(SidedVector4i margin) {
         this.margin = margin;
-        invalidate();
-    }
-
-    @Override
-    public SidedVector4i getInsets() {
-        return insets;
-    }
-
-    @Override
-    public void setInsets(SidedVector4i insets) {
-        this.insets = insets;
         invalidate();
     }
 

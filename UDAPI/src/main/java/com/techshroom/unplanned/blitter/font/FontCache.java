@@ -22,32 +22,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.blitter.font;
 
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface MidiSoundPlayer extends MidiEventChainLink, AutoCloseable {
+public class FontCache {
 
-    static MidiSoundPlayer getDefault() {
-        return JavaxSoundPlayer.getInstance();
+    private static String key(FontDescriptor fd) {
+        return fd.getName() + "@" + fd.getLocation();
     }
 
-    /**
-     * Called upon when the model wants settings changed for the player.
-     */
-    void openSettingsPanel();
+    private final Map<String, Font> loadedFonts = new HashMap<>();
+    private final FontLoader loader;
 
-    /**
-     * Called upon when the model has a new SF2 to hook up.
-     * 
-     * @param sf2File
-     *            the file to use as the soundfont
-     */
-    void setSoundfont(Path sf2File);
+    public FontCache(FontLoader loader) {
+        this.loader = loader;
+    }
 
-    MidiSoundPlayer open();
+    public Font getOrLoadFont(FontDescriptor fd) {
+        String key = key(fd);
+        Font font = loadedFonts.get(key);
+        if (font == null) {
+            try {
+                font = loader.loadFont(fd);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+            loadedFonts.put(key, font);
+        }
+        return font;
+    }
 
-    @Override
-    void close();
+    public void deleteFont(FontDescriptor fd) {
+        Font font = loadedFonts.remove(key(fd));
+        if (font != null) {
+            font.delete();
+        }
+    }
+
+    public void deleteFont(Font font) {
+        loadedFonts.values().remove(font);
+        font.delete();
+    }
 
 }

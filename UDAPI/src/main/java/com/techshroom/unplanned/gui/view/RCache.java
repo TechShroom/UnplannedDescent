@@ -22,57 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.gui.view;
 
-import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.openal.ALC10.alcOpenDevice;
 
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.ALC;
-
-/**
- * Plays sounds using the provided sound font.
- */
-class MidiSoundfontPlayer implements MidiSoundPlayer {
-
-    static {
-        long dev = alcOpenDevice((ByteBuffer) null);
-        checkState(dev != 0, "no sound device found");
-        AL.createCapabilities(ALC.createCapabilities(dev));
-    }
-
-    static MidiSoundfontPlayer manangeFont(MidiSoundfont sounds) {
-        return new MidiSoundfontPlayer();
-    }
-
-    private MidiSoundfontPlayer() {
-    }
-
-    @Override
-    public void openSettingsPanel() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setSoundsfont(Path sf2File) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public MidiSoundPlayer open() {
-        return this;
-    }
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void onEvent(MidiEventChain chain) {
-        chain.sendCurrentEventToNext();
-    }
-
+public interface RCache<T> {
+    
+    void destroy();
+    
+    T getValue();
+    
 }

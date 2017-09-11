@@ -28,8 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import com.flowpowered.math.vector.Vector2d;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.core.util.LifecycleObject;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.GuiElementInternal;
 
@@ -42,7 +43,7 @@ public final class RenderManager {
 
         private final RenderManager manager;
 
-        public RMRenderJob(RenderManager manager, GraphicsContext context, GE element, Map<String, Object> state, Map<String, Object> renderCache) {
+        public RMRenderJob(RenderManager manager, GraphicsContext context, GE element, Map<String, Object> state, Map<String, RCache<Object>> renderCache) {
             super(context, element, state, renderCache);
             this.manager = manager;
         }
@@ -62,11 +63,14 @@ public final class RenderManager {
     }
 
     private final RootGuiElementRender renderer;
+    private final GraphicsContext context;
     private final Map<GuiElement, Map<String, Object>> stateStorage = new WeakHashMap<>();
-    private final Map<GuiElement, Map<String, Object>> renderCacheStorage = new WeakHashMap<>();
+    private final Map<GuiElement, Map<String, RCache<Object>>> renderCacheStorage = new WeakHashMap<>();
+    private Vector2d scale = Vector2d.ONE;
 
-    public RenderManager(RootGuiElementRender renderer) {
+    public RenderManager(RootGuiElementRender renderer, GraphicsContext context) {
         this.renderer = renderer;
+        this.context = context;
     }
 
     Map<String, Object> getState(GuiElement element) {
@@ -77,15 +81,13 @@ public final class RenderManager {
         stateStorage.put(element, state);
     }
 
-    Map<String, Object> getRenderCache(GuiElement element) {
-        Map<String, Object> renderCache = renderCacheStorage.getOrDefault(element, new HashMap<>());
+    Map<String, RCache<Object>> getRenderCache(GuiElement element) {
+        Map<String, RCache<Object>> renderCache = renderCacheStorage.getOrDefault(element, new HashMap<>());
         if (element instanceof GuiElementInternal) {
             if (((GuiElementInternal) element).internalInvalidatedSinceLastDrawNotification()) {
                 // invalidate render cache
                 renderCache.forEach((k, v) -> {
-                    if (v instanceof LifecycleObject) {
-                        ((LifecycleObject) v).destroy();
-                    }
+                    v.destroy();
                 });
                 renderCache.clear();
             }
@@ -97,20 +99,34 @@ public final class RenderManager {
         return renderCache;
     }
 
-    void putRenderCache(GuiElement element, Map<String, Object> renderCache) {
+    void putRenderCache(GuiElement element, Map<String, RCache<Object>> renderCache) {
         if (element instanceof GuiElementInternal) {
             ((GuiElementInternal) element).internalDrawNotification();
         }
         renderCacheStorage.put(element, renderCache);
     }
 
-    public void render(GraphicsContext context, GuiElement root) {
+    public Vector2d getScale() {
+        return scale;
+    }
+
+    public void setScale(Vector2d scale) {
+        this.scale = scale;
+    }
+
+    public void render(GuiElement root) {
         if (root.isVisible()) {
+            DigitalPen pen = context.getPen();
+            pen.uncap();
             try (RMRenderJob<GuiElement> job = new RMRenderJob<GuiElement>(this, context, root, getState(root), getRenderCache(root))) {
-                renderer.render(job);
+                pen.draw(() -> {
+                    pen.scale(scale);
+                    renderer.render(job);
+                });
             } finally {
                 // post render, do clean up
                 RenderUtility.performColorCacheCleanup();
+                pen.cap();
             }
         }
     }

@@ -22,32 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.blitter.pen;
 
-import java.nio.file.Path;
-
-public interface MidiSoundPlayer extends MidiEventChainLink, AutoCloseable {
-
-    static MidiSoundPlayer getDefault() {
-        return JavaxSoundPlayer.getInstance();
-    }
-
-    /**
-     * Called upon when the model wants settings changed for the player.
-     */
-    void openSettingsPanel();
-
-    /**
-     * Called upon when the model has a new SF2 to hook up.
-     * 
-     * @param sf2File
-     *            the file to use as the soundfont
-     */
-    void setSoundfont(Path sf2File);
-
-    MidiSoundPlayer open();
-
-    @Override
-    void close();
-
+public enum TextAlignmentH {
+    LEFT, CENTER, RIGHT
 }

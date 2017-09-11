@@ -22,32 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.midishapes.midi.player;
+package com.techshroom.unplanned.gui.hooks;
 
-import java.nio.file.Path;
+import com.flowpowered.math.vector.Vector2d;
+import com.techshroom.unplanned.blitter.font.FontDescriptor;
 
-public interface MidiSoundPlayer extends MidiEventChainLink, AutoCloseable {
+public interface TextSizer {
 
-    static MidiSoundPlayer getDefault() {
-        return JavaxSoundPlayer.getInstance();
-    }
-
-    /**
-     * Called upon when the model wants settings changed for the player.
-     */
-    void openSettingsPanel();
-
-    /**
-     * Called upon when the model has a new SF2 to hook up.
-     * 
-     * @param sf2File
-     *            the file to use as the soundfont
-     */
-    void setSoundfont(Path sf2File);
-
-    MidiSoundPlayer open();
-
-    @Override
-    void close();
+    Vector2d sizeText(String text, FontDescriptor font);
 
 }

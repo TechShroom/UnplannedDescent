@@ -58,26 +58,28 @@ public class SimpleRootGuiElementRenderer implements RootGuiElementRender {
     }
 
     private GuiElementRenderer<GuiElement> resolveRenderer(Class<? extends GuiElement> clazz) {
-        return resolvedRenderers.computeIfAbsent(clazz, k -> {
-            Queue<Class<?>> classes = new LinkedList<>();
-            classes.add(clazz);
-            while (!classes.isEmpty()) {
-                Class<?> current = classes.remove();
-                if (current == null || !GuiElement.class.isAssignableFrom(current)) {
-                    // not in our scope
-                    continue;
-                }
-                GuiElementRenderer<GuiElement> geRender = renderers.get(current);
-                if (geRender != null) {
-                    return geRender;
-                }
+        return resolvedRenderers.computeIfAbsent(clazz, k -> doResolveRenderer(clazz));
+    }
 
-                // add to the search!
-                classes.add(current.getSuperclass());
-                Collections.addAll(classes, current.getInterfaces());
+    private GuiElementRenderer<GuiElement> doResolveRenderer(Class<? extends GuiElement> clazz) {
+        Queue<Class<?>> classes = new LinkedList<>();
+        classes.add(clazz);
+        while (!classes.isEmpty()) {
+            Class<?> current = classes.remove();
+            if (current == null || !GuiElement.class.isAssignableFrom(current)) {
+                // not in our scope
+                continue;
             }
-            throw new IllegalArgumentException("Missing renderer for " + clazz);
-        });
+            GuiElementRenderer<GuiElement> geRender = renderers.get(current);
+            if (geRender != null) {
+                return geRender;
+            }
+
+            // add to the search!
+            classes.add(current.getSuperclass());
+            Collections.addAll(classes, current.getInterfaces());
+        }
+        throw new IllegalArgumentException("Missing renderer for " + clazz);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class SimpleRootGuiElementRenderer implements RootGuiElementRender {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <GE extends GuiElement> void addRenderer(GuiElementRenderer<GE> renderer, Class<GE> type) {
+    public <GE extends GuiElement> void addRenderer(GuiElementRenderer<? super GE> renderer, Class<GE> type) {
         renderers.put(type, (GuiElementRenderer<GuiElement>) renderer);
         resolvedRenderers.clear();
     }

@@ -112,7 +112,7 @@ public class GLOptionPane {
     private static final float CHOICE_FONT_SIZE = 18;
 
     private static final int PROMPT_ALIGN = NVG_ALIGN_CENTER | NVG_ALIGN_TOP;
-    private static final int CHOICE_ALIGN = NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE;
+    private static final int CHOICE_ALIGN = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE;
     private static final int BUTTON_ALIGN = NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE;
 
     private static final float INITIAL_Y_OFFSET = 25;
@@ -272,6 +272,9 @@ public class GLOptionPane {
     public void onKey(KeyStateEvent event) {
         if (event.is(Key.ESCAPE, KeyState.RELEASED)) {
             selected = -1;
+            selfGeneratedClose = true;
+            win.setCloseRequested(true);
+        } else if (event.is(Key.ENTER, KeyState.RELEASED)) {
             selfGeneratedClose = true;
             win.setCloseRequested(true);
         }

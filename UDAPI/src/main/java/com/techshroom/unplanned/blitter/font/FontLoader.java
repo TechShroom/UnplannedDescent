@@ -26,24 +26,12 @@ package com.techshroom.unplanned.blitter.font;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import com.google.common.io.Resources;
 
 public interface FontLoader {
 
-    default Font loadFontFromFileSystem(String name, String ttf) throws IOException {
-        try (InputStream stream = Files.newInputStream(Paths.get(ttf))) {
-            return loadFont(name, stream);
-        }
-    }
-
-    default Font loadFontFromClasspath(String name, String ttf) throws IOException {
-        URL cpLocation = Resources.getResource(ttf);
-        try (InputStream stream = Resources.asByteSource(cpLocation).openBufferedStream()) {
-            return loadFont(name, stream);
+    default Font loadFont(FontDescriptor fd) throws IOException {
+        try (InputStream stream = FontLoaderStatic.getFdInputStream(fd)) {
+            return loadFont(fd.getName(), stream).withSize(fd.getSize());
         }
     }
 

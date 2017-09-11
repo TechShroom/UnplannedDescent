@@ -40,28 +40,49 @@ public class FontDefault {
     private static final String PLAIN = "Regular";
     private static final String BOLD = "Bold";
     private static final String ITALIC = "Italic";
+    private static final int DEFAULT_SIZE = 10;
+
+    public static FontDescriptor getPlainDescriptor() {
+        return getDescriptor(PLAIN);
+    }
+
+    public static FontDescriptor getBoldDescriptor() {
+        return getDescriptor(BOLD);
+    }
+
+    public static FontDescriptor getItalicDescriptor() {
+        return getDescriptor(ITALIC);
+    }
+
+    public static FontDescriptor getBoldItalicDescriptor() {
+        return getDescriptor(BOLD + ITALIC);
+    }
+
+    private static FontDescriptor getDescriptor(String style) {
+        String name = FAMILY + "-" + style;
+        String ttf = LOCATION + "/" + name + ".ttf";
+        return FontDescriptor.describe(name, ttf, DEFAULT_SIZE, FontDescriptor.Type.CLASSPATH);
+    }
 
     public static Font loadPlain(GraphicsContext ctx) {
-        return load(ctx, PLAIN);
+        return load(ctx, getPlainDescriptor());
     }
 
     public static Font loadBold(GraphicsContext ctx) {
-        return load(ctx, BOLD);
+        return load(ctx, getBoldDescriptor());
     }
 
     public static Font loadItalic(GraphicsContext ctx) {
-        return load(ctx, ITALIC);
+        return load(ctx, getItalicDescriptor());
     }
 
     public static Font loadBoldItalic(GraphicsContext ctx) {
-        return load(ctx, BOLD + ITALIC);
+        return load(ctx, getBoldItalicDescriptor());
     }
 
-    private static Font load(GraphicsContext ctx, String style) {
-        String name = FAMILY + "-" + style;
-        String ttf = LOCATION + "/" + name + ".ttf";
+    private static Font load(GraphicsContext ctx, FontDescriptor desc) {
         try {
-            return ctx.getFontLoader().loadFontFromClasspath(name, ttf);
+            return ctx.getFontLoader().loadFont(desc);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

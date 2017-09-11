@@ -22,14 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.view;
+package com.techshroom.unplanned.gui.model.layout;
 
-import com.techshroom.unplanned.gui.model.Label;
+import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.PropertyKey;
+import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
-public class LabelRenderer implements GuiElementRenderer<Label> {
+public class FlexLayout implements Layout {
+
+    @AutoValue
+    public abstract static class FlexData {
+
+        @AutoValue.Builder
+        public interface Builder {
+
+            FlexData build();
+
+            default <E extends GuiElement> E addTo(E element) {
+                return addFlexData(element, build());
+            }
+
+        }
+
+        FlexData() {
+        }
+
+    }
+
+    private static final PropertyKey<FlexData> PROP_FLEX_DATA = PropertyKey.of("flexLayoutFlexData");
+
+    public static <E extends GuiElement> E addFlexData(E element, FlexData flexData) {
+        element.setProperty(PROP_FLEX_DATA, flexData);
+        return element;
+    }
 
     @Override
-    public void render(RenderJob<Label> job) {
+    public void layout(GroupElement element) {
     }
 
 }
