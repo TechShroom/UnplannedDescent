@@ -25,12 +25,26 @@
 package com.techshroom.unplanned.gui.model.parent;
 
 import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.FlowLayout;
 import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.techshroom.unplanned.gui.model.layout.NullLayout;
 
 public class GroupElementBase extends ParentElementBase implements GroupElement {
 
-    private Layout layout = new FlowLayout();
+    private boolean needsLayout = true;
+    private Layout layout = NullLayout.INSTANCE;
+
+    @Override
+    public void markLayoutDirty() {
+        needsLayout = true;
+    }
+
+    @Override
+    public void layoutIfNeeded() {
+        if (needsLayout) {
+            layout();
+            needsLayout = false;
+        }
+    }
 
     @Override
     public Layout getLayout() {
@@ -40,17 +54,41 @@ public class GroupElementBase extends ParentElementBase implements GroupElement 
     @Override
     protected void layoutChildren() {
         layout.layout(this);
+        // update children if needed
+        for (GuiElement c : children) {
+            if (c instanceof GroupElement) {
+                ((GroupElement) c).markLayoutDirty();
+                ((GroupElement) c).layoutIfNeeded();
+            }
+        }
     }
 
     @Override
     public void setLayout(Layout layout) {
+        for (int i = 0; i < children.size(); i++) {
+            this.layout.onChildRemoved(children.get(i), i);
+        }
+
         this.layout = layout;
+
+        for (int i = 0; i < children.size(); i++) {
+            this.layout.onChildAdded(children.get(i), i);
+        }
         invalidate();
     }
 
     @Override
     public void addChild(GuiElement element) {
         children.add(element);
+        layout.onChildAdded(element, children.size() - 1);
+        invalidate();
+    }
+
+    @Override
+    public void removeChild(GuiElement element) {
+        int index = children.indexOf(element);
+        children.remove(index);
+        layout.onChildRemoved(element, index);
         invalidate();
     }
 

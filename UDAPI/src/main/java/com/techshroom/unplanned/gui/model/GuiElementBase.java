@@ -34,22 +34,26 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.SidedVector4i;
+import com.techshroom.unplanned.gui.event.ElementRevalidationEvent;
 import com.techshroom.unplanned.gui.model.parent.ParentElement;
 
 public class GuiElementBase implements GuiElement, GuiElementInternal {
 
     private final Map<String, Object> properties = new HashMap<>();
+    private final EventBus eventBus = new EventBus("GuiBus0x" + Integer.toHexString(System.identityHashCode(this)));
     private boolean visible = true;
     private Vector2i pos = Vector2i.ZERO;
     private SidedVector4i padding = SidedVector4i.ZERO;
     private SidedVector4i margin = SidedVector4i.ZERO;
     @Nullable
     private Vector2i size;
-    private Vector2i minSize = Vector2i.ZERO;
-    private Vector2i maxSize = Vector2i.ZERO;
-    private Vector2i preferredSize = Vector2i.ZERO;
+    private boolean sizeFromPreferredSize = false;
+    private Size<SizeValue> minSize = GuiAssist.sizeFrom(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    private Size<SizeValue> maxSize = GuiAssist.sizeFrom(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    private Size<SizeValue> preferredSize = GuiAssist.sizeFrom(Vector2i.ZERO);
     private Color foregroundColor = Color.BLACK;
     private Color backgroundColor = Color.GRAY;
     @Nullable
@@ -58,6 +62,11 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     // we also set invalidatedSinceLastDrawNotification to true
     private boolean valid;
     private boolean invalidatedSinceLastDrawNotification = true;
+
+    @Override
+    public EventBus getEventBus() {
+        return eventBus;
+    }
 
     @Override
     public void invalidate() {
@@ -72,13 +81,16 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     public void validate() {
         if (!valid) {
             onRevalidation();
+            // fire the event post-revalidate
+            eventBus.post(ElementRevalidationEvent.create());
             valid = true;
         }
     }
 
     protected void onRevalidation() {
         if (size == null) {
-            size = preferredSize;
+            size = solidifySize(preferredSize);
+            sizeFromPreferredSize = true;
         }
     }
 
@@ -98,6 +110,11 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     }
 
     @Override
+    public boolean hasProperty(PropertyKey<?> key) {
+        return properties.containsKey(key.getKey());
+    }
+
+    @Override
     public <T> T getProperty(PropertyKey<T> key) {
         // assumed OK, could cause ClassCastEx later
         @SuppressWarnings("unchecked")
@@ -108,6 +125,11 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     @Override
     public <T> void setProperty(PropertyKey<T> key, T value) {
         properties.put(key.getKey(), value);
+    }
+
+    @Override
+    public void removeProperty(PropertyKey<?> key) {
+        properties.remove(key.getKey());
     }
 
     @Override
@@ -155,6 +177,11 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     }
 
     @Override
+    public boolean hasSize() {
+        return size != null;
+    }
+
+    @Override
     public Vector2i getSize() {
         return checkNotNull(size, "invalid state, please validate before calling size");
     }
@@ -162,19 +189,20 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     @Override
     public void setSize(Vector2i size) {
         this.size = size;
+        sizeFromPreferredSize = false;
         invalidate();
     }
 
     @Override
-    public Vector2i getPreferredSize() {
+    public Size<SizeValue> getPreferredSize() {
         return preferredSize;
     }
 
     @Override
-    public void setPreferredSize(Vector2i size) {
+    public void setPreferredSize(Size<SizeValue> size) {
         // set size to null if it was equal to the previous preferred
         // this keeps the size <-> preferredSize ties
-        if (this.size == this.preferredSize) {
+        if (sizeFromPreferredSize) {
             this.size = null;
         }
         this.preferredSize = size;
@@ -182,23 +210,23 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     }
 
     @Override
-    public Vector2i getMinSize() {
+    public Size<SizeValue> getMinSize() {
         return minSize;
     }
 
     @Override
-    public void setMinSize(Vector2i minSize) {
+    public void setMinSize(Size<SizeValue> minSize) {
         this.minSize = minSize;
         invalidate();
     }
 
     @Override
-    public Vector2i getMaxSize() {
+    public Size<SizeValue> getMaxSize() {
         return maxSize;
     }
 
     @Override
-    public void setMaxSize(Vector2i maxSize) {
+    public void setMaxSize(Size<SizeValue> maxSize) {
         this.maxSize = maxSize;
         invalidate();
     }

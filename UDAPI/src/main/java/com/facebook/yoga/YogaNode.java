@@ -12,8 +12,16 @@ package com.facebook.yoga;
 import static org.lwjgl.util.yoga.Yoga.YGNodeCalculateLayout;
 import static org.lwjgl.util.yoga.Yoga.YGNodeCopyStyle;
 import static org.lwjgl.util.yoga.Yoga.YGNodeFree;
+import static org.lwjgl.util.yoga.Yoga.YGNodeGetHasNewLayout;
 import static org.lwjgl.util.yoga.Yoga.YGNodeInsertChild;
 import static org.lwjgl.util.yoga.Yoga.YGNodeIsDirty;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetDirection;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetHeight;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetLeft;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetMargin;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetPadding;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetTop;
+import static org.lwjgl.util.yoga.Yoga.YGNodeLayoutGetWidth;
 import static org.lwjgl.util.yoga.Yoga.YGNodeMarkDirty;
 import static org.lwjgl.util.yoga.Yoga.YGNodeNew;
 import static org.lwjgl.util.yoga.Yoga.YGNodeNewWithConfig;
@@ -21,6 +29,7 @@ import static org.lwjgl.util.yoga.Yoga.YGNodePrint;
 import static org.lwjgl.util.yoga.Yoga.YGNodeRemoveChild;
 import static org.lwjgl.util.yoga.Yoga.YGNodeReset;
 import static org.lwjgl.util.yoga.Yoga.YGNodeSetBaselineFunc;
+import static org.lwjgl.util.yoga.Yoga.YGNodeSetHasNewLayout;
 import static org.lwjgl.util.yoga.Yoga.YGNodeSetMeasureFunc;
 import static org.lwjgl.util.yoga.Yoga.YGNodeStyleGetAlignContent;
 import static org.lwjgl.util.yoga.Yoga.YGNodeStyleGetAlignItems;
@@ -105,51 +114,6 @@ public class YogaNode {
     private long mNativePointer;
     private Object mData;
 
-    /* Those flags needs be in sync with YGJNI.cpp */
-    private final static int MARGIN = 1;
-    private final static int PADDING = 2;
-    private final static int BORDER = 4;
-
-    private int mEdgeSetFlag = 0;
-
-    private boolean mHasSetPosition = false;
-
-    private float mWidth = YogaConstants.UNDEFINED;
-
-    private float mHeight = YogaConstants.UNDEFINED;
-
-    private float mTop = YogaConstants.UNDEFINED;
-
-    private float mLeft = YogaConstants.UNDEFINED;
-
-    private float mMarginLeft = 0;
-
-    private float mMarginTop = 0;
-
-    private float mMarginRight = 0;
-
-    private float mMarginBottom = 0;
-
-    private float mPaddingLeft = 0;
-
-    private float mPaddingTop = 0;
-
-    private float mPaddingRight = 0;
-
-    private float mPaddingBottom = 0;
-
-    private float mBorderLeft = 0;
-
-    private float mBorderTop = 0;
-
-    private float mBorderRight = 0;
-
-    private float mBorderBottom = 0;
-
-    private int mLayoutDirection = 0;
-
-    private boolean mHasNewLayout = true;
-
     YogaNode(long pointer) {
         mNativePointer = pointer;
     }
@@ -178,28 +142,6 @@ public class YogaNode {
     }
 
     public void reset() {
-        mEdgeSetFlag = 0;
-        mHasSetPosition = false;
-        mHasNewLayout = true;
-
-        mWidth = YogaConstants.UNDEFINED;
-        mHeight = YogaConstants.UNDEFINED;
-        mTop = YogaConstants.UNDEFINED;
-        mLeft = YogaConstants.UNDEFINED;
-        mMarginLeft = 0;
-        mMarginTop = 0;
-        mMarginRight = 0;
-        mMarginBottom = 0;
-        mPaddingLeft = 0;
-        mPaddingTop = 0;
-        mPaddingRight = 0;
-        mPaddingBottom = 0;
-        mBorderLeft = 0;
-        mBorderTop = 0;
-        mBorderRight = 0;
-        mBorderBottom = 0;
-        mLayoutDirection = 0;
-
         mMeasureFunction = null;
         mBaselineFunction = null;
         mData = null;
@@ -250,7 +192,7 @@ public class YogaNode {
     }
 
     public boolean hasNewLayout() {
-        return mHasNewLayout;
+        return YGNodeGetHasNewLayout(mNativePointer);
     }
 
     public void dirty() {
@@ -266,7 +208,7 @@ public class YogaNode {
     }
 
     public void markLayoutSeen() {
-        mHasNewLayout = false;
+        YGNodeSetHasNewLayout(mNativePointer, false);
     }
 
     public YogaDirection getStyleDirection() {
@@ -386,9 +328,6 @@ public class YogaNode {
     }
 
     public YogaValue getMargin(YogaEdge edge) {
-        if (!((mEdgeSetFlag & MARGIN) == MARGIN)) {
-            return YogaValue.UNDEFINED;
-        }
         try (MemoryStack stack = MemoryStack.stackPush()) {
             YGValue value = YGValue.callocStack();
             YGNodeStyleGetMargin(mNativePointer, edge.intValue(), value);
@@ -397,24 +336,18 @@ public class YogaNode {
     }
 
     public void setMargin(YogaEdge edge, float margin) {
-        mEdgeSetFlag |= MARGIN;
         YGNodeStyleSetMargin(mNativePointer, edge.intValue(), margin);
     }
 
     public void setMarginPercent(YogaEdge edge, float percent) {
-        mEdgeSetFlag |= MARGIN;
         YGNodeStyleSetMarginPercent(mNativePointer, edge.intValue(), percent);
     }
 
     public void setMarginAuto(YogaEdge edge) {
-        mEdgeSetFlag |= MARGIN;
         YGNodeStyleSetMarginAuto(mNativePointer, edge.intValue());
     }
 
     public YogaValue getPadding(YogaEdge edge) {
-        if (!((mEdgeSetFlag & PADDING) == PADDING)) {
-            return YogaValue.UNDEFINED;
-        }
         try (MemoryStack stack = MemoryStack.stackPush()) {
             YGValue value = YGValue.callocStack();
             YGNodeStyleGetPadding(mNativePointer, edge.intValue(), value);
@@ -423,31 +356,22 @@ public class YogaNode {
     }
 
     public void setPadding(YogaEdge edge, float padding) {
-        mEdgeSetFlag |= PADDING;
         YGNodeStyleSetPadding(mNativePointer, edge.intValue(), padding);
     }
 
     public void setPaddingPercent(YogaEdge edge, float percent) {
-        mEdgeSetFlag |= PADDING;
         YGNodeStyleSetPaddingPercent(mNativePointer, edge.intValue(), percent);
     }
 
     public float getBorder(YogaEdge edge) {
-        if (!((mEdgeSetFlag & BORDER) == BORDER)) {
-            return YogaConstants.UNDEFINED;
-        }
         return YGNodeStyleGetBorder(mNativePointer, edge.intValue());
     }
 
     public void setBorder(YogaEdge edge, float border) {
-        mEdgeSetFlag |= BORDER;
         YGNodeStyleSetBorder(mNativePointer, edge.intValue(), border);
     }
 
     public YogaValue getPosition(YogaEdge edge) {
-        if (!mHasSetPosition) {
-            return YogaValue.UNDEFINED;
-        }
         try (MemoryStack stack = MemoryStack.stackPush()) {
             YGValue value = YGValue.callocStack();
             YGNodeStyleGetPosition(mNativePointer, edge.intValue(), value);
@@ -456,12 +380,10 @@ public class YogaNode {
     }
 
     public void setPosition(YogaEdge edge, float position) {
-        mHasSetPosition = true;
         YGNodeStyleSetPosition(mNativePointer, edge.intValue(), position);
     }
 
     public void setPositionPercent(YogaEdge edge, float percent) {
-        mHasSetPosition = true;
         YGNodeStyleSetPositionPercent(mNativePointer, edge.intValue(), percent);
     }
 
@@ -578,80 +500,35 @@ public class YogaNode {
     }
 
     public float getLayoutX() {
-        return mLeft;
+        return YGNodeLayoutGetLeft(mNativePointer);
     }
 
     public float getLayoutY() {
-        return mTop;
+        return YGNodeLayoutGetTop(mNativePointer);
     }
 
     public float getLayoutWidth() {
-        return mWidth;
+        return YGNodeLayoutGetWidth(mNativePointer);
     }
 
     public float getLayoutHeight() {
-        return mHeight;
+        return YGNodeLayoutGetHeight(mNativePointer);
     }
 
     public float getLayoutMargin(YogaEdge edge) {
-        switch (edge) {
-            case LEFT:
-                return mMarginLeft;
-            case TOP:
-                return mMarginTop;
-            case RIGHT:
-                return mMarginRight;
-            case BOTTOM:
-                return mMarginBottom;
-            case START:
-                return getLayoutDirection() == YogaDirection.RTL ? mMarginRight : mMarginLeft;
-            case END:
-                return getLayoutDirection() == YogaDirection.RTL ? mMarginLeft : mMarginRight;
-            default:
-                throw new IllegalArgumentException("Cannot get layout margins of multi-edge shorthands");
-        }
+        return YGNodeLayoutGetMargin(mNativePointer, edge.intValue());
     }
 
     public float getLayoutPadding(YogaEdge edge) {
-        switch (edge) {
-            case LEFT:
-                return mPaddingLeft;
-            case TOP:
-                return mPaddingTop;
-            case RIGHT:
-                return mPaddingRight;
-            case BOTTOM:
-                return mPaddingBottom;
-            case START:
-                return getLayoutDirection() == YogaDirection.RTL ? mPaddingRight : mPaddingLeft;
-            case END:
-                return getLayoutDirection() == YogaDirection.RTL ? mPaddingLeft : mPaddingRight;
-            default:
-                throw new IllegalArgumentException("Cannot get layout paddings of multi-edge shorthands");
-        }
+        return YGNodeLayoutGetPadding(mNativePointer, edge.intValue());
     }
 
     public float getLayoutBorder(YogaEdge edge) {
-        switch (edge) {
-            case LEFT:
-                return mBorderLeft;
-            case TOP:
-                return mBorderTop;
-            case RIGHT:
-                return mBorderRight;
-            case BOTTOM:
-                return mBorderBottom;
-            case START:
-                return getLayoutDirection() == YogaDirection.RTL ? mBorderRight : mBorderLeft;
-            case END:
-                return getLayoutDirection() == YogaDirection.RTL ? mBorderLeft : mBorderRight;
-            default:
-                throw new IllegalArgumentException("Cannot get layout border of multi-edge shorthands");
-        }
+        return YGNodeStyleGetBorder(mNativePointer, edge.intValue());
     }
 
     public YogaDirection getLayoutDirection() {
-        return YogaDirection.fromInt(mLayoutDirection);
+        return YogaDirection.fromInt(YGNodeLayoutGetDirection(mNativePointer));
     }
 
     public void setMeasureFunction(YogaMeasureFunction measureFunction) {

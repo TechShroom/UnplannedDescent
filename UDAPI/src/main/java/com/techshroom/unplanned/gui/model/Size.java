@@ -22,47 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.gui.model;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import com.google.auto.value.AutoValue;
 
-import javax.annotation.Nullable;
+@AutoValue
+public abstract class Size<T> {
 
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.Layout;
-
-/**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
- */
-public interface GroupElement extends ParentElement {
-
-    void layoutIfNeeded();
-
-    void markLayoutDirty();
-
-    Layout getLayout();
-
-    void setLayout(Layout layout);
-
-    // for convenient init
-    default <L extends Layout> void setLayout(Supplier<L> initLayout, @Nullable Consumer<L> postEditLayout) {
-        L res = initLayout.get();
-        setLayout(res);
-        if (postEditLayout != null) {
-            postEditLayout.accept(res);
-        }
+    public static <T> Size<T> of(T width, T height) {
+        return new AutoValue_Size<>(width, height);
     }
 
-    void addChild(GuiElement element);
-
-    void removeChild(GuiElement element);
-
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    Size() {
     }
+
+    public abstract T width();
+
+    public abstract T height();
 
 }

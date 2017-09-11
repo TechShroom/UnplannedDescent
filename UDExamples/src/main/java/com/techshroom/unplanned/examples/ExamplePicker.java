@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
+import com.facebook.yoga.YogaAlign;
+import com.facebook.yoga.YogaFlexDirection;
+import com.facebook.yoga.YogaJustify;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
@@ -44,6 +47,9 @@ import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.model.Size;
+import com.techshroom.unplanned.gui.model.SizeValue;
+import com.techshroom.unplanned.gui.model.layout.YogaLayout;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 import com.techshroom.unplanned.gui.model.parent.Panel;
 import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
@@ -91,25 +97,31 @@ public class ExamplePicker {
 
         GroupElement base = new Panel();
         base.setPreferredSize(size);
-        // set up a chill 4 panel layout!
-        Vector2i quarter = size.div(2).sub(10, 10);
-        Vector2i eighth = quarter.div(2).sub(10, 10);
-        Vector2i sixteenth = eighth.div(2).sub(10, 10);
-        Vector2i thirtySecondth = sixteenth.div(2).sub(10, 10);
+        Panel left = new Panel();
+        Panel right = new Panel();
         Panel a = new Panel();
         Panel b = new Panel();
         Panel c = new Panel();
         Panel d = new Panel();
 
-        a.setPreferredSize(quarter);
-        b.setPreferredSize(eighth);
-        c.setPreferredSize(sixteenth);
-        d.setPreferredSize(thirtySecondth);
-
         a.setBackgroundColor(Color.RED);
         b.setBackgroundColor(Color.GREEN);
         c.setBackgroundColor(Color.fromString("#FEFDE7"));
         d.setBackgroundColor(Color.BLUE);
+        left.setBackgroundColor(Color.WHITE);
+        right.setBackgroundColor(Color.fromString("#AA00BB"));
+
+        a.setPreferredSize(Size.of(SizeValue.percent(50), SizeValue.integer(0)));
+        a.setMargin(SidedVector4i.all(5));
+        b.setMargin(SidedVector4i.all(5));
+        c.setMargin(SidedVector4i.all(5));
+        d.setMargin(SidedVector4i.all(5));
+        left.setMargin(SidedVector4i.all(10));
+        right.setMargin(SidedVector4i.all(50));
+
+        left.addChildren(a, b);
+        right.addChildren(c, d);
+        base.addChildren(left, right);
 
         Label label = Label.builder()
                 .text("Whatever!")
@@ -117,7 +129,30 @@ public class ExamplePicker {
                 .textSizer(ctx.getPen()).build();
         label.setPadding(new SidedVector4i(5, 5, 5, 5));
         label.setBackgroundColor(Color.RED);
-        base.addChild(label);
+        // base.addChild(label);
+
+        // Flex that layout!
+        base.setLayout(() -> {
+            YogaLayout layout = new YogaLayout();
+            layout.getRoot().setFlexDirection(YogaFlexDirection.ROW);
+            layout.getRoot().setAlignContent(YogaAlign.CENTER);
+            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
+            return layout;
+        }, null);
+        left.setLayout(() -> {
+            YogaLayout layout = new YogaLayout();
+            layout.getRoot().setAlignContent(YogaAlign.CENTER);
+            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
+            return layout;
+        }, layout -> {
+            layout.modifyNode(a, data -> data.yogaNode().setAlignSelf(YogaAlign.CENTER));
+        });
+        right.setLayout(() -> {
+            YogaLayout layout = new YogaLayout();
+            layout.getRoot().setAlignContent(YogaAlign.CENTER);
+            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
+            return layout;
+        }, null);
 
         RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();
         RenderManager guiRM = renderManager = new RenderManager(renderer, ctx);

@@ -22,46 +22,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.gui.model;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
-import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.google.auto.value.AutoValue;
 
 /**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
+ * Value for a size. May use the parent size to calculate the value.
  */
-public interface GroupElement extends ParentElement {
+@AutoValue
+public abstract class SizeValue {
 
-    void layoutIfNeeded();
-
-    void markLayoutDirty();
-
-    Layout getLayout();
-
-    void setLayout(Layout layout);
-
-    // for convenient init
-    default <L extends Layout> void setLayout(Supplier<L> initLayout, @Nullable Consumer<L> postEditLayout) {
-        L res = initLayout.get();
-        setLayout(res);
-        if (postEditLayout != null) {
-            postEditLayout.accept(res);
-        }
+    public enum SVType {
+        INTEGER,
+        PERCENT
     }
 
-    void addChild(GuiElement element);
+    public static SizeValue integer(int value) {
+        return create(SVType.INTEGER, value);
+    }
 
-    void removeChild(GuiElement element);
+    public static SizeValue percent(double value) {
+        return create(SVType.PERCENT, value);
+    }
 
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
+    public static SizeValue create(SVType type, double value) {
+        return new AutoValue_SizeValue(type, value);
+    }
+
+    SizeValue() {
+    }
+
+    public abstract SVType type();
+
+    public abstract double value();
+
+    public final int computeInteger(int sameParent, int crossParent) {
+        switch (type()) {
+            case INTEGER:
+                return (int) value();
+            case PERCENT:
+                return (int) (value() * sameParent);
+            default:
+                throw new IllegalStateException(type().name() + " is not part of the compute switch!");
         }
     }
 

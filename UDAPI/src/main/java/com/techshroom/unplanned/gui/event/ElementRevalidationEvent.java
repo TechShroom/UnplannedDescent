@@ -22,8 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/**
- * Bindings to LWJGL JNI Yoga. Used instead of Facebook's bindings because
- * they're way too difficult to include in a project currently.
- */
-package com.techshroom.unplanned.bindings.yoga;
+package com.techshroom.unplanned.gui.event;
+
+import com.google.auto.value.AutoValue;
+
+@AutoValue
+public abstract class ElementRevalidationEvent implements GuiEvent {
+
+    public static ElementRevalidationEvent create() {
+        return new AutoValue_ElementRevalidationEvent();
+    }
+
+    ElementRevalidationEvent() {
+    }
+
+}

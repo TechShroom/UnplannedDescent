@@ -24,45 +24,47 @@
  */
 package com.techshroom.unplanned.gui.model.parent;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import static com.google.common.base.Preconditions.checkElementIndex;
 
-import javax.annotation.Nullable;
-
-import com.techshroom.unplanned.gui.model.GuiElement;
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.gui.model.layout.Layout;
 
 /**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
+ * Holds slices ({@link Panel Panels}) that are painted on top of eachother. The
+ * slices should not be moved or re-sized, as they are locked to the parent size
+ * and location.
+ * 
+ * <p>
+ * Note: Padding and margin, which are layout-related properties, have no effect
+ * on the slices.
+ * </p>
  */
-public interface GroupElement extends ParentElement {
+public class SliceHolderElement extends GroupElementBase {
 
-    void layoutIfNeeded();
+    private static final Layout SLICE_LAYOUT = element -> {
+        ParentElement parent = element.getParent();
+        element.setSize(parent.getSize());
+        element.setRelativePosition(Vector2i.ZERO);
+    };
 
-    void markLayoutDirty();
-
-    Layout getLayout();
-
-    void setLayout(Layout layout);
-
-    // for convenient init
-    default <L extends Layout> void setLayout(Supplier<L> initLayout, @Nullable Consumer<L> postEditLayout) {
-        L res = initLayout.get();
-        setLayout(res);
-        if (postEditLayout != null) {
-            postEditLayout.accept(res);
-        }
+    {
+        setLayout(SLICE_LAYOUT);
     }
 
-    void addChild(GuiElement element);
+    public Panel addSlice() {
+        Panel panel = new Panel();
+        children.add(panel);
+        return panel;
+    }
 
-    void removeChild(GuiElement element);
+    public Panel getSlice(int index) {
+        checkElementIndex(index, children.size(), "panel index");
+        return (Panel) children.get(index);
+    }
 
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    // removeSlice is not offered because it would make tracking index tricky
+    public void cleanSlices() {
+        children.clear();
     }
 
 }

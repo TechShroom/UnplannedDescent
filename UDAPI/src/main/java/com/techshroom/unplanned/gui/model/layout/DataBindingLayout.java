@@ -22,47 +22,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
+package com.techshroom.unplanned.gui.model.layout;
 
 import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.techshroom.unplanned.gui.model.PropertyKey;
+import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
-/**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
- */
-public interface GroupElement extends ParentElement {
+public abstract class DataBindingLayout<D> implements Layout {
 
-    void layoutIfNeeded();
+    private final PropertyKey<D> propertyKey;
 
-    void markLayoutDirty();
+    protected DataBindingLayout(String key) {
+        propertyKey = PropertyKey.unique(key);
+    }
 
-    Layout getLayout();
+    protected D getInitialValue(GuiElement element) {
+        return null;
+    }
 
-    void setLayout(Layout layout);
-
-    // for convenient init
-    default <L extends Layout> void setLayout(Supplier<L> initLayout, @Nullable Consumer<L> postEditLayout) {
-        L res = initLayout.get();
-        setLayout(res);
-        if (postEditLayout != null) {
-            postEditLayout.accept(res);
+    @Override
+    public void onChildAdded(GuiElement element, int index) {
+        if (element.hasProperty(propertyKey)) {
+            return;
+        }
+        D init = getInitialValue(element);
+        if (init != null) {
+            element.setProperty(propertyKey, init);
         }
     }
 
-    void addChild(GuiElement element);
+    @Override
+    public void onChildRemoved(GuiElement element, int index) {
+        element.removeProperty(propertyKey);
+    }
+    
+    public <E extends GuiElement> E bindData(E element, D data) {
+        element.setProperty(propertyKey, data);
+        return element;
+    }
 
-    void removeChild(GuiElement element);
+    protected D getData(GuiElement element) {
+        return element.getProperty(propertyKey);
+    }
 
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    protected PropertyKey<D> getPropertyKey() {
+        return propertyKey;
+    }
+
+    @Override
+    public void layout(GroupElement element) {
     }
 
 }

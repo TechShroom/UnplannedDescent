@@ -44,6 +44,10 @@ public class ParentElementBase extends GuiElementBase implements ParentElement {
     @Override
     protected void onRevalidation() {
         super.onRevalidation();
+        // finalize child state for layout
+        for (GuiElement child : children) {
+            child.validate();
+        }
         layout();
     }
 
@@ -55,10 +59,7 @@ public class ParentElementBase extends GuiElementBase implements ParentElement {
     protected void layoutChildren() {
     }
 
-    private void layout() {
-        for (GuiElement child : children) {
-            child.validate();
-        }
+    protected void layout() {
         layoutChildren();
     }
 
