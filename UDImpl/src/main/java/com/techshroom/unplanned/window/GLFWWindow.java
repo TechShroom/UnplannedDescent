@@ -63,6 +63,7 @@ import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.core.util.GLFWUtil;
 import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.gui.model.parent.RootElement;
 import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
 import com.techshroom.unplanned.input.Keyboard;
@@ -88,6 +89,7 @@ public class GLFWWindow implements Window {
 
     private final EventBus eventBus;
     private final GLGraphicsContext graphicsContext;
+    private final RootElement rootElement;
     private final Mouse mouse;
     private final Keyboard keyboard;
     private final long pointer;
@@ -100,8 +102,11 @@ public class GLFWWindow implements Window {
         this.pointer = pointer;
         this.eventBus = new EventBus("window-0x" + Long.toHexString(pointer));
         this.graphicsContext = new GLGraphicsContext(this);
+        this.rootElement = new GLFWRootElement();
         this.mouse = new GLFWMouse(this);
         this.keyboard = new GLFWKeyboard(this);
+        
+        eventBus.register(rootElement);
 
         setupEventPublishers();
 
@@ -116,6 +121,8 @@ public class GLFWWindow implements Window {
         glfwSetFramebufferSizeCallback(pointer, (win, w, h) -> {
             eventBus.post(WindowFramebufferResizeEvent.create(this, w, h));
         });
+        Vector2i size = getSize();
+        eventBus.post(WindowResizeEvent.create(this, size.getX(), size.getY()));
     }
 
     public WindowSettings getSettings() {
@@ -250,6 +257,11 @@ public class GLFWWindow implements Window {
     @Override
     public GraphicsContext getGraphicsContext() {
         return graphicsContext;
+    }
+
+    @Override
+    public RootElement getRootElement() {
+        return rootElement;
     }
 
     @Override

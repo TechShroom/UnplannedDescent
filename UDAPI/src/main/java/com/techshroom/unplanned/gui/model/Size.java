@@ -29,6 +29,10 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class Size<T> {
 
+    public static <T> Size<T> of(T both) {
+        return of(both, both);
+    }
+
     public static <T> Size<T> of(T width, T height) {
         return new AutoValue_Size<>(width, height);
     }
@@ -37,7 +41,15 @@ public abstract class Size<T> {
     }
 
     public abstract T width();
+    
+    public final Size<T> withWidth(T width) {
+        return of(width, height());
+    }
 
     public abstract T height();
+    
+    public final Size<T> withHeight(T height) {
+        return of(width(), height);
+    }
 
 }

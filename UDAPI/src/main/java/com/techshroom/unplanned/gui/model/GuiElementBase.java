@@ -50,8 +50,8 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     private SidedVector4i margin = SidedVector4i.ZERO;
     @Nullable
     private Vector2i size;
-    private boolean sizeFromPreferredSize = false;
-    private Size<SizeValue> minSize = GuiAssist.sizeFrom(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    private boolean sizeFromPreferredSize = true;
+    private Size<SizeValue> minSize = GuiAssist.sizeFrom(Vector2i.ZERO);
     private Size<SizeValue> maxSize = GuiAssist.sizeFrom(Integer.MAX_VALUE, Integer.MAX_VALUE);
     private Size<SizeValue> preferredSize = GuiAssist.sizeFrom(Vector2i.ZERO);
     private Color foregroundColor = Color.BLACK;
@@ -88,9 +88,8 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     }
 
     protected void onRevalidation() {
-        if (size == null) {
+        if (sizeFromPreferredSize) {
             size = solidifySize(preferredSize);
-            sizeFromPreferredSize = true;
         }
     }
 
@@ -200,11 +199,6 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
 
     @Override
     public void setPreferredSize(Size<SizeValue> size) {
-        // set size to null if it was equal to the previous preferred
-        // this keeps the size <-> preferredSize ties
-        if (sizeFromPreferredSize) {
-            this.size = null;
-        }
         this.preferredSize = size;
         invalidate();
     }

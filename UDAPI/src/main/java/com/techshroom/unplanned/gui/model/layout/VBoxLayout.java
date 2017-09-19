@@ -22,19 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.gui.model.layout;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.flowpowered.math.vector.Vector2i;
 
-public final class Logging {
+public class VBoxLayout extends XBoxLayout {
 
-    public static Logger getLogger() {
-        return LoggerFactory.getLogger(StackTraceInfo.getInvokingClassName());
+    public VBoxLayout() {
+        this(0);
     }
 
-    private Logging() {
-        // is illegal :)
+    public VBoxLayout(double spacing) {
+        this(spacing, true);
+    }
+
+    public VBoxLayout(double spacing, boolean fillWidth) {
+        super("Vgrow", spacing, fillWidth);
+    }
+
+    @Override
+    protected int extractComponent(Vector2i vec) {
+        return vec.getY();
+    }
+
+    @Override
+    protected Vector2i setComponent(Vector2i vec, int compValue) {
+        return Vector2i.from(vec.getX(), compValue);
+    }
+
+    @Override
+    protected int extractComponentCross(Vector2i vec) {
+        return vec.getX();
+    }
+
+    @Override
+    protected Vector2i setComponentCross(Vector2i vec, int compValue) {
+        return Vector2i.from(compValue, vec.getY());
     }
 
 }

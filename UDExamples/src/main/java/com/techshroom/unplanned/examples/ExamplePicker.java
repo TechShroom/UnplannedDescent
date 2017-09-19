@@ -30,9 +30,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
-import com.facebook.yoga.YogaAlign;
-import com.facebook.yoga.YogaFlexDirection;
-import com.facebook.yoga.YogaJustify;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
@@ -49,7 +46,8 @@ import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.model.Label;
 import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
-import com.techshroom.unplanned.gui.model.layout.YogaLayout;
+import com.techshroom.unplanned.gui.model.layout.HBoxLayout;
+import com.techshroom.unplanned.gui.model.layout.VBoxLayout;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 import com.techshroom.unplanned.gui.model.parent.Panel;
 import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
@@ -58,6 +56,8 @@ import com.techshroom.unplanned.gui.view.RootGuiElementRender;
 import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.window.Window;
 import com.techshroom.unplanned.window.WindowSettings;
+
+import javafx.scene.layout.Priority;
 
 public class ExamplePicker {
 
@@ -96,7 +96,8 @@ public class ExamplePicker {
         Vector2i size = window.getSize();
 
         GroupElement base = new Panel();
-        base.setPreferredSize(size);
+        window.getRootElement().setChild(base);
+        base.setPreferredSize(Size.of(SizeValue.percent(100), SizeValue.percent(100)));
         Panel left = new Panel();
         Panel right = new Panel();
         Panel a = new Panel();
@@ -111,13 +112,8 @@ public class ExamplePicker {
         left.setBackgroundColor(Color.WHITE);
         right.setBackgroundColor(Color.fromString("#AA00BB"));
 
-        a.setPreferredSize(Size.of(SizeValue.percent(50), SizeValue.integer(0)));
-        a.setMargin(SidedVector4i.all(5));
-        b.setMargin(SidedVector4i.all(5));
-        c.setMargin(SidedVector4i.all(5));
-        d.setMargin(SidedVector4i.all(5));
-        left.setMargin(SidedVector4i.all(10));
-        right.setMargin(SidedVector4i.all(50));
+        left.setPadding(SidedVector4i.all(10));
+        right.setPadding(SidedVector4i.all(10));
 
         left.addChildren(a, b);
         right.addChildren(c, d);
@@ -129,30 +125,30 @@ public class ExamplePicker {
                 .textSizer(ctx.getPen()).build();
         label.setPadding(new SidedVector4i(5, 5, 5, 5));
         label.setBackgroundColor(Color.RED);
-        // base.addChild(label);
 
-        // Flex that layout!
         base.setLayout(() -> {
-            YogaLayout layout = new YogaLayout();
-            layout.getRoot().setFlexDirection(YogaFlexDirection.ROW);
-            layout.getRoot().setAlignContent(YogaAlign.CENTER);
-            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
-            return layout;
-        }, null);
-        left.setLayout(() -> {
-            YogaLayout layout = new YogaLayout();
-            layout.getRoot().setAlignContent(YogaAlign.CENTER);
-            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
+            HBoxLayout layout = new HBoxLayout(5);
             return layout;
         }, layout -> {
-            layout.modifyNode(a, data -> data.yogaNode().setAlignSelf(YogaAlign.CENTER));
+            layout.bindData(left, Priority.ALWAYS);
+            layout.bindData(right, Priority.ALWAYS);
         });
-        right.setLayout(() -> {
-            YogaLayout layout = new YogaLayout();
-            layout.getRoot().setAlignContent(YogaAlign.CENTER);
-            layout.getRoot().setJustifyContent(YogaJustify.CENTER);
+
+        left.setLayout(() -> {
+            VBoxLayout layout = new VBoxLayout(5);
             return layout;
-        }, null);
+        }, layout -> {
+            layout.bindData(a, Priority.ALWAYS);
+            layout.bindData(b, Priority.ALWAYS);
+        });
+
+        right.setLayout(() -> {
+            VBoxLayout layout = new VBoxLayout(5);
+            return layout;
+        }, layout -> {
+            layout.bindData(c, Priority.ALWAYS);
+            layout.bindData(d, Priority.ALWAYS);
+        });
 
         RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();
         RenderManager guiRM = renderManager = new RenderManager(renderer, ctx);
@@ -185,7 +181,6 @@ public class ExamplePicker {
         windowSize = event.getSize();
         int w = windowSize.getX();
         int h = windowSize.getY();
-        renderManager.setScale(windowSize.toDouble().div(UI_SIZE.toDouble()));
         proj = Matrix4f.createOrthographic(w, 0, 0, h, -1000, 1000);
     }
 

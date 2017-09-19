@@ -24,6 +24,7 @@
  */
 package com.techshroom.unplanned.gui.model.layout;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
@@ -36,5 +37,9 @@ public interface Layout {
     }
 
     void layout(GroupElement element);
+    
+    default Vector2i computePreferredSize(GroupElement element) {
+        return Vector2i.ZERO;
+    }
 
 }

@@ -83,8 +83,8 @@ public class Label extends GuiElementBase implements Labeled {
         if (textSizer != null) {
             // bind size to textSizer
             Vector2d textSize = textSizer.sizeText(text, font);
-            Vector2d actualSize = textSize.add(getPadding().getAsWidthHeight().toDouble());
-            setPreferredSize(actualSize.toInt());
+//            Vector2d actualSize = textSize.add(getPadding().getAsWidthHeight().toDouble());
+            setPreferredSize(textSize.toInt());
             // this will be transferred to size in super, if it's not set...
         }
         super.onRevalidation();

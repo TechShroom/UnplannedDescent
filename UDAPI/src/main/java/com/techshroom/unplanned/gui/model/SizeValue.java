@@ -61,7 +61,7 @@ public abstract class SizeValue {
             case INTEGER:
                 return (int) value();
             case PERCENT:
-                return (int) (value() * sameParent);
+                return (int) ((value() / 100d) * sameParent);
             default:
                 throw new IllegalStateException(type().name() + " is not part of the compute switch!");
         }

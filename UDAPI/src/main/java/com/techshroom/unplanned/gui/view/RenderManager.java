@@ -24,20 +24,28 @@
  */
 package com.techshroom.unplanned.gui.view;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
+
+import org.slf4j.Logger;
 
 import com.flowpowered.math.vector.Vector2d;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
+import com.techshroom.unplanned.core.util.Logging;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.GuiElementInternal;
+import com.techshroom.unplanned.gui.model.SizeValue.SVType;
 
 /**
  * Manages the renders and stores state associated with each element.
  */
 public final class RenderManager {
+
+    private static final Logger LOGGER = Logging.getLogger();
 
     private static final class RMRenderJob<GE extends GuiElement> extends RenderJob<GE> {
 
@@ -115,6 +123,7 @@ public final class RenderManager {
     }
 
     public void render(GuiElement root) {
+        sanityCheckRoot(root);
         if (root.isVisible()) {
             DigitalPen pen = context.getPen();
             pen.uncap();
@@ -127,6 +136,20 @@ public final class RenderManager {
                 // post render, do clean up
                 RenderUtility.performColorCacheCleanup();
                 pen.cap();
+            }
+        }
+    }
+
+    private static final Set<GuiElement> sanityCheckCache = Collections.newSetFromMap(new WeakHashMap<>());
+
+    private void sanityCheckRoot(GuiElement root) {
+        if (!sanityCheckCache.add(root)) {
+            return;
+        }
+        if (root.getParent() == null) {
+            if (root.getPreferredSize().width().type() == SVType.PERCENT ||
+                    root.getPreferredSize().height().type() == SVType.PERCENT) {
+                LOGGER.warn("[Sanity] Warning: root element has percent based size without a parent");
             }
         }
     }

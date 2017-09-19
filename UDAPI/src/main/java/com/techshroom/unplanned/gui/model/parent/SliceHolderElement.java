@@ -53,6 +53,7 @@ public class SliceHolderElement extends GroupElementBase {
 
     public Panel addSlice() {
         Panel panel = new Panel();
+        panel.setLayout(SLICE_LAYOUT);
         children.add(panel);
         return panel;
     }

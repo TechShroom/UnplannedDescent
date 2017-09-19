@@ -22,19 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.gui.model.parent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.techshroom.unplanned.gui.model.GuiElement;
 
-public final class Logging {
+public interface RootElement extends ParentElement {
 
-    public static Logger getLogger() {
-        return LoggerFactory.getLogger(StackTraceInfo.getInvokingClassName());
-    }
-
-    private Logging() {
-        // is illegal :)
-    }
-
+    void setChild(GuiElement child);
+    
+    GuiElement getChild();
+    
 }
