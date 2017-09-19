@@ -24,13 +24,17 @@
  */
 package com.techshroom.unplanned.gui.model.parent;
 
+import com.techshroom.unplanned.gui.model.GuiAssist;
 import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.Size;
+import com.techshroom.unplanned.gui.model.SizeValue;
 import com.techshroom.unplanned.gui.model.layout.Layout;
 import com.techshroom.unplanned.gui.model.layout.NullLayout;
 
 public class GroupElementBase extends ParentElementBase implements GroupElement {
 
     private boolean needsLayout = true;
+    private boolean preferredSizeFromLayout = true;
     private Layout layout = NullLayout.INSTANCE;
 
     @Override
@@ -44,6 +48,14 @@ public class GroupElementBase extends ParentElementBase implements GroupElement 
             layout();
             needsLayout = false;
         }
+    }
+
+    @Override
+    protected void onRevalidation() {
+        if (preferredSizeFromLayout) {
+            super.setPreferredSize(GuiAssist.sizeFrom(layout.computePreferredSize(this)));
+        }
+        super.onRevalidation();
     }
 
     @Override
@@ -90,6 +102,12 @@ public class GroupElementBase extends ParentElementBase implements GroupElement 
         children.remove(index);
         layout.onChildRemoved(element, index);
         invalidate();
+    }
+
+    @Override
+    public void setPreferredSize(Size<SizeValue> size) {
+        preferredSizeFromLayout = false;
+        super.setPreferredSize(size);
     }
 
 }

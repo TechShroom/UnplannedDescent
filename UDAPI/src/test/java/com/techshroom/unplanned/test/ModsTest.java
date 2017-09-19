@@ -31,11 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -45,8 +42,6 @@ import com.techshroom.unplanned.core.mod.ModMetadata;
 import com.techshroom.unplanned.core.mod.ModProvider;
 import com.techshroom.unplanned.core.mod.Mods;
 import com.techshroom.unplanned.core.mod.SkeletalMod;
-import com.techshroom.unplanned.core.util.Logging;
-import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
 public class ModsTest {
 
@@ -66,19 +61,6 @@ public class ModsTest {
             e.printStackTrace();
         }
         SERVICE = tmp;
-    }
-
-    private static Set<LoggingGroup> previousLoggingGroup;
-
-    @BeforeClass
-    public static void logAllGroups() {
-        previousLoggingGroup = Logging.getValidGroups();
-        Logging.setValidGroups(LoggingGroup.ALL);
-    }
-
-    @AfterClass
-    public static void restorePreviousLoggingGroups() {
-        Logging.setValidGroups(previousLoggingGroup);
     }
 
     @Test

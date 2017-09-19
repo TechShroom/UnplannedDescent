@@ -30,6 +30,8 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,8 +53,7 @@ public class ClassPathHack {
      *             if there are any problems injecting.
      */
     public static void addFile(String s) throws IOException {
-        File f = new File(s);
-        addFile(f);
+        addFile(Paths.get(s));
     }
 
     /**
@@ -63,8 +64,8 @@ public class ClassPathHack {
      * @throws IOException
      *             if there is any problems injecting.
      */
-    public static void addFile(File f) throws IOException {
-        addURL(f.toURI().toURL());
+    public static void addFile(Path f) throws IOException {
+        addURL(f.toUri().toURL());
     }
 
     /**
@@ -96,12 +97,12 @@ public class ClassPathHack {
     }
 
     public static boolean hasFile(String file) {
-        return hasFile(new File(file));
+        return hasFile(Paths.get(file));
     }
 
-    public static boolean hasFile(File file) {
+    public static boolean hasFile(Path file) {
         try {
-            return hasURL(file.toURI().toURL());
+            return hasURL(file.toUri().toURL());
         } catch (MalformedURLException e) {
             return false;
         }

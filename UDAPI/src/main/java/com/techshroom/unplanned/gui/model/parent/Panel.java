@@ -26,9 +26,32 @@ package com.techshroom.unplanned.gui.model.parent;
 
 import javax.swing.JPanel;
 
+import com.techshroom.unplanned.gui.model.layout.HBoxLayout;
+import com.techshroom.unplanned.gui.model.layout.VBoxLayout;
+
 /**
  * Like {@link JPanel}.
  */
 public class Panel extends GroupElementBase implements GroupElement {
+
+    public static Panel hBox() {
+        return hBox(0);
+    }
+
+    public static Panel hBox(double spacing) {
+        Panel panel = new Panel();
+        panel.setLayout(new HBoxLayout(spacing));
+        return panel;
+    }
+
+    public static Panel vBox() {
+        return vBox(0);
+    }
+
+    public static Panel vBox(double spacing) {
+        Panel panel = new Panel();
+        panel.setLayout(new VBoxLayout(spacing));
+        return panel;
+    }
 
 }

@@ -22,47 +22,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.window;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.glfw.GLFW.glfwInit;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.google.common.collect.Iterables;
+import com.google.common.eventbus.Subscribe;
+import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.gui.model.GuiElement;
+import com.techshroom.unplanned.gui.model.parent.ParentElementBase;
+import com.techshroom.unplanned.gui.model.parent.RootElement;
 
-import org.lwjgl.system.Configuration;
-import org.slf4j.Logger;
+class GLFWRootElement extends ParentElementBase implements RootElement {
 
-import com.techshroom.unplanned.core.Settings;
-
-public final class GLFWUtil {
-
-    private static final Logger LOGGER = Logging.getLogger();
-
-    private static boolean initialized;
-
-    public static void ensureInitialized() {
-        if (initialized) {
-            return;
-        }
-        LOGGER.trace("GLFWUtil initializing...");
-        initialized = true;
-        /* use apitrace if requested */
-        String apiTrace = Settings.APITRACE;
-        if (!apiTrace.isEmpty()) {
-            // check exists
-            Path path = Paths.get(apiTrace);
-            checkState(Files.exists(path), "apitrace file %s does not exist", apiTrace);
-            // set gl library location
-            Configuration.OPENGL_LIBRARY_NAME.set(path.toAbsolutePath().toString());
-            LOGGER.info("Using APITrace " + apiTrace);
-        }
-        GLFWErrorHandler.setAsErrorCallback();
-        checkState(glfwInit(), "failed to initialize GLFW");
+    @Subscribe
+    public void onWindowResize(WindowResizeEvent event) {
+        setSize(event.getSize());
+        setMinSize(event.getSize());
+        setMaxSize(event.getSize());
+        setPreferredSize(event.getSize());
+        // tell children to re-format themselves if needed
+        children.forEach(GuiElement::invalidate);
     }
 
-    private GLFWUtil() {
+    @Override
+    public void setChild(GuiElement child) {
+        GuiElement prev = Iterables.getFirst(children, null);
+        if (prev != null) {
+            prev.setParent(null);
+            children.remove(0);
+        }
+        if (child != null) {
+            children.add(child);
+            child.setParent(this);
+        }
+    }
+
+    @Override
+    public GuiElement getChild() {
+        checkState(children.size() > 0, "no child has been set");
+        GuiElement child = children.get(0);
+        return child;
     }
 
 }

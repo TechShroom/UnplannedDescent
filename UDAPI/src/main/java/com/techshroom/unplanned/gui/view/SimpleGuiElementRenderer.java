@@ -52,7 +52,7 @@ public class SimpleGuiElementRenderer<E extends GuiElement> implements GuiElemen
         pen.draw(() -> {
             pen.setColor(e.getBackgroundColor());
             RenderUtility.applyStandardTransform(e, pen, false);
-            Vector2i size = e.getSize();
+            Vector2i size = e.getSize().add(e.getPadding().getAsWidthHeight());
             pen.fill(() -> pen.rect(0, 0, size.getX(), size.getY()));
         });
     }

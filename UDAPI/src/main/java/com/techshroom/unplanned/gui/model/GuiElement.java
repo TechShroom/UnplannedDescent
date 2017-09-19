@@ -146,6 +146,14 @@ public interface GuiElement {
 
     void setPadding(SidedVector4i padding);
 
+    default Vector2i getSizeWithPadding() {
+        return getSize().add(getPadding().getAsWidthHeight());
+    }
+
+    default Vector2i getPreferredSizeWithPadding() {
+        return solidifySize(getPreferredSize()).add(getPadding().getAsWidthHeight());
+    }
+
     // margin
     SidedVector4i getMargin();
 

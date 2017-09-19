@@ -24,27 +24,32 @@
  */
 package com.techshroom.unplanned.core.mod;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.techshroom.unplanned.core.util.Functional.printErrors;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.techshroom.unplanned.core.util.AppFileSystem;
 import com.techshroom.unplanned.core.util.ClassPathHack;
 import com.techshroom.unplanned.core.util.CompileGeneric;
-import com.techshroom.unplanned.core.util.LUtils;
 import com.techshroom.unplanned.core.util.Logging;
-import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
 
 /**
  * Access point for mods. This is the class that handles all loading for mods.
@@ -53,6 +58,9 @@ import com.techshroom.unplanned.core.util.Logging.LoggingGroup;
  */
 public final class Mods {
 
+    private static final Logger LOGGER = Logging.getLogger();
+
+    private static final Path MODS_DIR = AppFileSystem.getRandomDir("mods", false);
     private static final Mod NULL_MOD = new SkeletalMod(
             ModMetadata.builder().idAndName("null").version("0.0.0")
                     .buildNumber(0).targetGameVersion("any").build()) {
@@ -67,21 +75,17 @@ public final class Mods {
      */
     public static void findAndLoad() {
         if (hasLoadedMods()) {
-            Logging.log("Reloading mods, may cause troubles",
-                    LoggingGroup.WARNING);
+            LOGGER.warn("Reloading mods, may cause troubles");
             providers.values().forEach(Mod::unload);
             providers.clear();
         }
-        Logging.log("UD Mod System starting...", LoggingGroup.DEBUG);
+        LOGGER.debug("UD Mod System starting...");
         if (!injectModsFolder()) {
-            Logging.log(
-                    "Not searching "
-                            + new File(LUtils.ROOT, "mods").getAbsolutePath()
-                            + " because it doesn't exist or is not a directory.",
-                    LoggingGroup.WARNING);
+            LOGGER.warn("Not searching {} because it doesn't exist or is not a directory.",
+                    MODS_DIR.toAbsolutePath());
         }
         List<ModProvider> providerList = ModLoader.loadModsFromClasspath();
-        Logging.log("Loaded mod providers from classpath.", LoggingGroup.DEBUG);
+        LOGGER.debug("Loaded mod providers from classpath.");
         Multimap<String, ModMetadata> ids = ArrayListMultimap.create();
         providerList.forEach(
                 p -> ids.put(p.getMetadata().getId(), p.getMetadata()));
@@ -90,14 +94,15 @@ public final class Mods {
                     .filter(e -> e.getValue().size() < 2).map(Entry::getKey)
                     .collect(Collectors.toSet());
             toRemove.forEach(ids::removeAll);
-            Logging.log("ID Conflicts detected, load failed",
-                    LoggingGroup.ERROR);
+            LOGGER.error("ID Conflicts detected, load failed");
             throw new ModIDConflictException(ids);
         }
-        Logging.log("Loaded provider list, dumping", LoggingGroup.JUNK);
-        providerList
-                .forEach(x -> Logging.log("PROVIDER: " + x, LoggingGroup.JUNK));
-        Logging.log("Creating mods via providers...", LoggingGroup.DEBUG);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Loaded provider list, dumping");
+            providerList
+                    .forEach(x -> LOGGER.trace("PROVIDER: " + x));
+        }
+        LOGGER.debug("Creating mods via providers...");
         providers =
                 HashMultimap
                         .create(Multimaps
@@ -111,41 +116,38 @@ public final class Mods {
         providers.asMap().entrySet().stream()
                 .filter(e -> e.getValue() == NULL_MOD).map(Entry::getKey)
                 .forEach(providers::removeAll);
-        Logging.log("Loading mods...", LoggingGroup.DEBUG);
+        LOGGER.debug("Loading mods...");
         providers.values().stream().forEach(printErrors(Mod::load,
                 CompileGeneric.<Consumer<Mod>> specify(Consumer.class)));
         loadedMods = true;
-        Logging.log("UD Mod System loaded.", LoggingGroup.DEBUG);
+        LOGGER.debug("UD Mod System loaded.");
     }
 
     private static boolean injectModsFolder() {
-        String topLevel = LUtils.ROOT;
-        File mods = new File(topLevel, "mods");
-        if (!loadDirectory(mods)) {
+        if (!loadDirectory(MODS_DIR)) {
             return false;
         }
-        System.err.println("Injected '" + mods + "/**' into classpath.");
         return true;
     }
 
-    private static boolean loadDirectory(File dir) {
-        if (!dir.exists() || dir.isFile()) {
+    private static boolean loadDirectory(Path dir) {
+        if (!Files.isDirectory(dir)) {
             return false;
         }
 
-        File[] files = dir.listFiles();
-        for (File f : files) {
-            if (f.isDirectory()) {
-                loadDirectory(f);
-                continue;
-            }
-
+        List<Path> potential;
+        try (Stream<Path> files = Files.list(dir)) {
+            potential = files.filter(Files::isRegularFile).collect(toImmutableList());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        for (Path f : potential) {
             try {
                 if (!ClassPathHack.hasFile(f)) {
                     ClassPathHack.addFile(f);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new UncheckedIOException(e);
             }
 
         }
