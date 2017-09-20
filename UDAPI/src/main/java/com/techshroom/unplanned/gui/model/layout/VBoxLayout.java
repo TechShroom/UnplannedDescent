@@ -28,16 +28,42 @@ import com.flowpowered.math.vector.Vector2i;
 
 public class VBoxLayout extends XBoxLayout {
 
-    public VBoxLayout() {
-        this(0);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public VBoxLayout(double spacing) {
-        this(spacing, true);
+    public static final class Builder {
+
+        private double spacing = 0;
+        private boolean fillWidth = true;
+        private Alignment alignment = Alignment.CENTER;
+
+        private Builder() {
+        }
+
+        public Builder spacing(double spacing) {
+            this.spacing = spacing;
+            return this;
+        }
+
+        public Builder fillWidth(boolean fillWidth) {
+            this.fillWidth = fillWidth;
+            return this;
+        }
+
+        public Builder alignment(Alignment alignment) {
+            this.alignment = alignment;
+            return this;
+        }
+
+        public VBoxLayout build() {
+            return new VBoxLayout(spacing, fillWidth, alignment);
+        }
+
     }
 
-    public VBoxLayout(double spacing, boolean fillWidth) {
-        super("Vgrow", spacing, fillWidth);
+    private VBoxLayout(double spacing, boolean fillWidth, Alignment alignment) {
+        super("Vgrow", spacing, fillWidth, alignment);
     }
 
     @Override

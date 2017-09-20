@@ -31,6 +31,8 @@ public abstract class Color {
 
     public static final Color WHITE = addColor(createDirectOpaque(0xFF, 0xFF, 0xFF));
 
+    public static final Color TRANSPARENT = addColor(createDirect(0, 0, 0, 0));
+
     private static int hash(int red, int green, int blue, int alpha) {
         int h = 1;
         h *= 1000003;

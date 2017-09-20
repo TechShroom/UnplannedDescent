@@ -24,8 +24,6 @@
  */
 package com.techshroom.unplanned.gui.model.layout;
 
-import java.util.function.Predicate;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
@@ -39,15 +37,17 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
 
     private final double spacing;
     private final boolean fill;
+    private final Alignment align;
 
-    protected XBoxLayout(String key, double spacing, boolean fill) {
+    protected XBoxLayout(String key, double spacing, boolean fill, Alignment align) {
         super(key);
         this.spacing = spacing;
         this.fill = fill;
+        this.align = align;
     }
 
     @Override
-    public Vector2i computePreferredSize(GroupElement element) {
+    public Vector2i computePreferredSize(GroupElement<?> element) {
         int mainSize = 0;
         int crossSize = 0;
         for (GuiElement child : element.getChildren()) {
@@ -59,56 +59,68 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
     }
 
     @Override
-    public void layout(GroupElement element) {
+    public void layout(GroupElement<?> element) {
         // sizes[] does not include spacing!
         double[] sizes = new double[element.getChildren().size()];
-        double[] addStart = new double[element.getChildren().size()];
-        double[] addEnd = new double[element.getChildren().size()];
         double remaining = extractComponent(element.getSize());
-        remaining = initialSizeElements(element, remaining, sizes, addStart, addEnd);
+        remaining = initialSizeElements(element, remaining, sizes);
         remaining = expandElements(Priority.ALWAYS, element, remaining, sizes);
         remaining = expandElements(Priority.SOMETIMES, element, remaining, sizes);
-        sizeElements(element, extractComponentCross(element.getSize()), sizes, addStart, addEnd);
+        layoutElements(element, remaining, extractComponentCross(element.getSize()), sizes);
     }
 
-    private double initialSizeElements(GroupElement element, double remaining, double[] sizes, double[] addStart, double[] addEnd) {
+    private double initialSizeElements(GroupElement<?> element, double remaining, double[] sizes) {
         for (int i = 0; i < element.getChildren().size(); i++) {
             if (i > 0) {
                 remaining -= spacing;
             }
             GuiElement e = element.getChildren().get(i);
-            addStart[i] = extractComponent(e.getPadding().getTopLeft().add(e.getMargin().getTopLeft()));
-            remaining -= addStart[i];
             // try preferred size
-            sizes[i] = extractComponent(e.solidifySize(e.getPreferredSize()));
+            sizes[i] = extractComponent(LayoutAssist.getLayoutSize(e, e.getPreferredSize()));
             if (remaining < sizes[i]) {
                 // use min instead.
-                sizes[i] = extractComponent(e.solidifySize(e.getMinSize()));
+                int componentMin = extractComponent(LayoutAssist.getLayoutSize(e, e.getMinSize()));
+                sizes[i] = Math.max(componentMin, remaining);
             }
             remaining -= sizes[i];
-            // add latter padding and spacing
-            addEnd[i] = extractComponent(e.getPadding().getBottomRight().add(e.getMargin().getBottomRight()));
-            remaining -= addEnd[i];
         }
         return remaining;
     }
 
-    private double expandElements(Priority priority, GroupElement element, double remaining, double[] sizes) {
+    private double expandElements(Priority priority, GroupElement<?> element, double remaining, double[] sizes) {
         if (remaining <= 0) {
             return remaining;
         }
 
         // find number to split over
-        int numberAtPriority = element.getChildren().stream()
-                .map(this::getData)
-                .filter(Predicate.isEqual(priority))
-                .mapToInt($ -> 1).sum();
-        if (numberAtPriority > 0) {
+        int splitNum = 0;
+        for (GuiElement e : element.getChildren()) {
+            if (getData(e) == priority) {
+                splitNum++;
+            }
+        }
+        if (splitNum > 0) {
+            // tally up total size of all splitting components
+            double remSave = remaining;
+            double addSize = 0;
             for (int i = 0; i < element.getChildren().size(); i++) {
                 GuiElement e = element.getChildren().get(i);
 
                 if (getData(e) == priority) {
-                    sizes[i] += remaining / numberAtPriority;
+                    double size = Math.min(sizes[i] + remSave / splitNum, extractComponent(e.solidifySize(e.getMaxSize())));
+                    double remSub = size - sizes[i];
+                    remaining -= remSub;
+                    addSize += size;
+                }
+            }
+            // divy size up among elements
+            for (int i = 0; i < element.getChildren().size(); i++) {
+                GuiElement e = element.getChildren().get(i);
+
+                if (getData(e) == priority) {
+                    sizes[i] = Math.min(addSize / splitNum, extractComponent(e.solidifySize(e.getMaxSize())));
+                    addSize -= sizes[i];
+                    splitNum--;
                 }
             }
             remaining = 0;
@@ -117,27 +129,42 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
         return remaining;
     }
 
-    private void sizeElements(GroupElement element, double crossMax, double[] sizes, double[] addStart, double[] addEnd) {
-        Vector2i padding = element.getPadding().getTopLeft();
-        double progress = extractComponent(padding);
+    private void layoutElements(GroupElement<?> element, double remaining, double crossMax, double[] sizes) {
+        double progress = initalProgress(element, remaining);
         for (int i = 0; i < element.getChildren().size(); i++) {
             GuiElement e = element.getChildren().get(i);
             double sz = sizes[i];
             Vector2i relPos = e.getRelativePosition();
             int margin = extractComponent(e.getMargin().getTopLeft());
             relPos = setComponent(relPos, (int) Math.round(progress + margin));
-            progress += addStart[i];
             // must adjust cross position for padding too!
-            relPos = setComponentCross(relPos, extractComponent(e.getMargin().getTopLeft().add(padding)));
+            relPos = setComponentCross(relPos, extractComponent(e.getMargin().getTopLeft())
+                    + extractComponent(element.getPadding().getTopLeft()));
             e.setRelativePosition(relPos);
-            e.setSize(setComponent(e.getSize(), (int) Math.round(sz)));
+            Vector2i sizeVec = setComponent(Vector2i.ZERO, (int) Math.round(sz));
+            int size = extractComponent(LayoutAssist.layout2original(e, sizeVec));
+            e.setSize(setComponent(e.getSize(), size));
             if (fill) {
                 double adjMax = crossMax;
                 adjMax -= extractComponentCross(e.getPadding().getAsWidthHeight().add(e.getMargin().getAsWidthHeight()));
                 e.setSize(setComponentCross(e.getSize(), Math.max(0, (int) adjMax)));
             }
-            progress += sz + addEnd[i];
+            progress += sz;
             progress += spacing;
+        }
+    }
+
+    private double initalProgress(GroupElement<?> element, double remaining) {
+        switch (align) {
+            case CENTER:
+                int padOffset = extractComponent(element.getPadding().getTopLeft());
+                return remaining / 2 + padOffset;
+            case START:
+                return extractComponent(element.getPadding().getTopLeft());
+            case END:
+                return extractComponent(element.getPadding().getBottomRight());
+            default:
+                throw new IllegalStateException("Missing align case " + align);
         }
     }
 

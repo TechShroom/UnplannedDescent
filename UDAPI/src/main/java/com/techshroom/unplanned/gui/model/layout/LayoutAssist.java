@@ -22,31 +22,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.gui.model.layout;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.gui.model.GuiElement;
-import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.techshroom.unplanned.gui.model.Size;
+import com.techshroom.unplanned.gui.model.SizeValue;
 
-/**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
- */
-public interface GroupElement<L extends Layout> extends ParentElement {
+public class LayoutAssist {
 
-    void layoutIfNeeded();
+    public static Vector2i getLayoutSize(GuiElement ctx, Size<SizeValue> size) {
+        // pref size + padding + margin
+        return ctx.solidifySize(size)
+                .add(ctx.getPadding().getAsWidthHeight())
+                .add(ctx.getMargin().getAsWidthHeight());
+    }
 
-    void markLayoutDirty();
-
-    L getLayout();
-
-    void addChild(GuiElement element);
-
-    void removeChild(GuiElement element);
-
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    public static Vector2i layout2original(GuiElement ctx, Vector2i layoutSize) {
+        return layoutSize
+                .sub(ctx.getPadding().getAsWidthHeight())
+                .sub(ctx.getMargin().getAsWidthHeight());
     }
 
 }

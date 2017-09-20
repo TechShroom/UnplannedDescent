@@ -24,29 +24,13 @@
  */
 package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.layout.Layout;
 
-/**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
- */
-public interface GroupElement<L extends Layout> extends ParentElement {
+abstract class XBox<L extends Layout> extends GroupElementBase<L> implements SetLayoutMixin<L> {
 
-    void layoutIfNeeded();
-
-    void markLayoutDirty();
-
-    L getLayout();
-
-    void addChild(GuiElement element);
-
-    void removeChild(GuiElement element);
-
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
-        }
+    @Override
+    public void setLayout(L layout) {
+        super.internalSetLayout(layout);
     }
 
 }

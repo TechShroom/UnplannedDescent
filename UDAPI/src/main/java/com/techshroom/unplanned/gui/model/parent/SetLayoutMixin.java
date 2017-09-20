@@ -24,28 +24,23 @@
  */
 package com.techshroom.unplanned.gui.model.parent;
 
-import com.techshroom.unplanned.gui.model.GuiElement;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
+
 import com.techshroom.unplanned.gui.model.layout.Layout;
 
-/**
- * {@link ParentElement} with the ability to add elements generically, and have
- * them laid out.
- */
-public interface GroupElement<L extends Layout> extends ParentElement {
+public interface SetLayoutMixin<L extends Layout> {
 
-    void layoutIfNeeded();
+    void setLayout(L layout);
 
-    void markLayoutDirty();
-
-    L getLayout();
-
-    void addChild(GuiElement element);
-
-    void removeChild(GuiElement element);
-
-    default void addChildren(GuiElement... elements) {
-        for (GuiElement e : elements) {
-            addChild(e);
+    // for convenient init
+    default <L2 extends L> void setLayout(Supplier<L2> initLayout, @Nullable Consumer<L2> postEditLayout) {
+        L2 res = initLayout.get();
+        setLayout(res);
+        if (postEditLayout != null) {
+            postEditLayout.accept(res);
         }
     }
 

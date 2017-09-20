@@ -55,7 +55,7 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     private Size<SizeValue> maxSize = GuiAssist.sizeFrom(Integer.MAX_VALUE, Integer.MAX_VALUE);
     private Size<SizeValue> preferredSize = GuiAssist.sizeFrom(Vector2i.ZERO);
     private Color foregroundColor = Color.BLACK;
-    private Color backgroundColor = Color.GRAY;
+    private Color backgroundColor = Color.TRANSPARENT;
     @Nullable
     private ParentElement parent;
     // valid is false to start out invalidated
