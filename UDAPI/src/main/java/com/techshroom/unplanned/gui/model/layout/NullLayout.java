@@ -33,7 +33,7 @@ public enum NullLayout implements Layout {
     INSTANCE;
 
     @Override
-    public void layout(GroupElement element) {
+    public void layout(GroupElement<?> element) {
     }
 
 }

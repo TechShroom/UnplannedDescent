@@ -26,7 +26,6 @@ package com.techshroom.unplanned.gui.model.layout;
 
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.PropertyKey;
-import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
 public abstract class DataBindingLayout<D> implements Layout {
 
@@ -55,7 +54,7 @@ public abstract class DataBindingLayout<D> implements Layout {
     public void onChildRemoved(GuiElement element, int index) {
         element.removeProperty(propertyKey);
     }
-    
+
     public <E extends GuiElement> E bindData(E element, D data) {
         element.setProperty(propertyKey, data);
         return element;
@@ -67,10 +66,6 @@ public abstract class DataBindingLayout<D> implements Layout {
 
     protected PropertyKey<D> getPropertyKey() {
         return propertyKey;
-    }
-
-    @Override
-    public void layout(GroupElement element) {
     }
 
 }

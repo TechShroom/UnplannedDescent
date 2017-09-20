@@ -27,17 +27,43 @@ package com.techshroom.unplanned.gui.model.layout;
 import com.flowpowered.math.vector.Vector2i;
 
 public class HBoxLayout extends XBoxLayout {
-    
-    public HBoxLayout() {
-        this(0);
-    }
-    
-    public HBoxLayout(double spacing) {
-        this(spacing, true);
+
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public HBoxLayout(double spacing, boolean fillWidth) {
-        super("Hgrow", spacing, fillWidth);
+    public static final class Builder {
+
+        private double spacing = 0;
+        private boolean fillHeight = true;
+        private Alignment alignment = Alignment.CENTER;
+
+        private Builder() {
+        }
+
+        public Builder spacing(double spacing) {
+            this.spacing = spacing;
+            return this;
+        }
+
+        public Builder fillHeight(boolean fillHeight) {
+            this.fillHeight = fillHeight;
+            return this;
+        }
+
+        public Builder alignment(Alignment alignment) {
+            this.alignment = alignment;
+            return this;
+        }
+
+        public HBoxLayout build() {
+            return new HBoxLayout(spacing, fillHeight, alignment);
+        }
+
+    }
+
+    private HBoxLayout(double spacing, boolean fillHeight, Alignment alignment) {
+        super("Hgrow", spacing, fillHeight, alignment);
     }
 
     @Override

@@ -48,8 +48,8 @@ import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
 import com.techshroom.unplanned.gui.model.layout.HBoxLayout;
 import com.techshroom.unplanned.gui.model.layout.VBoxLayout;
-import com.techshroom.unplanned.gui.model.parent.GroupElement;
 import com.techshroom.unplanned.gui.model.parent.Panel;
+import com.techshroom.unplanned.gui.model.parent.VBox;
 import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
 import com.techshroom.unplanned.gui.view.RenderManager;
 import com.techshroom.unplanned.gui.view.RootGuiElementRender;
@@ -95,7 +95,7 @@ public class ExamplePicker {
 
         Vector2i size = window.getSize();
 
-        GroupElement base = new Panel();
+        Panel base = new Panel();
         window.getRootElement().setChild(base);
         base.setPreferredSize(Size.of(SizeValue.percent(100), SizeValue.percent(100)));
         Panel left = new Panel();
@@ -123,29 +123,26 @@ public class ExamplePicker {
                 .text("Whatever!")
                 .font(FontDefault.getPlainDescriptor().withSize(50))
                 .textSizer(ctx.getPen()).build();
-        label.setPadding(new SidedVector4i(5, 5, 5, 5));
-        label.setBackgroundColor(Color.RED);
+        label.setPadding(SidedVector4i.of(5, 5, 5, 5));
+        label.setMargin(SidedVector4i.all(20));
+        label.setBackgroundColor(Color.GREEN);
+        VBox labelCentrist = new VBox();
+        labelCentrist.setLayout(VBoxLayout.builder().fillWidth(false).build());
+        labelCentrist.addChild(label);
+        a.addChild(labelCentrist);
+        a.setLayout(HBoxLayout.builder().build());
 
-        base.setLayout(() -> {
-            HBoxLayout layout = new HBoxLayout(5);
-            return layout;
-        }, layout -> {
+        base.setLayout(() -> HBoxLayout.builder().spacing(5).build(), layout -> {
             layout.bindData(left, Priority.ALWAYS);
             layout.bindData(right, Priority.ALWAYS);
         });
 
-        left.setLayout(() -> {
-            VBoxLayout layout = new VBoxLayout(5);
-            return layout;
-        }, layout -> {
+        left.setLayout(() -> VBoxLayout.builder().spacing(5).build(), layout -> {
             layout.bindData(a, Priority.ALWAYS);
             layout.bindData(b, Priority.ALWAYS);
         });
 
-        right.setLayout(() -> {
-            VBoxLayout layout = new VBoxLayout(5);
-            return layout;
-        }, layout -> {
+        right.setLayout(() -> VBoxLayout.builder().spacing(5).build(), layout -> {
             layout.bindData(c, Priority.ALWAYS);
             layout.bindData(d, Priority.ALWAYS);
         });

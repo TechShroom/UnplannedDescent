@@ -29,13 +29,14 @@ import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
 import com.techshroom.unplanned.gui.model.layout.Layout;
-import com.techshroom.unplanned.gui.model.layout.NullLayout;
 
-public class GroupElementBase extends ParentElementBase implements GroupElement {
+public abstract class GroupElementBase<L extends Layout> extends ParentElementBase implements GroupElement<L> {
 
     private boolean needsLayout = true;
     private boolean preferredSizeFromLayout = true;
-    private Layout layout = NullLayout.INSTANCE;
+    private L layout = initalLayout();
+
+    protected abstract L initalLayout();
 
     @Override
     public void markLayoutDirty() {
@@ -59,7 +60,7 @@ public class GroupElementBase extends ParentElementBase implements GroupElement 
     }
 
     @Override
-    public Layout getLayout() {
+    public L getLayout() {
         return this.layout;
     }
 
@@ -69,14 +70,13 @@ public class GroupElementBase extends ParentElementBase implements GroupElement 
         // update children if needed
         for (GuiElement c : children) {
             if (c instanceof GroupElement) {
-                ((GroupElement) c).markLayoutDirty();
-                ((GroupElement) c).layoutIfNeeded();
+                ((GroupElement<?>) c).markLayoutDirty();
+                ((GroupElement<?>) c).layoutIfNeeded();
             }
         }
     }
 
-    @Override
-    public void setLayout(Layout layout) {
+    protected void internalSetLayout(L layout) {
         for (int i = 0; i < children.size(); i++) {
             this.layout.onChildRemoved(children.get(i), i);
         }

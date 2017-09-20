@@ -26,32 +26,27 @@ package com.techshroom.unplanned.gui.model.parent;
 
 import javax.swing.JPanel;
 
-import com.techshroom.unplanned.gui.model.layout.HBoxLayout;
-import com.techshroom.unplanned.gui.model.layout.VBoxLayout;
+import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.gui.model.layout.Layout;
+import com.techshroom.unplanned.gui.model.layout.NullLayout;
 
 /**
  * Like {@link JPanel}.
  */
-public class Panel extends GroupElementBase implements GroupElement {
+public class Panel extends GroupElementBase<Layout> implements SetLayoutMixin<Layout> {
 
-    public static Panel hBox() {
-        return hBox(0);
+    {
+        setBackgroundColor(Color.GRAY);
     }
 
-    public static Panel hBox(double spacing) {
-        Panel panel = new Panel();
-        panel.setLayout(new HBoxLayout(spacing));
-        return panel;
+    @Override
+    protected Layout initalLayout() {
+        return NullLayout.INSTANCE;
     }
 
-    public static Panel vBox() {
-        return vBox(0);
-    }
-
-    public static Panel vBox(double spacing) {
-        Panel panel = new Panel();
-        panel.setLayout(new VBoxLayout(spacing));
-        return panel;
+    @Override
+    public void setLayout(Layout layout) {
+        super.internalSetLayout(layout);
     }
 
 }

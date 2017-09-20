@@ -36,9 +36,9 @@ public interface Layout {
     default void onChildRemoved(GuiElement element, int index) {
     }
 
-    void layout(GroupElement element);
-    
-    default Vector2i computePreferredSize(GroupElement element) {
+    void layout(GroupElement<?> element);
+
+    default Vector2i computePreferredSize(GroupElement<?> element) {
         return Vector2i.ZERO;
     }
 

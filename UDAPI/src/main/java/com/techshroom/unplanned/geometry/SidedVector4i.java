@@ -25,68 +25,42 @@
 package com.techshroom.unplanned.geometry;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import com.flowpowered.math.vector.Vector4i;
-import com.flowpowered.math.vector.VectorNi;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
 
 // css order, top-right-bottom-left
-public class SidedVector4i extends Vector4i {
+@AutoValue
+public abstract class SidedVector4i extends Vector4i {
 
     public static SidedVector4i all(int value) {
-        return new SidedVector4i(value, value, value, value);
+        return of(value, value, value, value);
+    }
+
+    public static SidedVector4i of(int x, int y, int z, int w) {
+        return new AutoValue_SidedVector4i(x, y, z, w);
     }
 
     private static final long serialVersionUID = -5860154702722742447L;
 
     public static final SidedVector4i ZERO = all(0);
-    public static final SidedVector4i UNIT_TOP = new SidedVector4i(1, 0, 0, 0);
-    public static final SidedVector4i UNIT_RIGHT = new SidedVector4i(0, 1, 0, 0);
-    public static final SidedVector4i UNIT_BOTTOM = new SidedVector4i(0, 0, 1, 0);
-    public static final SidedVector4i UNIT_LEFT = new SidedVector4i(0, 0, 0, 1);
+    public static final SidedVector4i UNIT_TOP = of(1, 0, 0, 0);
+    public static final SidedVector4i UNIT_RIGHT = of(0, 1, 0, 0);
+    public static final SidedVector4i UNIT_BOTTOM = of(0, 0, 1, 0);
+    public static final SidedVector4i UNIT_LEFT = of(0, 0, 0, 1);
     public static final SidedVector4i ONE = all(1);
 
-    public SidedVector4i() {
-    }
+    @Override
+    public abstract int getX();
 
-    public SidedVector4i(double x, double y, double z, double w) {
-        super(x, y, z, w);
-    }
+    @Override
+    public abstract int getY();
 
-    public SidedVector4i(int x, int y, int z, int w) {
-        super(x, y, z, w);
-    }
+    @Override
+    public abstract int getZ();
 
-    public SidedVector4i(Vector2i v, double z, double w) {
-        super(v, z, w);
-    }
-
-    public SidedVector4i(Vector2i v, int z, int w) {
-        super(v, z, w);
-    }
-
-    public SidedVector4i(Vector2i v) {
-        super(v);
-    }
-
-    public SidedVector4i(Vector3i v, double w) {
-        super(v, w);
-    }
-
-    public SidedVector4i(Vector3i v, int w) {
-        super(v, w);
-    }
-
-    public SidedVector4i(Vector3i v) {
-        super(v);
-    }
-
-    public SidedVector4i(Vector4i v) {
-        super(v);
-    }
-
-    public SidedVector4i(VectorNi v) {
-        super(v);
-    }
+    @Override
+    public abstract int getW();
 
     public int getTop() {
         return getX();
@@ -104,28 +78,33 @@ public class SidedVector4i extends Vector4i {
         return getW();
     }
 
+    @Memoized
     public Vector2i getTopLeft() {
         return new Vector2i(getLeft(), getTop());
     }
 
+    @Memoized
     public Vector2i getTopRight() {
         return new Vector2i(getRight(), getTop());
     }
 
+    @Memoized
     public Vector2i getBottomRight() {
         return new Vector2i(getRight(), getBottom());
     }
 
+    @Memoized
     public Vector2i getBottomLeft() {
         return new Vector2i(getLeft(), getBottom());
     }
 
+    @Memoized
     public Vector2i getAsWidthHeight() {
         return new Vector2i(getLeft() + getRight(), getTop() + getBottom());
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return String.format("[top=%s,right=%s,bottom=%s,left=%s]", getTop(), getRight(), getBottom(), getLeft());
     }
 

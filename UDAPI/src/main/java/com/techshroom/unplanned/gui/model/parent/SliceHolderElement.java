@@ -39,21 +39,22 @@ import com.techshroom.unplanned.gui.model.layout.Layout;
  * on the slices.
  * </p>
  */
-public class SliceHolderElement extends GroupElementBase {
+public class SliceHolderElement extends GroupElementBase<Layout> {
 
     private static final Layout SLICE_LAYOUT = element -> {
-        ParentElement parent = element.getParent();
-        element.setSize(parent.getSize());
-        element.setRelativePosition(Vector2i.ZERO);
+        element.getChildren().forEach(c -> {
+            c.setSize(element.getSize());
+            c.setRelativePosition(Vector2i.ZERO);
+        });
     };
-
-    {
-        setLayout(SLICE_LAYOUT);
+    
+    @Override
+    protected Layout initalLayout() {
+        return SLICE_LAYOUT;
     }
 
     public Panel addSlice() {
         Panel panel = new Panel();
-        panel.setLayout(SLICE_LAYOUT);
         children.add(panel);
         return panel;
     }
