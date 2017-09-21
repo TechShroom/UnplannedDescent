@@ -66,6 +66,7 @@ public class ExamplePicker {
 
     private static final Vector2i UI_SIZE = new Vector2i(1024, 768);
 
+    private Example runExample = null;
     private Window window;
     private Matrix4f proj;
     private Vector2i windowSize;
@@ -109,7 +110,7 @@ public class ExamplePicker {
 
                 @Subscribe
                 public void onAction(ActionEvent event) {
-                    ex.run();
+                    runExample = ex;
                 }
             });
             buttonList.addChild(b);
@@ -129,9 +130,28 @@ public class ExamplePicker {
             }
 
             ctx.swapBuffers();
+
+            if (runExample != null) {
+                runExample();
+            }
         }
 
         window.destroy();
+    }
+
+    private void runExample() {
+        window.getEventBus().unregister(this);
+        try {
+            runExample.run(window);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            runExample = null;
+            window.getEventBus().register(this);
+            window.setVisible(true);
+            window.setCloseRequested(false);
+            window.setSize(UI_SIZE);
+        }
     }
 
     @Subscribe

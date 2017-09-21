@@ -63,7 +63,6 @@ import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.window.Window;
-import com.techshroom.unplanned.window.WindowSettings;
 
 @AutoService(Example.class)
 public class SimpleRotatingCube extends Example {
@@ -79,25 +78,17 @@ public class SimpleRotatingCube extends Example {
     private Shape shape;
     private Shape lightSource;
 
-    public static void main(String[] args) {
-        new SimpleRotatingCube().run();
-    }
-
     @Override
-    public void run() {
+    public void run(Window window) {
         // System.setProperty("ud.apitrace",
         // "/home/octy/Documents/GitHub/apitrace/build/wrappers/glxtrace.so");
-
-        window = WindowSettings.builder()
-                .screenSize(800, 600)
-                .title("SimpleRotatingCube")
-                .build().createWindow();
+        this.window = window;
+        window.setTitle("SimpleRotatingCube");
+        window.setSize(Vector2i.from(800, 600));
         window.getEventBus().register(this);
         GraphicsContext ctx = window.getGraphicsContext();
 
         ctx.makeActiveContext();
-        window.setVsyncOn(true);
-        window.setVisible(true);
 
         Vector2i size = window.getSize();
         resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
@@ -198,7 +189,8 @@ public class SimpleRotatingCube extends Example {
             ctx.swapBuffers();
         }
 
-        window.destroy();
+        window.getMouse().deactivateMouseGrab();
+        window.getEventBus().unregister(this);
     }
 
     public void setRotatatedMVP(GraphicsContext ctx, Vector3f translate, Vector3d pyr) {

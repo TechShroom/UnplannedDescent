@@ -24,12 +24,14 @@
  */
 package com.techshroom.unplanned.examples;
 
+import com.techshroom.unplanned.window.Window;
+
 public abstract class Example {
 
     public String getName() {
         return getClass().getSimpleName();
     }
 
-    public abstract void run();
+    public abstract void run(Window window);
 
 }
