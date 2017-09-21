@@ -27,7 +27,6 @@ package com.techshroom.unplanned.examples.rubix;
 import com.google.auto.service.AutoService;
 import com.techshroom.unplanned.examples.Example;
 import com.techshroom.unplanned.window.Window;
-import com.techshroom.unplanned.window.WindowSettings;
 
 @AutoService(Example.class)
 public class RubixCube extends Example {
@@ -35,12 +34,10 @@ public class RubixCube extends Example {
     private Window window;
 
     @Override
-    public void run() {
-        window = WindowSettings.builder()
-                .screenSize(1024, 768)
-                .title("Rubix Cube")
-                .build().createWindow();
-        
+    public void run(Window window) {
+        this.window = window;
+        window.setTitle("Rubix Cube");
+
         window.getGraphicsContext().makeActiveContext();
         window.setVsyncOn(true);
         window.setVisible(true);
@@ -50,7 +47,7 @@ public class RubixCube extends Example {
         while (!window.isCloseRequested()) {
             window.processEvents();
             window.getGraphicsContext().clearGraphicsState();
-            
+
             window.getGraphicsContext().swapBuffers();
         }
 
