@@ -187,9 +187,9 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     }
 
     @Override
-    public void setSize(Vector2i size) {
+    public void setSize(@Nullable Vector2i size) {
         this.size = size;
-        sizeFromPreferredSize = false;
+        sizeFromPreferredSize = size == null;
         invalidate();
     }
 

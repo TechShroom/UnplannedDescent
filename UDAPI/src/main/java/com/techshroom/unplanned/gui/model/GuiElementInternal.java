@@ -25,7 +25,7 @@
 package com.techshroom.unplanned.gui.model;
 
 /**
- * Internal GuiElement for supporting draw-caching.
+ * Internal GuiElement calls.
  */
 public interface GuiElementInternal {
 

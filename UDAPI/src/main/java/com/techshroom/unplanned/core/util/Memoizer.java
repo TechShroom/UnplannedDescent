@@ -22,36 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.gui.model.parent;
+package com.techshroom.unplanned.core.util;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.WeakHashMap;
+import java.util.function.Function;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.techshroom.unplanned.gui.model.GuiElement;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 
-/**
- * Parent of more {@link GuiElement GuiElements}.
- */
-public interface ParentElement extends GuiElement {
+public final class Memoizer {
 
-    /**
-     * An unmodifiable list of children. It may be changed by the element itself
-     * via other methods.
-     * 
-     * @return a view into the children of this element
-     */
-    List<GuiElement> getChildren();
+    private static final Table<Object, String, Object> MEMOIZE_TABLE = Tables.newCustomTable(new WeakHashMap<>(), HashMap::new);
 
-    /**
-     * Finds the inner-most element at {@code pos}. This will recurse into other
-     * parent elements.
-     * 
-     * @param pos
-     *            the position to find an element at
-     * @return the element found, may be this element
-     * @throws IllegalArgumentException
-     *             if the position is outside of the bounds of this parent
-     */
-    GuiElement getElementAt(Vector2i pos);
+    public static <O, T> T memoize(O owner, String key, Function<O, T> valueCalculator) {
+        // should be safe, unless someone tries to break it...
+        @SuppressWarnings("unchecked")
+        T value = (T) MEMOIZE_TABLE.row(owner).computeIfAbsent(key, k -> valueCalculator.apply(owner));
+        return value;
+    }
 
 }
