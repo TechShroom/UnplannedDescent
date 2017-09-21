@@ -42,7 +42,9 @@ import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.geometry.CornerVector4i;
 import com.techshroom.unplanned.geometry.SidedVector4i;
+import com.techshroom.unplanned.gui.model.Border;
 import com.techshroom.unplanned.gui.model.Label;
 import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
@@ -126,6 +128,7 @@ public class ExamplePicker {
         label.setPadding(SidedVector4i.of(5, 5, 5, 5));
         label.setMargin(SidedVector4i.all(20));
         label.setBackgroundColor(Color.GREEN);
+        label.setBorder(Border.builder().radii(CornerVector4i.of(20, 10, 10, 20)).build());
         VBox labelCentrist = new VBox();
         labelCentrist.setLayout(VBoxLayout.builder().fillWidth(false).build());
         labelCentrist.addChild(label);
@@ -141,6 +144,7 @@ public class ExamplePicker {
             layout.bindData(a, Priority.ALWAYS);
             layout.bindData(b, Priority.ALWAYS);
         });
+        left.setBorder(Border.builder().radii(CornerVector4i.all(200)).build());
 
         right.setLayout(() -> VBoxLayout.builder().spacing(5).build(), layout -> {
             layout.bindData(c, Priority.ALWAYS);

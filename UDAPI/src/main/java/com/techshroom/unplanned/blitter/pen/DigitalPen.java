@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 import com.flowpowered.math.vector.Vector2d;
 import com.techshroom.unplanned.blitter.font.Font;
 import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.geometry.CornerVector4i;
 import com.techshroom.unplanned.gui.hooks.TextSizer;
 
 public interface DigitalPen extends TextSizer {
@@ -94,6 +95,12 @@ public interface DigitalPen extends TextSizer {
     void rect(float x, float y, float w, float h);
 
     void roundedRect(float x, float y, float w, float h, float r);
+
+    void roundedRectVarying(float x, float y, float w, float h, float topLeft, float topRight, float bottomRight, float bottomLeft);
+
+    default void roundedRectVarying(float x, float y, float w, float h, CornerVector4i r) {
+        roundedRectVarying(x, y, w, h, r.getX(), r.getY(), r.getZ(), r.getW());
+    }
 
     void textAlignment(TextAlignmentH alignHorizontal, TextAlignmentV alignVertical);
 

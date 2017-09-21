@@ -24,19 +24,17 @@
  */
 package com.techshroom.unplanned.geometry;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
 
-// css order, top-right-bottom-left
+// css order, TL-TR-BR-BL
 @AutoValue
-public abstract class SidedVector4i {
+public abstract class CornerVector4i {
 
-    public static SidedVector4i all(int value) {
+    public static CornerVector4i all(int value) {
         return of(value, value, value, value);
     }
 
-    public static SidedVector4i of(int x, int y, int z, int w) {
+    public static CornerVector4i of(int x, int y, int z, int w) {
         if (x == y && y == z && z == w) {
             switch (w) {
                 case 0:
@@ -51,15 +49,15 @@ public abstract class SidedVector4i {
                     return ONE;
             }
         }
-        return new AutoValue_SidedVector4i(x, y, z, w);
+        return new AutoValue_CornerVector4i(x, y, z, w);
     }
 
-    public static final SidedVector4i ZERO = all(0);
-    public static final SidedVector4i UNIT_TOP = of(1, 0, 0, 0);
-    public static final SidedVector4i UNIT_RIGHT = of(0, 1, 0, 0);
-    public static final SidedVector4i UNIT_BOTTOM = of(0, 0, 1, 0);
-    public static final SidedVector4i UNIT_LEFT = of(0, 0, 0, 1);
-    public static final SidedVector4i ONE = all(1);
+    public static final CornerVector4i ZERO = all(0);
+    public static final CornerVector4i UNIT_TOP = of(1, 0, 0, 0);
+    public static final CornerVector4i UNIT_RIGHT = of(0, 1, 0, 0);
+    public static final CornerVector4i UNIT_BOTTOM = of(0, 0, 1, 0);
+    public static final CornerVector4i UNIT_LEFT = of(0, 0, 0, 1);
+    public static final CornerVector4i ONE = all(1);
 
     public boolean allEqual() {
         return getX() == getY() && getY() == getZ() && getZ() == getW();
@@ -73,50 +71,25 @@ public abstract class SidedVector4i {
 
     public abstract int getW();
 
-    public int getTop() {
+    public int getTopLeft() {
         return getX();
     }
 
-    public int getRight() {
+    public int getTopRight() {
         return getY();
     }
 
-    public int getBottom() {
+    public int getBottomRight() {
         return getZ();
     }
 
-    public int getLeft() {
+    public int getBottomLeft() {
         return getW();
-    }
-
-    @Memoized
-    public Vector2i getTopLeft() {
-        return new Vector2i(getLeft(), getTop());
-    }
-
-    @Memoized
-    public Vector2i getTopRight() {
-        return new Vector2i(getRight(), getTop());
-    }
-
-    @Memoized
-    public Vector2i getBottomRight() {
-        return new Vector2i(getRight(), getBottom());
-    }
-
-    @Memoized
-    public Vector2i getBottomLeft() {
-        return new Vector2i(getLeft(), getBottom());
-    }
-
-    @Memoized
-    public Vector2i getAsWidthHeight() {
-        return new Vector2i(getLeft() + getRight(), getTop() + getBottom());
     }
 
     @Override
     public final String toString() {
-        return String.format("[top=%s,right=%s,bottom=%s,left=%s]", getTop(), getRight(), getBottom(), getLeft());
+        return String.format("[topLeft=%s,topRight=%s,bottomRight=%s,bottomLeft=%s]", getTopLeft(), getTopRight(), getBottomRight(), getBottomLeft());
     }
 
 }
