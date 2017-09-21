@@ -27,13 +27,13 @@ package com.techshroom.unplanned.gui.model;
 import com.techshroom.unplanned.blitter.font.FontDescriptor;
 import com.techshroom.unplanned.gui.hooks.TextSizer;
 
-public class Label extends LabeledBase {
+public class Button extends LabeledBase {
 
-    public static Builder<Label> builder() {
-        return new Builder<>(Label::new);
+    public static Builder<Button> builder() {
+        return new Builder<>(Button::new);
     }
 
-    protected Label(FontDescriptor font, String text, TextSizer textSizer) {
+    protected Button(FontDescriptor font, String text, TextSizer textSizer) {
         super(font, text, textSizer);
     }
 

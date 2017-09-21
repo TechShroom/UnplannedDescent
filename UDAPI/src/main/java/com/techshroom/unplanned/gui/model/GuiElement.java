@@ -175,6 +175,12 @@ public interface GuiElement {
 
     void setBackgroundColor(Color backgroundColor);
 
+    // border
+
+    Border getBorder();
+
+    void setBorder(Border border);
+
     // parent
     /**
      * Notifies this element that it is now a child of {@code element}. The

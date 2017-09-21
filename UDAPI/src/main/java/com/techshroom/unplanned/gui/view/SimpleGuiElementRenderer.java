@@ -27,6 +27,8 @@ package com.techshroom.unplanned.gui.view;
 import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
+import com.techshroom.unplanned.geometry.CornerVector4i;
+import com.techshroom.unplanned.gui.model.Border;
 import com.techshroom.unplanned.gui.model.GuiElement;
 
 /**
@@ -53,7 +55,19 @@ public class SimpleGuiElementRenderer<E extends GuiElement> implements GuiElemen
             pen.setColor(e.getBackgroundColor());
             RenderUtility.applyStandardTransform(e, pen, false);
             Vector2i size = e.getSize().add(e.getPadding().getAsWidthHeight());
-            pen.fill(() -> pen.rect(0, 0, size.getX(), size.getY()));
+            pen.fill(() -> {
+                Border border = e.getBorder();
+                if (Border.zero().equals(border)) {
+                    pen.rect(0, 0, size.getX(), size.getY());
+                } else {
+                    CornerVector4i radii = border.getRadii();
+                    if (radii.allEqual()) {
+                        pen.roundedRect(0, 0, size.getX(), size.getY(), radii.getX());
+                    } else  {
+                        pen.roundedRectVarying(0, 0, size.getX(), size.getY(), radii);
+                    }
+                }
+            });
         });
     }
 

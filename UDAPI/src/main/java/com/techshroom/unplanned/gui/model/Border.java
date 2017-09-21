@@ -24,17 +24,43 @@
  */
 package com.techshroom.unplanned.gui.model;
 
-import com.techshroom.unplanned.blitter.font.FontDescriptor;
-import com.techshroom.unplanned.gui.hooks.TextSizer;
+import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.geometry.CornerVector4i;
 
-public class Label extends LabeledBase {
+@AutoValue
+public abstract class Border {
 
-    public static Builder<Label> builder() {
-        return new Builder<>(Label::new);
+    private static final Border ZERO = builder().radii(CornerVector4i.ZERO).autoBuild();
+
+    public static Border zero() {
+        return ZERO;
     }
 
-    protected Label(FontDescriptor font, String text, TextSizer textSizer) {
-        super(font, text, textSizer);
+    public static Builder builder() {
+        return new AutoValue_Border.Builder();
     }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder radii(CornerVector4i radii);
+
+        abstract CornerVector4i getRadii();
+
+        abstract Border autoBuild();
+
+        public final Border build() {
+            if (CornerVector4i.ZERO.equals(getRadii())) {
+                return ZERO;
+            }
+            return autoBuild();
+        }
+
+    }
+
+    Border() {
+    }
+
+    public abstract CornerVector4i getRadii();
 
 }

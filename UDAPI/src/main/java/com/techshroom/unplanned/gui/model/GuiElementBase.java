@@ -56,6 +56,7 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     private Size<SizeValue> preferredSize = GuiAssist.sizeFrom(Vector2i.ZERO);
     private Color foregroundColor = Color.BLACK;
     private Color backgroundColor = Color.TRANSPARENT;
+    private Border border = Border.zero();
     @Nullable
     private ParentElement parent;
     // valid is false to start out invalidated
@@ -253,6 +254,16 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     @Override
     public void setBackgroundColor(Color backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    @Override
+    public Border getBorder() {
+        return border;
+    }
+
+    @Override
+    public void setBorder(Border border) {
+        this.border = border;
     }
 
     @Override

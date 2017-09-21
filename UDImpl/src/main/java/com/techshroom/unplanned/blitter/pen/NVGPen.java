@@ -40,6 +40,7 @@ import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
 import static org.lwjgl.nanovg.NanoVG.nvgRect;
 import static org.lwjgl.nanovg.NanoVG.nvgRestore;
 import static org.lwjgl.nanovg.NanoVG.nvgRoundedRect;
+import static org.lwjgl.nanovg.NanoVG.nvgRoundedRectVarying;
 import static org.lwjgl.nanovg.NanoVG.nvgSave;
 import static org.lwjgl.nanovg.NanoVG.nvgScale;
 import static org.lwjgl.nanovg.NanoVG.nvgStroke;
@@ -190,6 +191,11 @@ public class NVGPen implements DigitalPen {
     @Override
     public void roundedRect(float x, float y, float w, float h, float r) {
         nvgRoundedRect(ctx(), x, y, w, h, r);
+    }
+
+    @Override
+    public void roundedRectVarying(float x, float y, float w, float h, float topLeft, float topRight, float bottomLeft, float bottomRight) {
+        nvgRoundedRectVarying(ctx(), x, y, w, h, topLeft, topRight, bottomLeft, bottomRight);
     }
 
     @Override
