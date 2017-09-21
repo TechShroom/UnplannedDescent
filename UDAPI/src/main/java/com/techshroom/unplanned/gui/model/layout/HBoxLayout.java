@@ -32,38 +32,44 @@ public class HBoxLayout extends XBoxLayout {
         return new Builder();
     }
 
-    public static final class Builder {
+    public static final class Builder extends XBoxLayout.Builder<HBoxLayout> {
 
-        private double spacing = 0;
-        private boolean fillHeight = true;
-        private Alignment alignment = Alignment.CENTER;
-
-        private Builder() {
+        protected Builder() {
+            super(HBoxLayout::new);
         }
 
+        @Override
         public Builder spacing(double spacing) {
-            this.spacing = spacing;
+            super.spacing(spacing);
+            return this;
+        }
+
+        @Override
+        public Builder contentAlignment(Alignment alignment) {
+            super.contentAlignment(alignment);
+            return this;
+        }
+
+        @Override
+        public Builder crossItemAlignment(Alignment alignment) {
+            super.crossItemAlignment(alignment);
             return this;
         }
 
         public Builder fillHeight(boolean fillHeight) {
-            this.fillHeight = fillHeight;
+            this.fill = fillHeight;
             return this;
         }
 
-        public Builder alignment(Alignment alignment) {
-            this.alignment = alignment;
-            return this;
-        }
-
+        @Override
         public HBoxLayout build() {
-            return new HBoxLayout(spacing, fillHeight, alignment);
+            return super.build();
         }
 
     }
 
-    private HBoxLayout(double spacing, boolean fillHeight, Alignment alignment) {
-        super("Hgrow", spacing, fillHeight, alignment);
+    private HBoxLayout(double spacing, boolean fillHeight, Alignment alignContent, Alignment alignItemsCross) {
+        super("Hgrow", spacing, fillHeight, alignContent, alignItemsCross);
     }
 
     @Override

@@ -26,8 +26,10 @@ package com.techshroom.unplanned.window;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.Subscribe;
+import com.techshroom.unplanned.event.mouse.MouseEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.ParentElementBase;
@@ -43,6 +45,14 @@ class GLFWRootElement extends ParentElementBase implements RootElement {
         setPreferredSize(event.getSize());
         // tell children to re-format themselves if needed
         children.forEach(GuiElement::invalidate);
+    }
+
+    @Subscribe
+    public void onMouseEvent(MouseEvent event) {
+        Vector2i pos = event.getSource().getPosition().toInt();
+        if (getBounds().contains(pos)) {
+            getElementAt(pos).getEventBus().post(event);
+        }
     }
 
     @Override

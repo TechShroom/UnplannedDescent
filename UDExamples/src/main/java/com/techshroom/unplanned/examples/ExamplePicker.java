@@ -36,21 +36,18 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Streams;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.blitter.font.FontDefault;
 import com.techshroom.unplanned.blitter.transform.TransformStack;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
-import com.techshroom.unplanned.geometry.CornerVector4i;
 import com.techshroom.unplanned.geometry.SidedVector4i;
-import com.techshroom.unplanned.gui.model.Border;
-import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.event.ActionEvent;
+import com.techshroom.unplanned.gui.model.Button;
 import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
-import com.techshroom.unplanned.gui.model.layout.HBoxLayout;
 import com.techshroom.unplanned.gui.model.layout.VBoxLayout;
-import com.techshroom.unplanned.gui.model.parent.Panel;
+import com.techshroom.unplanned.gui.model.parent.HBox;
 import com.techshroom.unplanned.gui.model.parent.VBox;
 import com.techshroom.unplanned.gui.view.DefaultRootGuiElementRenderer;
 import com.techshroom.unplanned.gui.view.RenderManager;
@@ -58,8 +55,6 @@ import com.techshroom.unplanned.gui.view.RootGuiElementRender;
 import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.window.Window;
 import com.techshroom.unplanned.window.WindowSettings;
-
-import javafx.scene.layout.Priority;
 
 public class ExamplePicker {
 
@@ -74,6 +69,7 @@ public class ExamplePicker {
     private Window window;
     private Matrix4f proj;
     private Vector2i windowSize;
+
     public static void main(String[] args) {
         new ExamplePicker().run();
     }
@@ -95,58 +91,28 @@ public class ExamplePicker {
 
         Vector2i size = window.getSize();
 
-        Panel base = new Panel();
+        HBox base = new HBox();
+        base.setBackgroundColor(Color.GREEN);
         window.getRootElement().setChild(base);
         base.setPreferredSize(Size.of(SizeValue.percent(100), SizeValue.percent(100)));
-        Panel left = new Panel();
-        Panel right = new Panel();
-        Panel a = new Panel();
-        Panel b = new Panel();
-        Panel c = new Panel();
-        Panel d = new Panel();
+        VBox buttonList = new VBox();
+        buttonList.setLayout(VBoxLayout.builder().fillWidth(false).spacing(10).build());
+        buttonList.setPadding(SidedVector4i.all(10));
+        base.addChild(buttonList);
 
-        a.setBackgroundColor(Color.RED);
-        b.setBackgroundColor(Color.GREEN);
-        c.setBackgroundColor(Color.fromString("#FEFDE7"));
-        d.setBackgroundColor(Color.BLUE);
-        left.setBackgroundColor(Color.WHITE);
-        right.setBackgroundColor(Color.fromString("#AA00BB"));
+        EXAMPLES.forEach((name, ex) -> {
+            Button b = Button.builder()
+                    .text(name)
+                    .textSizer(ctx.getPen())
+                    .build();
+            b.getEventBus().register(new Object() {
 
-        left.setPadding(SidedVector4i.all(10));
-        right.setPadding(SidedVector4i.all(10));
-
-        left.addChildren(a, b);
-        right.addChildren(c, d);
-        base.addChildren(left, right);
-
-        Label label = Label.builder()
-                .text("Whatever!")
-                .font(FontDefault.getPlainDescriptor().withSize(20))
-                .textSizer(ctx.getPen()).build();
-        label.setPadding(SidedVector4i.of(5, 5, 5, 5));
-        label.setMargin(SidedVector4i.all(20));
-        label.setBackgroundColor(Color.GREEN);
-        label.setBorder(Border.builder().radii(CornerVector4i.of(20, 10, 10, 20)).build());
-        VBox labelCentrist = new VBox();
-        labelCentrist.setLayout(VBoxLayout.builder().fillWidth(false).build());
-        labelCentrist.addChild(label);
-        a.addChild(labelCentrist);
-        a.setLayout(HBoxLayout.builder().build());
-
-        base.setLayout(() -> HBoxLayout.builder().spacing(5).build(), layout -> {
-            layout.bindData(left, Priority.ALWAYS);
-            layout.bindData(right, Priority.ALWAYS);
-        });
-
-        left.setLayout(() -> VBoxLayout.builder().spacing(5).build(), layout -> {
-            layout.bindData(a, Priority.ALWAYS);
-            layout.bindData(b, Priority.ALWAYS);
-        });
-        left.setBorder(Border.builder().radii(CornerVector4i.all(200)).build());
-
-        right.setLayout(() -> VBoxLayout.builder().spacing(5).build(), layout -> {
-            layout.bindData(c, Priority.ALWAYS);
-            layout.bindData(d, Priority.ALWAYS);
+                @Subscribe
+                public void onAction(ActionEvent event) {
+                    ex.run();
+                }
+            });
+            buttonList.addChild(b);
         });
 
         RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();

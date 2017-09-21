@@ -25,6 +25,7 @@
 package com.techshroom.unplanned.gui.model.layout;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
@@ -35,15 +36,56 @@ import javafx.scene.layout.Priority;
  */
 abstract class XBoxLayout extends DataBindingLayout<Priority> {
 
+    interface XBoxLayoutConstructor<X extends XBoxLayout> {
+
+        X construct(double spacing, boolean fill, Alignment alignContent, Alignment alignItemsCross);
+    }
+
+    static abstract class Builder<X extends XBoxLayout> {
+
+        private final XBoxLayoutConstructor<X> constructor;
+
+        private double spacing = 0;
+        protected boolean fill = true;
+        private Alignment contentAlignment = Alignment.CENTER;
+        private Alignment crossItemAlignment = Alignment.CENTER;
+
+        protected Builder(XBoxLayoutConstructor<X> constructor) {
+            this.constructor = constructor;
+        }
+
+        public Builder<X> spacing(double spacing) {
+            this.spacing = spacing;
+            return this;
+        }
+
+        public Builder<X> contentAlignment(Alignment alignment) {
+            this.contentAlignment = alignment;
+            return this;
+        }
+
+        public Builder<X> crossItemAlignment(Alignment alignment) {
+            this.crossItemAlignment = alignment;
+            return this;
+        }
+
+        public X build() {
+            return constructor.construct(spacing, fill, contentAlignment, crossItemAlignment);
+        }
+
+    }
+
     private final double spacing;
     private final boolean fill;
-    private final Alignment align;
+    private final Alignment alignContent;
+    private final Alignment alignItemsCross;
 
-    protected XBoxLayout(String key, double spacing, boolean fill, Alignment align) {
+    protected XBoxLayout(String key, double spacing, boolean fill, Alignment alignContent, Alignment alignItemsCross) {
         super(key);
         this.spacing = spacing;
         this.fill = fill;
-        this.align = align;
+        this.alignContent = alignContent;
+        this.alignItemsCross = alignItemsCross;
     }
 
     @Override
@@ -134,13 +176,6 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
         for (int i = 0; i < element.getChildren().size(); i++) {
             GuiElement e = element.getChildren().get(i);
             double sz = sizes[i];
-            Vector2i relPos = e.getRelativePosition();
-            int margin = extractComponent(e.getMargin().getTopLeft());
-            relPos = setComponent(relPos, (int) Math.round(progress + margin));
-            // must adjust cross position for padding too!
-            relPos = setComponentCross(relPos, extractComponent(e.getMargin().getTopLeft())
-                    + extractComponent(element.getPadding().getTopLeft()));
-            e.setRelativePosition(relPos);
             Vector2i sizeVec = setComponent(Vector2i.ZERO, (int) Math.round(sz));
             int size = extractComponent(LayoutAssist.layout2original(e, sizeVec));
             e.setSize(setComponent(e.getSize(), size));
@@ -149,13 +184,24 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
                 adjMax -= extractComponentCross(e.getPadding().getAsWidthHeight().add(e.getMargin().getAsWidthHeight()));
                 e.setSize(setComponentCross(e.getSize(), Math.max(0, (int) adjMax)));
             }
+            setPosition(element, progress, e);
             progress += sz;
             progress += spacing;
         }
     }
 
+    private void setPosition(GroupElement<?> element, double progress, GuiElement e) {
+        Vector2i relPos = e.getRelativePosition();
+        int margin = extractComponent(e.getMargin().getTopLeft());
+        relPos = setComponent(relPos, (int) Math.round(progress + margin));
+        // must adjust cross position for padding too!
+        int size = extractComponentCross(e.getSizeWithPadding());
+        relPos = setComponentCross(relPos, (int) crossComponentOffset(element, e, size));
+        e.setRelativePosition(relPos);
+    }
+
     private double initalProgress(GroupElement<?> element, double remaining) {
-        switch (align) {
+        switch (alignContent) {
             case CENTER:
                 int padOffset = extractComponent(element.getPadding().getTopLeft());
                 return remaining / 2 + padOffset;
@@ -164,7 +210,21 @@ abstract class XBoxLayout extends DataBindingLayout<Priority> {
             case END:
                 return extractComponent(element.getPadding().getBottomRight());
             default:
-                throw new IllegalStateException("Missing align case " + align);
+                throw new IllegalStateException("Missing align case " + alignContent);
+        }
+    }
+
+    private double crossComponentOffset(GroupElement<?> element, GuiElement e, double size) {
+        SidedVector4i padMar = e.getMargin().add(element.getPadding());
+        switch (alignItemsCross) {
+            case CENTER:
+                return (extractComponentCross(element.getSizeWithPadding()) - size) / 2;
+            case START:
+                return extractComponentCross(padMar.getTopLeft());
+            case END:
+                return extractComponentCross(padMar.getBottomRight());
+            default:
+                throw new IllegalStateException("Missing align case " + alignContent);
         }
     }
 

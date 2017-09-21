@@ -24,10 +24,22 @@
  */
 package com.techshroom.unplanned.gui.model;
 
+import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.font.FontDescriptor;
+import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.event.keyboard.KeyState;
+import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
+import com.techshroom.unplanned.event.mouse.MouseButtonEvent;
+import com.techshroom.unplanned.geometry.CornerVector4i;
+import com.techshroom.unplanned.geometry.SidedVector4i;
+import com.techshroom.unplanned.gui.event.ActionEvent;
 import com.techshroom.unplanned.gui.hooks.TextSizer;
+import com.techshroom.unplanned.input.Key;
 
 public class Button extends LabeledBase {
+
+    private static final Border BUTTON_BORDER = Border.builder().radii(CornerVector4i.all(5)).build();
+    private static final SidedVector4i BUTTON_PADDING = SidedVector4i.all(5);
 
     public static Builder<Button> builder() {
         return new Builder<>(Button::new);
@@ -35,6 +47,32 @@ public class Button extends LabeledBase {
 
     protected Button(FontDescriptor font, String text, TextSizer textSizer) {
         super(font, text, textSizer);
+        // setup styling to look like a button
+        setBorder(BUTTON_BORDER);
+        setBackgroundColor(Color.LIGHT_GRAY);
+        setPadding(BUTTON_PADDING);
+    }
+
+    @Override
+    protected Object getSubscriber() {
+        return new Object() {
+
+            @Subscribe
+            public void onMouseClick(MouseButtonEvent event) {
+                // trigger on release
+                if (event.getButton() == 0 && !event.isDown()) {
+                    getEventBus().post(ActionEvent.create());
+                }
+            }
+
+            @Subscribe
+            public void onKey(KeyStateEvent event) {
+                // trigger on press
+                if (event.is(Key.ENTER, KeyState.PRESSED)) {
+                    getEventBus().post(ActionEvent.create());
+                }
+            }
+        };
     }
 
 }

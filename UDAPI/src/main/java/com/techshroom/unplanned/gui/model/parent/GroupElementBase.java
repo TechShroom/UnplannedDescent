@@ -54,6 +54,10 @@ public abstract class GroupElementBase<L extends Layout> extends ParentElementBa
     @Override
     protected void onRevalidation() {
         if (preferredSizeFromLayout) {
+            // finalize child state for preferred size
+            for (GuiElement child : children) {
+                child.validate();
+            }
             super.setPreferredSize(GuiAssist.sizeFrom(layout.computePreferredSize(this)));
         }
         super.onRevalidation();
