@@ -74,8 +74,6 @@ public class ExamplePicker {
     private Window window;
     private Matrix4f proj;
     private Vector2i windowSize;
-    private RenderManager renderManager;
-
     public static void main(String[] args) {
         new ExamplePicker().run();
     }
@@ -123,7 +121,7 @@ public class ExamplePicker {
 
         Label label = Label.builder()
                 .text("Whatever!")
-                .font(FontDefault.getPlainDescriptor().withSize(50))
+                .font(FontDefault.getPlainDescriptor().withSize(20))
                 .textSizer(ctx.getPen()).build();
         label.setPadding(SidedVector4i.of(5, 5, 5, 5));
         label.setMargin(SidedVector4i.all(20));
@@ -152,7 +150,7 @@ public class ExamplePicker {
         });
 
         RootGuiElementRender renderer = new DefaultRootGuiElementRenderer();
-        RenderManager guiRM = renderManager = new RenderManager(renderer, ctx);
+        RenderManager guiRM = new RenderManager(renderer, ctx);
         resize(WindowResizeEvent.create(window, size.getX(), size.getY()));
 
         while (!window.isCloseRequested()) {

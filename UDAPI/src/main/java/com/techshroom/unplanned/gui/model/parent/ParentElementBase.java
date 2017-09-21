@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.GuiElementBase;
 
@@ -39,6 +40,24 @@ public class ParentElementBase extends GuiElementBase implements ParentElement {
     @Override
     public List<GuiElement> getChildren() {
         return childrenView;
+    }
+    
+    @Override
+    public GuiElement getElementAt(Vector2i pos) {
+        if (!getBounds().contains(pos)) {
+            throw new IllegalArgumentException("position out of bounds");
+        }
+        // TODO optimize maybe? dunno how slow it is...
+        Vector2i adjPos = pos.sub(getRelativePosition());
+        for (GuiElement element : children) {
+            if (element.getBounds().contains(adjPos)) {
+                if (element instanceof ParentElement) {
+                    return ((ParentElement) element).getElementAt(adjPos);
+                }
+                return element;
+            }
+        }
+        return this;
     }
 
     @Override

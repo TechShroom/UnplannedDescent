@@ -235,6 +235,7 @@ public class NVGPen implements DigitalPen {
     @Override
     public void fillText(int x, int y, String text) {
         font.setAsCurrentFont();
+        nvgFillColor(ctx(), nvgColor);
         nvgText(ctx(), x, y, text);
     }
 

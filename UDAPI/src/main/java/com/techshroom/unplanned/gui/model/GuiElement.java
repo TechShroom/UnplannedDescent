@@ -32,6 +32,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.SidedVector4i;
+import com.techshroom.unplanned.geometry.WHRectangleI;
 import com.techshroom.unplanned.gui.model.SizeValue.SVType;
 import com.techshroom.unplanned.gui.model.parent.ParentElement;
 
@@ -88,7 +89,7 @@ public interface GuiElement {
 
     Vector2i getSize();
 
-    void setSize(Vector2i size);
+    void setSize(@Nullable Vector2i size);
 
     default void setSize(int width, int height) {
         setSize(Vector2i.from(width, height));
@@ -194,6 +195,12 @@ public interface GuiElement {
 
     @Nullable
     ParentElement getParent();
+
+    default WHRectangleI getBounds() {
+        Vector2i sizePad = getSizeWithPadding();
+        Vector2i pos = getRelativePosition();
+        return WHRectangleI.of(pos.getX(), pos.getY(), sizePad.getX(), sizePad.getY());
+    }
 
     /**
      * Calculates the <em>absolute</em> position of this element. This takes the
