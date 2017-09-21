@@ -63,10 +63,19 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     // we also set invalidatedSinceLastDrawNotification to true
     private boolean valid;
     private boolean invalidatedSinceLastDrawNotification = true;
+    
+    {
+        // self-register for convenience
+        eventBus.register(getSubscriber());
+    }
 
     @Override
     public EventBus getEventBus() {
         return eventBus;
+    }
+    
+    protected Object getSubscriber() {
+        return new Object();
     }
 
     @Override

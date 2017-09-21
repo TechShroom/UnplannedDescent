@@ -32,38 +32,44 @@ public class VBoxLayout extends XBoxLayout {
         return new Builder();
     }
 
-    public static final class Builder {
+    public static final class Builder extends XBoxLayout.Builder<VBoxLayout> {
 
-        private double spacing = 0;
-        private boolean fillWidth = true;
-        private Alignment alignment = Alignment.CENTER;
-
-        private Builder() {
+        protected Builder() {
+            super(VBoxLayout::new);
         }
 
+        @Override
         public Builder spacing(double spacing) {
-            this.spacing = spacing;
+            super.spacing(spacing);
+            return this;
+        }
+
+        @Override
+        public Builder contentAlignment(Alignment alignment) {
+            super.contentAlignment(alignment);
+            return this;
+        }
+
+        @Override
+        public Builder crossItemAlignment(Alignment alignment) {
+            super.crossItemAlignment(alignment);
             return this;
         }
 
         public Builder fillWidth(boolean fillWidth) {
-            this.fillWidth = fillWidth;
+            this.fill = fillWidth;
             return this;
         }
 
-        public Builder alignment(Alignment alignment) {
-            this.alignment = alignment;
-            return this;
-        }
-
+        @Override
         public VBoxLayout build() {
-            return new VBoxLayout(spacing, fillWidth, alignment);
+            return super.build();
         }
 
     }
 
-    private VBoxLayout(double spacing, boolean fillWidth, Alignment alignment) {
-        super("Vgrow", spacing, fillWidth, alignment);
+    private VBoxLayout(double spacing, boolean fillWidth, Alignment alignContent, Alignment alignItemsCross) {
+        super("Vgrow", spacing, fillWidth, alignContent, alignItemsCross);
     }
 
     @Override

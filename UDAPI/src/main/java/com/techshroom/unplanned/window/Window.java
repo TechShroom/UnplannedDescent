@@ -102,6 +102,11 @@ public interface Window {
      * An element that can be used as the root of a GUI tree. This is useful for
      * creating percent-sized roots, as they will be sized to the window size.
      * 
+     * <p>
+     * This element will also automatically handle mouse and keyboard events.
+     * It's really useful!
+     * </p>
+     * 
      * @return the window root element
      */
     RootElement getRootElement();

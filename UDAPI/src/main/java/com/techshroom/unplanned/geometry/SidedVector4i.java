@@ -114,6 +114,10 @@ public abstract class SidedVector4i {
         return new Vector2i(getLeft() + getRight(), getTop() + getBottom());
     }
 
+    public final SidedVector4i add(SidedVector4i b) {
+        return of(getX() + b.getX(), getY() + b.getY(), getZ() + b.getZ(), getW() + b.getW());
+    }
+
     @Override
     public final String toString() {
         return String.format("[top=%s,right=%s,bottom=%s,left=%s]", getTop(), getRight(), getBottom(), getLeft());

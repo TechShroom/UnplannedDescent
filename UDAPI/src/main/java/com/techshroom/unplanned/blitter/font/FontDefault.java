@@ -40,7 +40,7 @@ public class FontDefault {
     private static final String PLAIN = "Regular";
     private static final String BOLD = "Bold";
     private static final String ITALIC = "Italic";
-    private static final int DEFAULT_SIZE = 10;
+    private static final int DEFAULT_SIZE = 20;
 
     public static FontDescriptor getPlainDescriptor() {
         return getDescriptor(PLAIN);
