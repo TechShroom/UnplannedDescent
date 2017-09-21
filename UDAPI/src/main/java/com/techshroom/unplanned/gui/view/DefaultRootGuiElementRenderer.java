@@ -24,7 +24,7 @@
  */
 package com.techshroom.unplanned.gui.view;
 
-import com.techshroom.unplanned.gui.model.Label;
+import com.techshroom.unplanned.gui.model.Labeled;
 
 /**
  * Extension of {@link SimpleRootGuiElementRenderer} to automatically add
@@ -33,7 +33,7 @@ import com.techshroom.unplanned.gui.model.Label;
 public class DefaultRootGuiElementRenderer extends SimpleRootGuiElementRenderer {
 
     {
-        addRenderer(new LabeledRenderer(), Label.class);
+        addRenderer(new LabeledRenderer(), Labeled.class);
     }
 
 }
