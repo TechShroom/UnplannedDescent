@@ -15,12 +15,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.techshroom', name: 'Aversion', version: '3.0.0'
+        classpath group: 'com.techshroom', name: 'Aversion', version: '3.0.1'
         classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
         classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
     }
 }
-ext.lwjglVersion = '3.1.3-SNAPSHOT'
+ext.lwjglVersion = '3.1.3'
 
 def addLWJGL(project, ext, natives) {
     // "lwjgl" or "lwjgl-ext"
@@ -69,6 +69,7 @@ subprojects {
     mavencfg {
         coords 'TechShroom', 'UnplannedDescent'
         description 'UnplannedDescent'
+        artifactName = rootProject.name + '.' + project.name
     }
 
     repositories {
@@ -146,7 +147,7 @@ subprojects {
     }
 }
 
-project('UDAPI') {
+project(':api') {
     dependencies {
         compile group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
         addLWJGL(project, '', true);
@@ -154,7 +155,7 @@ project('UDAPI') {
     }
 }
 
-project('UDImpl') {
+project(':implementation') {
     dependencies {
         addLWJGL(project, '', true);
         addLWJGL(project, 'opengl', true);
@@ -163,13 +164,13 @@ project('UDImpl') {
         addLWJGL(project, 'nanovg', true);
         addLWJGL(project, 'stb', true);
 
-        compile project(':UDAPI')
+        compile project(':api')
     }
 }
-project('UDExamples') {
+project(':examples') {
     dependencies {
-        compile project(':UDAPI')
-        runtime project(':UDImpl')
+        compile project(':api')
+        runtime project(':implementation')
     }
     apply plugin: 'com.github.johnrengelman.shadow'
     jar {

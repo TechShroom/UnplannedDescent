@@ -1,2 +1,5 @@
 rootProject.name = 'UnplannedDescent'
 include 'UDAPI', 'UDImpl', 'UDExamples'
+project(':UDAPI').name = 'api'
+project(':UDImpl').name = 'implementation'
+project(':UDExamples').name = 'examples'

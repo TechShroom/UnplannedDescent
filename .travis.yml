@@ -1,5 +1,9 @@
 language: java
+before_install:
+    - ./setup_travis.sh
 script: ./gradlew build -s
+after_success:
+    - ./upload-archives-travis.sh
 jdk:
   - oraclejdk8
 # Caching for Gradle files, prevents hitting Maven too much.
@@ -17,6 +21,3 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
-after_script:
-  # Make sure to kill daemon
-  - ./gradlew --stop
