@@ -4,11 +4,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Collection;
 
+import com.flowpowered.math.vector.Vector4d;
 import com.flowpowered.math.vector.Vector4f;
 import com.flowpowered.math.vector.Vector4i;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.primitives.Doubles;
 
 @AutoValue
 public abstract class Color {
@@ -116,7 +118,47 @@ public abstract class Color {
         return fromInt(toInt(red), toInt(green), toInt(blue), toInt(alpha));
     }
 
-    private static int toInt(float component) {
+    public static Color fromHsl(Vector4d hsl) {
+        double h = hsl.getX();
+        double s = hsl.getY();
+        double l = hsl.getZ();
+        double a = hsl.getW();
+        double r;
+        double g;
+        double b;
+
+        if (s == 0) {
+            r = g = b = l; // achromatic
+        } else {
+            double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            double p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+        }
+        return fromInt(toInt(r), toInt(g), toInt(b), toInt(a));
+    }
+
+    private static double hue2rgb(double p, double q, double t) {
+        if (t < 0) {
+            t += 1;
+        }
+        if (t > 1) {
+            t -= 1;
+        }
+        if (t < 1 / 6) {
+            return p + (q - p) * 6 * t;
+        }
+        if (t < 1 / 2) {
+            return q;
+        }
+        if (t < 2 / 3) {
+            return p + (q - p) * (2 / 3 - t) * 6;
+        }
+        return p;
+    }
+
+    private static int toInt(double component) {
         return (int) (component * 0xFF);
     }
 
@@ -163,14 +205,58 @@ public abstract class Color {
         return asVector4i().toFloat().div(255);
     }
 
+    public final Color lighter() {
+        Vector4d hsl = toHsl();
+        hsl = hsl.mul(1, 1, 1.1, 1);
+        return fromHsl(hsl);
+    }
+
+    public final Color darker() {
+        Vector4d hsl = toHsl();
+        hsl = hsl.mul(1, 1, 0.90, 1);
+        return fromHsl(hsl);
+    }
+
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hash(getRed(), getGreen(), getBlue(), getAlpha());
     }
 
     @Override
     public final String toString() {
         return String.format("#" + HEX2D + HEX2D + HEX2D + HEX2D, getRed(), getGreen(), getBlue(), getAlpha());
+    }
+
+    public final Vector4d toHsl() {
+        double r = getRed() / 255d;
+        double g = getGreen() / 255d;
+        double b = getBlue() / 255d;
+        double a = getAlpha() / 255d;
+
+        double max = Doubles.max(r, g, b);
+        double min = Doubles.min(r, g, b);
+        double h;
+        double s;
+        double l = (max + min) / 2;
+
+        if (max == min) {
+            h = s = 0;
+        } else {
+            double d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max == r) {
+                h = (g - b) / d + (g < b ? 6 : 0);
+            } else if (max == g) {
+                h = (b - r) / d + 2;
+            } else if (max == b) {
+                h = (r - g) / d + 4;
+            } else {
+                throw new IllegalStateException();
+            }
+            h /= 6;
+        }
+
+        return Vector4d.from(h, s, l, a);
     }
 
 }

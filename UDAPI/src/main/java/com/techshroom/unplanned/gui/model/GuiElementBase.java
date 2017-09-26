@@ -38,6 +38,7 @@ import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.event.ElementRevalidationEvent;
+import com.techshroom.unplanned.gui.model.constrhooks.ConstrHook;
 import com.techshroom.unplanned.gui.model.parent.ParentElement;
 
 public class GuiElementBase implements GuiElement, GuiElementInternal {
@@ -67,6 +68,10 @@ public class GuiElementBase implements GuiElement, GuiElementInternal {
     {
         // self-register for convenience
         eventBus.register(getSubscriber());
+    }
+    
+    protected <THIS extends GuiElementBase> void inherits(THIS $this, ConstrHook<? super THIS> hook) {
+        hook.onConstruction($this);
     }
 
     @Override

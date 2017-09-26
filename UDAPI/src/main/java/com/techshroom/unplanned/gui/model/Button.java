@@ -34,9 +34,14 @@ import com.techshroom.unplanned.geometry.CornerVector4i;
 import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.event.ActionEvent;
 import com.techshroom.unplanned.gui.hooks.TextSizer;
+import com.techshroom.unplanned.gui.model.constrhooks.HoverBackgroundColor;
 import com.techshroom.unplanned.input.Key;
 
 public class Button extends LabeledBase {
+    
+    {
+        inherits(this, HoverBackgroundColor.INSTANCE);
+    }
 
     private static final Border BUTTON_BORDER = Border.builder().radii(CornerVector4i.all(5)).build();
     private static final SidedVector4i BUTTON_PADDING = SidedVector4i.all(5);
@@ -51,6 +56,7 @@ public class Button extends LabeledBase {
         setBorder(BUTTON_BORDER);
         setBackgroundColor(Color.LIGHT_GRAY);
         setPadding(BUTTON_PADDING);
+        setProperty(HoverBackgroundColor.PROP_HOVER_BACKGROUND_COLOR, Color.LIGHT_GRAY.lighter());
     }
 
     @Override

@@ -26,11 +26,16 @@ package com.techshroom.unplanned.window;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.lang.ref.WeakReference;
+
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.event.mouse.MouseEvent;
+import com.techshroom.unplanned.event.mouse.MouseMoveEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import com.techshroom.unplanned.gui.event.HoverEndEvent;
+import com.techshroom.unplanned.gui.event.HoverStartEvent;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.ParentElementBase;
 import com.techshroom.unplanned.gui.model.parent.RootElement;
@@ -47,12 +52,35 @@ class GLFWRootElement extends ParentElementBase implements RootElement {
         children.forEach(GuiElement::invalidate);
     }
 
+    private WeakReference<GuiElement> currentHoverElement = new WeakReference<>(null);
+
     @Subscribe
     public void onMouseEvent(MouseEvent event) {
         Vector2i pos = event.getSource().getPosition().toInt();
         if (getBounds().contains(pos)) {
-            getElementAt(pos).getEventBus().post(event);
+            GuiElement currentElement = getElementAt(pos);
+            if (event instanceof MouseMoveEvent) {
+                GuiElement currentHover = currentHoverElement.get();
+                if (currentHover != null) {
+                    if (currentElement != currentHover) {
+                        // end hover
+                        currentHover.getEventBus().post(HoverEndEvent.create((MouseMoveEvent) event));
+                        currentHover = null;
+                    }
+                } 
+                if (currentHover == null) {
+                    // start hover
+                    currentHover = currentElement;
+                    currentHoverElement = new WeakReference<>(currentHover);
+                    currentHover.getEventBus().post(HoverStartEvent.create((MouseMoveEvent) event));
+                }
+            }
+            currentElement.getEventBus().post(event);
         }
+    }
+
+    private void clearState() {
+        currentHoverElement = new WeakReference<>(null);
     }
 
     @Override
@@ -65,6 +93,8 @@ class GLFWRootElement extends ParentElementBase implements RootElement {
         if (child != null) {
             children.add(child);
             child.setParent(this);
+        } else {
+            clearState();
         }
     }
 
