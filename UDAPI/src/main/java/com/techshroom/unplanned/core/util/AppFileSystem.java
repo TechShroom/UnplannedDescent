@@ -47,12 +47,19 @@ public class AppFileSystem {
 
     private static Path ensureDirectory(Path path, boolean create) {
         if (!Files.isDirectory(path)) {
+            Exception ex = null;
             try {
                 if (create) {
                     Files.createDirectories(path);
+                } else if (Files.exists(path)) {
+                    // not a directory, and exists -- ERROR
+                    ex = new IllegalStateException("File exists");
                 }
             } catch (IOException e) {
-                throw new IllegalStateException(path.toAbsolutePath() + " is not a directory", e);
+                ex = e;
+            }
+            if (ex != null) {
+                throw new IllegalStateException(path.toAbsolutePath() + " is not a directory", ex);
             }
         }
         return path;
