@@ -24,10 +24,9 @@
  */
 package com.techshroom.unplanned.core;
 
-import java.util.Set;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableSortedSet;
+import com.techshroom.unplanned.core.util.UX;
 
 public final class Settings {
 
@@ -43,12 +42,8 @@ public final class Settings {
         return load(property, defaultVal, Function.identity());
     }
 
-    private static final Set<String> TRUE = ImmutableSortedSet.orderedBy(String.CASE_INSENSITIVE_ORDER)
-            .add("y", "yes", "true", "1")
-            .build();
-
     private static boolean load(String property, boolean defaultVal) {
-        return load(property, defaultVal, TRUE::contains);
+        return load(property, defaultVal, UX::userInputIsTrue);
     }
 
     public static final String APITRACE = load("ud.apitrace", "");
