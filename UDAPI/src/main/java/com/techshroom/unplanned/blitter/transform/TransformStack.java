@@ -56,7 +56,7 @@ public interface TransformStack extends AutoCloseable {
     }
 
     /**
-     * Uploads the matrices stored in the stack.w
+     * Uploads the matrices stored in the stack.
      */
     void apply(MatrixUploader uploader);
 

@@ -25,6 +25,7 @@
 package com.techshroom.unplanned.blitter.pen;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BASELINE;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BOTTOM;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_CENTER;
@@ -146,6 +147,7 @@ public class NVGPen implements DigitalPen {
 
     @Override
     public void setColor(Color color) {
+        checkNotNull(color);
         this.color = color;
         colorNvgColor(nvgColor, color);
     }
