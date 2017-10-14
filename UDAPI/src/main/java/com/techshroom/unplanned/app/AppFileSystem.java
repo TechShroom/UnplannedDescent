@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.app;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +35,7 @@ import com.google.common.base.Strings;
  * Manages consistent and compatible paths for configuration and other
  * directories.
  */
-public class AppFileSystem {
+public final class AppFileSystem {
 
     private static final Path HOME = Paths.get(System.getProperty("user.home"));
     private static final Path BASE_RANDOM_DIR = getBaseRandomDir();
@@ -89,8 +89,21 @@ public class AppFileSystem {
         return getConfigDir("unplannedDescent", create);
     }
 
-    public static Path getRandomDir(String name, boolean create) {
-        return ensureDirectory(BASE_RANDOM_DIR.resolve(name), create);
+    private final String appName;
+
+    public AppFileSystem(String appName) {
+        this.appName = appName;
+    }
+
+    public Path getConfigDir(boolean create) {
+        return getConfigDir(appName, create);
+    }
+
+    /**
+     * Creates a directory under the config folder with the given name.
+     */
+    public Path getRandomDir(String name, boolean create) {
+        return ensureDirectory(getConfigDir(create).resolve(name), create);
     }
 
 }

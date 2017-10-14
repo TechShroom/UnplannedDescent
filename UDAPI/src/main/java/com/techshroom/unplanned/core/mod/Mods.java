@@ -46,7 +46,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.techshroom.unplanned.core.util.AppFileSystem;
+import com.techshroom.unplanned.app.AppFileSystem;
 import com.techshroom.unplanned.core.util.ClassPathHack;
 import com.techshroom.unplanned.core.util.CompileGeneric;
 import com.techshroom.unplanned.core.util.Logging;
@@ -60,7 +60,9 @@ public final class Mods {
 
     private static final Logger LOGGER = Logging.getLogger();
 
-    private static final Path MODS_DIR = AppFileSystem.getRandomDir("mods", false);
+    // TODO de-static mods so it works with the new App system
+    // private static final Path MODS_DIR = AppFileSystem.getRandomDir("mods",
+    // false);
     private static final Mod NULL_MOD = new SkeletalMod(
             ModMetadata.builder().idAndName("null").version("0.0.0")
                     .buildNumber(0).targetGameVersion("any").build()) {
@@ -81,8 +83,9 @@ public final class Mods {
         }
         LOGGER.debug("UD Mod System starting...");
         if (!injectModsFolder()) {
-            LOGGER.warn("Not searching {} because it doesn't exist or is not a directory.",
-                    MODS_DIR.toAbsolutePath());
+            // LOGGER.warn("Not searching {} because it doesn't exist or is not
+            // a directory.",
+            // MODS_DIR.toAbsolutePath());
         }
         List<ModProvider> providerList = ModLoader.loadModsFromClasspath();
         LOGGER.debug("Loaded mod providers from classpath.");
@@ -124,9 +127,9 @@ public final class Mods {
     }
 
     private static boolean injectModsFolder() {
-        if (!loadDirectory(MODS_DIR)) {
-            return false;
-        }
+        // if (!loadDirectory(MODS_DIR)) {
+        // return false;
+        // }
         return true;
     }
 

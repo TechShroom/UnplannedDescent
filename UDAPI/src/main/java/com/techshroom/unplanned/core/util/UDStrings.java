@@ -160,4 +160,10 @@ public final class UDStrings {
         return b.toString();
     }
 
+    public static String lowercaseFirstLetter(String input) {
+        int afterFirstCp = input.offsetByCodePoints(0, 1);
+        int firstLowerCp = Character.toLowerCase(input.codePointAt(0));
+        return String.valueOf(Character.toChars(firstLowerCp)) + input.substring(afterFirstCp);
+    }
+
 }

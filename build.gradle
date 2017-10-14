@@ -150,6 +150,7 @@ subprojects {
 project(':api') {
     dependencies {
         compile group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
+        compile group: 'com.github.luben', name: 'zstd-jni', version: '1.3.1-1'
         addLWJGL(project, '', true);
         addLWJGL(project, 'stb', true);
     }
