@@ -29,6 +29,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -59,6 +60,27 @@ public abstract class App {
      */
     public static final String GENERIC_APP_RESOURCE_ID = "app";
 
+    private static final Path DEFAULT_APP_BASE_DIR = Paths.get(".");
+
+    public static Builder builder() {
+        return new AutoValue_App.Builder()
+                .RPLoaderType(ResourcePackLoaderType.FF2)
+                .baseDir(DEFAULT_APP_BASE_DIR);
+    }
+
+    @AutoValue.Builder
+    public interface Builder {
+
+        Builder id(CombinedId id);
+
+        Builder RPLoaderType(ResourcePackLoaderType type);
+
+        Builder baseDir(Path baseDir);
+
+        App build();
+
+    }
+
     App() {
     }
 
@@ -66,13 +88,15 @@ public abstract class App {
 
     public abstract ResourcePackLoaderType getRPLoaderType();
 
+    public abstract Path getBaseDir();
+
     public final ResourcePackLoader getRPLoader() {
         return ResourcePackLoaders.getLoader(getRPLoaderType());
     }
 
     @Memoized
     public ResourcePack getResourcePack() {
-        Path baseRPDir = getFileSystem().getRandomDir("resourcepacks", true);
+        Path baseRPDir = getFileSystem().getDir("resourcepacks", true);
         List<Path> paths;
         try (Stream<Path> iter = Files.list(baseRPDir)) {
             paths = iter.collect(toImmutableList());
@@ -84,7 +108,7 @@ public abstract class App {
 
     @Memoized
     public AppFileSystem getFileSystem() {
-        return new AppFileSystem(getId().titleCase());
+        return new AppFileSystem(getBaseDir());
     }
 
     public final RId rId(String rId) {

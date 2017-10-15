@@ -17,7 +17,7 @@ buildscript {
     dependencies {
         classpath group: 'com.techshroom', name: 'Aversion', version: '3.0.1'
         classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
-        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
     }
 }
 ext.lwjglVersion = '3.1.3'
@@ -97,9 +97,7 @@ subprojects {
         compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
         compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
 
-        compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
-
-        compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
+        compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
 
         compile group: 'com.techshroom', name: 'jsr305-plus', version: '0.0.1'
 
@@ -118,7 +116,7 @@ subprojects {
 
         addAPTReqWComp group: 'com.google.guava', name: 'guava', version: '23.0'
         addAPT group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc3'
-        addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.5'
+        addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.5.1'
         addAPTReq name: 'aopalliance'
         addAPTReq name: 'asm'
         addAPTReq name: 'auto-value'
@@ -149,7 +147,7 @@ subprojects {
 
 project(':api') {
     dependencies {
-        compile group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
+        compile group: 'net.java.dev.jna', name: 'jna', version: '4.5.0'
         compile group: 'com.github.luben', name: 'zstd-jni', version: '1.3.1-1'
         addLWJGL(project, '', true);
         addLWJGL(project, 'stb', true);

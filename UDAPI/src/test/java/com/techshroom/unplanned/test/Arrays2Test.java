@@ -38,7 +38,6 @@ import com.techshroom.unplanned.core.util.Arrays2;
  */
 public class Arrays2Test {
 
-    private static Object[] CREATE_equivarray;
     private static int[] SPL_original, SPL_normalcp, SPL_reversecp,
             SPL_bigstepcp, SPL_rbigstepcp;
 
@@ -49,7 +48,6 @@ public class Arrays2Test {
      */
     @BeforeClass
     public static void setUp() throws Exception {
-        CREATE_equivarray = new Object[1];
         SPL_original = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         SPL_normalcp = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         SPL_reversecp = new int[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
@@ -62,8 +60,15 @@ public class Arrays2Test {
      */
     @Test
     public void createsArray() {
-        assertArrayEquals(CREATE_equivarray,
-                Arrays2.newArray(Object.class, CREATE_equivarray.length));
+        assertArrayEquals(new Object[1], Arrays2.newArray(Object.class, 1));
+    }
+
+    /**
+     * Arrays2 can create a primitive array.
+     */
+    @Test
+    public void createsPrimitiveArray() {
+        assertArrayEquals(new int[1], Arrays2.newPrimitiveArray(int.class, 1));
     }
 
     /**

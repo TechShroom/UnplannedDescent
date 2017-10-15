@@ -38,10 +38,8 @@ import com.google.common.base.Strings;
 public final class AppFileSystem {
 
     private static final Path HOME = Paths.get(System.getProperty("user.home"));
-    private static final Path BASE_RANDOM_DIR = getBaseRandomDir();
     private static final Path BASE_CONFIG_DIR = getBaseConfigDir();
     static {
-        ensureDirectory(BASE_RANDOM_DIR, false);
         ensureDirectory(BASE_CONFIG_DIR, false);
     }
 
@@ -73,37 +71,27 @@ public final class AppFileSystem {
         return Paths.get(xdgConfig);
     }
 
-    private static Path getBaseRandomDir() {
-        String ranDir = System.getenv("UD_RANDOM_DIR");
-        if (Strings.isNullOrEmpty(ranDir)) {
-            return Paths.get("./random/");
-        }
-        return Paths.get(ranDir);
+    private static final AppFileSystem GENERIC_AFS = new AppFileSystem(BASE_CONFIG_DIR.resolve("unplannedDescent"));
+
+    public static AppFileSystem getGenericFS() {
+        return GENERIC_AFS;
     }
 
-    public static Path getConfigDir(String appName, boolean create) {
-        return ensureDirectory(BASE_CONFIG_DIR.resolve(appName), create);
-    }
+    private final Path baseDir;
 
-    public static Path getCommonConfigDir(boolean create) {
-        return getConfigDir("unplannedDescent", create);
-    }
-
-    private final String appName;
-
-    public AppFileSystem(String appName) {
-        this.appName = appName;
+    public AppFileSystem(Path baseDir) {
+        this.baseDir = ensureDirectory(baseDir, true);
     }
 
     public Path getConfigDir(boolean create) {
-        return getConfigDir(appName, create);
+        return getDir("config", create);
     }
 
     /**
-     * Creates a directory under the config folder with the given name.
+     * Creates a directory under the base folder with the given name.
      */
-    public Path getRandomDir(String name, boolean create) {
-        return ensureDirectory(getConfigDir(create).resolve(name), create);
+    public Path getDir(String name, boolean create) {
+        return ensureDirectory(baseDir.resolve(name), create);
     }
 
 }

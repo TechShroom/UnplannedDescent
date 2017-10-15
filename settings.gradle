@@ -1,5 +1,5 @@
 rootProject.name = 'UnplannedDescent'
-include 'UDAPI', 'UDImpl', 'UDExamples'
+include 'UDAPI', 'UDImpl', 'UDExamples', 'BaleOut'
 project(':UDAPI').name = 'api'
 project(':UDImpl').name = 'implementation'
 project(':UDExamples').name = 'examples'
