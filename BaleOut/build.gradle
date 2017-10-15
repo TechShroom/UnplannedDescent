@@ -1,3 +1,4 @@
 dependencies {
+    compile project(':api')
     compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
 }
