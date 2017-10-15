@@ -130,11 +130,11 @@ public abstract class Color {
         if (s == 0) {
             r = g = b = l; // achromatic
         } else {
-            double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            double q = l <= 0.5 ? l * (1 + s) : l + s - l * s;
             double p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1 / 3);
+            r = hue2rgb(p, q, h + 1 / 3d);
             g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1 / 3);
+            b = hue2rgb(p, q, h - 1 / 3d);
         }
         return fromInt(toInt(r), toInt(g), toInt(b), toInt(a));
     }
@@ -146,14 +146,14 @@ public abstract class Color {
         if (t > 1) {
             t -= 1;
         }
-        if (t < 1 / 6) {
+        if (t < 1 / 6d) {
             return p + (q - p) * 6 * t;
         }
-        if (t < 1 / 2) {
+        if (t < 1 / 2d) {
             return q;
         }
-        if (t < 2 / 3) {
-            return p + (q - p) * (2 / 3 - t) * 6;
+        if (t < 2 / 3d) {
+            return p + (q - p) * (2 / 3d - t) * 6;
         }
         return p;
     }
@@ -208,6 +208,10 @@ public abstract class Color {
     public final Color lighter() {
         Vector4d hsl = toHsl();
         hsl = hsl.mul(1, 1, 1.1, 1);
+        // add small fraction if already zero
+        if (hsl.getZ() == 0) {
+            hsl = hsl.add(0, 0, 0.05, 0);
+        }
         return fromHsl(hsl);
     }
 

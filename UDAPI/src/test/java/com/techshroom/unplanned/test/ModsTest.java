@@ -56,6 +56,7 @@ public class ModsTest {
                     .resolve(
                             "META-INF/services/" + ModProvider.class.getName());
             Files.createDirectories(tmp.getParent());
+            Files.deleteIfExists(tmp);
             Files.createFile(tmp);
         } catch (Exception e) {
             e.printStackTrace();
