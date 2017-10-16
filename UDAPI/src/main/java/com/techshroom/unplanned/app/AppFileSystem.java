@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.app;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,13 +35,11 @@ import com.google.common.base.Strings;
  * Manages consistent and compatible paths for configuration and other
  * directories.
  */
-public class AppFileSystem {
+public final class AppFileSystem {
 
     private static final Path HOME = Paths.get(System.getProperty("user.home"));
-    private static final Path BASE_RANDOM_DIR = getBaseRandomDir();
     private static final Path BASE_CONFIG_DIR = getBaseConfigDir();
     static {
-        ensureDirectory(BASE_RANDOM_DIR, false);
         ensureDirectory(BASE_CONFIG_DIR, false);
     }
 
@@ -73,24 +71,27 @@ public class AppFileSystem {
         return Paths.get(xdgConfig);
     }
 
-    private static Path getBaseRandomDir() {
-        String ranDir = System.getenv("UD_RANDOM_DIR");
-        if (Strings.isNullOrEmpty(ranDir)) {
-            return Paths.get("./random/");
-        }
-        return Paths.get(ranDir);
+    private static final AppFileSystem GENERIC_AFS = new AppFileSystem(BASE_CONFIG_DIR.resolve("unplannedDescent"));
+
+    public static AppFileSystem getGenericFS() {
+        return GENERIC_AFS;
     }
 
-    public static Path getConfigDir(String appName, boolean create) {
-        return ensureDirectory(BASE_CONFIG_DIR.resolve(appName), create);
+    private final Path baseDir;
+
+    public AppFileSystem(Path baseDir) {
+        this.baseDir = ensureDirectory(baseDir, true);
     }
 
-    public static Path getCommonConfigDir(boolean create) {
-        return getConfigDir("unplannedDescent", create);
+    public Path getConfigDir(boolean create) {
+        return getDir("config", create);
     }
 
-    public static Path getRandomDir(String name, boolean create) {
-        return ensureDirectory(BASE_RANDOM_DIR.resolve(name), create);
+    /**
+     * Creates a directory under the base folder with the given name.
+     */
+    public Path getDir(String name, boolean create) {
+        return ensureDirectory(baseDir.resolve(name), create);
     }
 
 }

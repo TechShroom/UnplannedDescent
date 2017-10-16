@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.core.util;
+package com.techshroom.unplanned.core.util.files;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
