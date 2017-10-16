@@ -26,6 +26,7 @@ package com.techshroom.unplanned.rp;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -61,8 +62,16 @@ public class LangResource implements VirtualResource {
     }
 
     private static Map<String, String> loadLangKeys(RId resourceId, ResourcePack pack) {
-        ImmutableMap.Builder<String, String> lk = ImmutableMap.builder();
-        return lk.build();
+        RawResource res = pack.loadResource(resourceId);
+        return res.useReader(reader -> {
+            ImmutableMap.Builder<String, String> lk = ImmutableMap.builder();
+            Properties props = new Properties();
+            props.load(reader);
+            for (String s : props.stringPropertyNames()) {
+                lk.put(s, props.getProperty(s));
+            }
+            return lk.build();
+        });
     }
 
     private final RId resourceId;

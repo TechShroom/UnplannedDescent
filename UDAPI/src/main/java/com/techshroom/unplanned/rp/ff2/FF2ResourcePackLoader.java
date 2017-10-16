@@ -63,7 +63,7 @@ public class FF2ResourcePackLoader implements SimpleResourcePackLoader {
                 RId id = RId.parse(data.readUTF());
                 byte index = data.readByte();
                 long offset = data.readLong();
-                int size = data.readInt();
+                long size = data.readLong();
                 idx.putValue(id, FF2Index.Value.create(index, offset, size));
             }
         } catch (IOException e) {

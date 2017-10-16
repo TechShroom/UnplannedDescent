@@ -71,6 +71,7 @@ public class FF2ResourcePackWriter {
                 data.writeUTF(e.getKey().toString());
                 data.writeByte(e.getValue().getIndex());
                 data.writeLong(e.getValue().getOffset());
+                data.writeLong(e.getValue().getSize());
             }
         }
     }

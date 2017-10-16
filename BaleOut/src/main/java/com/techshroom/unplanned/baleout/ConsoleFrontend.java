@@ -165,6 +165,8 @@ public class ConsoleFrontend extends BaseFrontend {
             String finalizedPrefix = basePrefix;
             return paths
                     .filter(p -> Files.isRegularFile(p))
+                    // filter out files that aren't "resources"
+                    .filter(p -> !p.getParent().equals(resourcesDir))
                     .collect(toImmutableMap(p -> {
                         // Extract base dir
                         String baseDir = p.getParent().toAbsolutePath().toString().replace(finalizedPrefix, "");
