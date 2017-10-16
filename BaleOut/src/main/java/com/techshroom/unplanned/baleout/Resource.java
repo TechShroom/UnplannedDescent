@@ -22,68 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.rp.ff2;
+package com.techshroom.unplanned.baleout;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
 import com.techshroom.unplanned.rp.RId;
 
-/**
- * Representation of the FF2 index file. Used to look up where resources are
- * stored.
- */
 @AutoValue
-public abstract class FF2Index {
-
-    @AutoValue
-    public static abstract class Value {
-
-        public static Value create(byte index, long offset, long size) {
-            return new AutoValue_FF2Index_Value(index, offset, size);
-        }
-
-        Value() {
-        }
-
-        public abstract byte getIndex();
-
-        public abstract long getOffset();
-
-        public abstract long getSize();
-
+public abstract class Resource {
+    
+    public static Resource fromPath(RId id, Path source) throws IOException {
+        return wrap(id, source, Files.size(source));
+    }
+    
+    public static Resource wrap(RId id, Path source, long size) {
+        return new AutoValue_Resource(id, source, size);
     }
 
-    public static Builder builder() {
-        return new AutoValue_FF2Index.Builder();
+    Resource() {
     }
 
-    @AutoValue.Builder
-    public interface Builder {
+    public abstract RId getId();
 
-        ImmutableMap.Builder<RId, Value> dataLookupBuilder();
+    public abstract Path getSource();
 
-        default Builder putValue(RId id, Value resource) {
-            dataLookupBuilder().put(id, resource);
-            return this;
-        }
-
-        FF2Index build();
-
-    }
-
-    FF2Index() {
-    }
-
-    public abstract ImmutableMap<RId, Value> getDataLookup();
-
-    public final Value getData(RId resourceId) {
-        return getDataLookup().get(resourceId);
-    }
-
-    @Memoized
-    public int getFileCount() {
-        return getDataLookup().values().stream().mapToInt(Value::getIndex).max().getAsInt() + 1;
-    }
+    public abstract long getSize();
 
 }

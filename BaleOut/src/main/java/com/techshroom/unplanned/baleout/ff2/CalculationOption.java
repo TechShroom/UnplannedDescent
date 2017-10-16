@@ -22,49 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.rp;
+package com.techshroom.unplanned.baleout.ff2;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import com.techshroom.unplanned.core.util.CompileGeneric;
 import com.techshroom.unplanned.core.util.CompileGeneric.ClassCompileGeneric;
 import com.techshroom.unplanned.core.util.FakeEnum;
-import com.techshroom.unplanned.core.util.IOSupplier;
+import com.techshroom.unplanned.core.util.MetricUnit;
+import com.techshroom.unplanned.core.util.genericmap.GenericMapKey;
 
 /**
- * Pseudo-enum for a type of resource.
+ * Pseudo-enum for calculation options.
  */
-public abstract class ResourceType<R extends Resource> extends FakeEnum<ResourceType<R>> {
+public class CalculationOption<T> extends FakeEnum<CalculationOption<T>> implements GenericMapKey<T> {
 
-    public static List<ResourceType<?>> values() {
+    public static List<CalculationOption<?>> values() {
         @SuppressWarnings("rawtypes")
-        ClassCompileGeneric<ResourceType> cg = CompileGeneric.specify(ResourceType.class);
+        ClassCompileGeneric<CalculationOption> cg = CompileGeneric.specify(CalculationOption.class);
         @SuppressWarnings("unchecked")
-        List<ResourceType<?>> values = (List<ResourceType<?>>) values(cg);
+        List<CalculationOption<?>> values = (List<CalculationOption<?>>) values(cg);
         return values;
     }
 
-    public static final ResourceType<RawResource> RAW = new ResourceType<RawResource>("RAW") {
+    // defaults to 1GB
+    public static final CalculationOption<Long> MAXIMUM_FILE_SIZE =
+            new CalculationOption<>("MAXIMUM_FILE_SIZE", "maximumFileSize", Long.class, MetricUnit.GIGA.toNone(1));
 
-        @Override
-        public RawResource create(ResourcePack creator, RId resourceId, IOSupplier<InputStream> streamCreator) throws IOException {
-            return new RawResource(streamCreator.get());
-        }
-    };
-    public static final ResourceType<LangResource> LANG = new ResourceType<LangResource>("LANG") {
+    public final String camelCaseName;
+    public final Class<T> type;
+    public final T defaultValue;
 
-        @Override
-        public LangResource create(ResourcePack creator, RId resourceId, IOSupplier<InputStream> streamCreator) throws IOException {
-            return new LangResource(resourceId, creator);
-        }
-    };
-
-    private ResourceType(String name) {
+    private CalculationOption(String name, String camelCaseName, Class<T> type, T defaultValue) {
         super(name);
+        this.camelCaseName = camelCaseName;
+        this.type = type;
+        this.defaultValue = defaultValue;
     }
-
-    public abstract R create(ResourcePack creator, RId resourceId, IOSupplier<InputStream> streamCreator) throws IOException;
 
 }

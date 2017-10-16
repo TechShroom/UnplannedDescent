@@ -24,7 +24,6 @@
  */
 package com.techshroom.unplanned.rp;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -36,26 +35,15 @@ import com.google.common.collect.Maps;
  */
 public interface ResourcePack {
 
-    default <R extends Resource> R loadResource(RId id, ResourceType<R> type) throws ResourceLoadException {
+    default RawResource loadResource(RId id) throws ResourceLoadException {
         if (getComponentPacks().isEmpty()) {
             throw new ResourceNotFoundException(id, "no component packs");
-        }
-        // special case lang files -- they like to look at the sub-components
-        if (type == ResourceType.LANG) {
-            try {
-                return type.create(this, id, () -> {
-                    throw new IOException("Irresponsible lang file...");
-                });
-            } catch (IOException e) {
-                // lang files shouldn't need streams.
-                throw new AssertionError("Not possible if everything is working correctly.", e);
-            }
         }
         ImmutableMap.Builder<ResourcePack, ResourceLoadException> suppressed = ImmutableMap.builder();
         boolean allNotFound = true;
         for (ResourcePack pack : getComponentPacks()) {
             try {
-                
+                return pack.loadResource(id);
             } catch (ResourceLoadException e) {
                 suppressed.put(pack, e);
                 if (!(e instanceof ResourceNotFoundException)) {
@@ -84,7 +72,7 @@ public interface ResourcePack {
             throw new ResourceNotFoundException(id, "Component Pack Errors: [" + reasons + "]");
         }
     }
-    
+
     String getId();
 
     /**

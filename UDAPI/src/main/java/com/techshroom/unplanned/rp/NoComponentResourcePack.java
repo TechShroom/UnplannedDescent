@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 public interface NoComponentResourcePack extends ResourcePack {
 
     @Override
-    <R extends Resource> R loadResource(RId id, ResourceType<R> type) throws ResourceLoadException;
+    RawResource loadResource(RId id) throws ResourceLoadException;
 
     @Override
     default ImmutableList<ResourcePack> getComponentPacks() {

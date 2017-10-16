@@ -75,8 +75,14 @@ public abstract class RId {
 
     public static RId from(String domain, String category, String identifier) {
         checkArgument(!domain.contains(":"), "domain cannot contain a colon");
+        checkArgument(!domain.isEmpty(), "domain cannot be empty");
+        
         checkArgument(!category.contains(":"), "category cannot contain a colon");
+        checkArgument(!category.isEmpty(), "category cannot be empty");
+        
         checkArgument(!identifier.contains(":"), "identifier cannot contain a colon");
+        checkArgument(!identifier.isEmpty(), "identifier cannot be empty");
+        checkArgument(!identifier.contains("/"), "identifier cannot contain a slash");
         return new AutoValue_RId(domain, category, identifier);
     }
 

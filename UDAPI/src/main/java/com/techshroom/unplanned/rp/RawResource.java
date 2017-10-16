@@ -37,7 +37,8 @@ import com.google.common.io.CharStreams;
 import com.techshroom.unplanned.core.util.IOFunction;
 
 /**
- * Raw interpretation of a resource value.
+ * Represents a "loaded" resource. This may still be streamed from disk if it is
+ * large enough, or it is specifically requested.
  * 
  * <p>
  * Only one of the {@code as*} or {@code use*} methods may be called. After the
@@ -45,7 +46,7 @@ import com.techshroom.unplanned.core.util.IOFunction;
  * with the new object.
  * </p>
  */
-public class RawResource implements Resource {
+public class RawResource {
 
     private InputStream source;
 

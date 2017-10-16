@@ -22,68 +22,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.rp.ff2;
+package com.techshroom.unplanned.baleout.ff2;
 
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableMap;
+import com.techshroom.unplanned.baleout.Resource;
 import com.techshroom.unplanned.rp.RId;
 
 /**
- * Representation of the FF2 index file. Used to look up where resources are
- * stored.
+ * Helper class for {@link FF2Calculator} -- holds a group of resources.
  */
 @AutoValue
-public abstract class FF2Index {
-
-    @AutoValue
-    public static abstract class Value {
-
-        public static Value create(byte index, long offset, long size) {
-            return new AutoValue_FF2Index_Value(index, offset, size);
-        }
-
-        Value() {
-        }
-
-        public abstract byte getIndex();
-
-        public abstract long getOffset();
-
-        public abstract long getSize();
-
-    }
+public abstract class CalcGroup {
 
     public static Builder builder() {
-        return new AutoValue_FF2Index.Builder();
+        return new AutoValue_CalcGroup.Builder();
     }
 
     @AutoValue.Builder
     public interface Builder {
 
-        ImmutableMap.Builder<RId, Value> dataLookupBuilder();
-
-        default Builder putValue(RId id, Value resource) {
-            dataLookupBuilder().put(id, resource);
+        ImmutableMap.Builder<RId, Resource> resourcesBuilder();
+        
+        default Builder addResource(Resource resource) {
+            resourcesBuilder().put(resource.getId(), resource);
             return this;
         }
 
-        FF2Index build();
+        CalcGroup build();
 
     }
 
-    FF2Index() {
+    CalcGroup() {
     }
 
-    public abstract ImmutableMap<RId, Value> getDataLookup();
-
-    public final Value getData(RId resourceId) {
-        return getDataLookup().get(resourceId);
-    }
+    public abstract ImmutableMap<RId, Resource> getResources();
 
     @Memoized
-    public int getFileCount() {
-        return getDataLookup().values().stream().mapToInt(Value::getIndex).max().getAsInt() + 1;
+    public long getSize() {
+        return getResources().values().stream().mapToLong(Resource::getSize).sum();
     }
 
 }

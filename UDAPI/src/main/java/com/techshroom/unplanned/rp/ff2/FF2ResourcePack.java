@@ -24,8 +24,6 @@
  */
 package com.techshroom.unplanned.rp.ff2;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -35,9 +33,8 @@ import com.techshroom.unplanned.core.util.files.FileRetentionPolicies;
 import com.techshroom.unplanned.core.util.files.FileRetentionPolicy;
 import com.techshroom.unplanned.rp.NoComponentResourcePack;
 import com.techshroom.unplanned.rp.RId;
-import com.techshroom.unplanned.rp.Resource;
+import com.techshroom.unplanned.rp.RawResource;
 import com.techshroom.unplanned.rp.ResourceLoadException;
-import com.techshroom.unplanned.rp.ResourceType;
 
 /**
  * FF2 resource pack.
@@ -61,16 +58,13 @@ class FF2ResourcePack implements NoComponentResourcePack {
     }
 
     @Override
-    public <R extends Resource> R loadResource(RId id, ResourceType<R> type) throws ResourceLoadException {
+    public RawResource loadResource(RId id) throws ResourceLoadException {
         FF2Index.Value val = index.getData(id);
-        checkArgument(val.getType() == type, "wrong type %s, expected %s", type, val.getType());
         try {
-            return type.create(this, id, () -> {
-                Path file = folderSource.resolve(String.valueOf(val.getIndex()));
-                InputStream stream = fileManager.openStream(file);
-                stream.skip(val.getOffset());
-                return ByteStreams.limit(stream, val.getSize());
-            });
+            Path file = folderSource.resolve(String.valueOf(val.getIndex()));
+            InputStream stream = fileManager.openStream(file);
+            stream.skip(val.getOffset());
+            return new RawResource(ByteStreams.limit(stream, val.getSize()));
         } catch (IOException e) {
             throw new ResourceLoadException(e);
         }

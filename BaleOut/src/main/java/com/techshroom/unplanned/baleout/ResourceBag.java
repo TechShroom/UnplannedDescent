@@ -22,68 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.rp.ff2;
+package com.techshroom.unplanned.baleout;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
+import java.io.InputStream;
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
+import com.techshroom.unplanned.core.util.IOFunction;
+import com.techshroom.unplanned.core.util.IOSupplier;
 import com.techshroom.unplanned.rp.RId;
 
 /**
- * Representation of the FF2 index file. Used to look up where resources are
- * stored.
+ * Immutable provider of resources.
  */
-@AutoValue
-public abstract class FF2Index {
+public class ResourceBag {
 
-    @AutoValue
-    public static abstract class Value {
+    private final Map<RId, IOSupplier<InputStream>> streams;
 
-        public static Value create(byte index, long offset, long size) {
-            return new AutoValue_FF2Index_Value(index, offset, size);
-        }
-
-        Value() {
-        }
-
-        public abstract byte getIndex();
-
-        public abstract long getOffset();
-
-        public abstract long getSize();
-
+    public ResourceBag(Map<RId, ? extends IOSupplier<InputStream>> streams) {
+        this.streams = ImmutableMap.copyOf(streams);
     }
 
-    public static Builder builder() {
-        return new AutoValue_FF2Index.Builder();
+    public IOFunction<RId, InputStream> asFunction() {
+        return i -> streams.get(i).get();
     }
 
-    @AutoValue.Builder
-    public interface Builder {
-
-        ImmutableMap.Builder<RId, Value> dataLookupBuilder();
-
-        default Builder putValue(RId id, Value resource) {
-            dataLookupBuilder().put(id, resource);
-            return this;
-        }
-
-        FF2Index build();
-
-    }
-
-    FF2Index() {
-    }
-
-    public abstract ImmutableMap<RId, Value> getDataLookup();
-
-    public final Value getData(RId resourceId) {
-        return getDataLookup().get(resourceId);
-    }
-
-    @Memoized
-    public int getFileCount() {
-        return getDataLookup().values().stream().mapToInt(Value::getIndex).max().getAsInt() + 1;
+    public Map<RId, IOSupplier<InputStream>> asMap() {
+        return streams;
     }
 
 }

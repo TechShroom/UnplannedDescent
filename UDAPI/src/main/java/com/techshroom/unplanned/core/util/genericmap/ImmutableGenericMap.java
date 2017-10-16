@@ -22,17 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
+package com.techshroom.unplanned.core.util.genericmap;
 
-import java.io.IOException;
-
-/**
- * BaleOut frontend implementations.
- */
-public interface Frontend {
-
-    String getId();
-    
-    void run(String[] args) throws IOException;
+public interface ImmutableGenericMap extends GenericMap {
 
 }

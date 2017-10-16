@@ -24,46 +24,56 @@
  */
 package com.techshroom.unplanned.baleout;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.Map;
 
-import com.techshroom.unplanned.core.util.Exit;
+import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.baleout.MapValueConverter.ValueWrapper;
 
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
+import joptsimple.ValueConverter;
 
-public class JOptCommon {
-
-    public static Optional<OptionSet> parse(OptionParser parser, String... args) throws IOException {
-        OptionSpec<Void> helpSpec =
-                parser.acceptsAll(Arrays.asList("h", "help"), "Displays this help.")
-                        .forHelp();
-        OptionSet opts;
-        try {
-            opts = parser.parse(args);
-        } catch (OptionException e) {
-            System.err.println("Error: " + e.getMessage() + "\n");
-            displayHelp(parser);
-            throw Exit.with(1);
+public abstract class MapValueConverter<T> implements ValueConverter<ValueWrapper<T>> {
+    
+    @AutoValue
+    public abstract static class ValueWrapper<T> {
+        
+        public static <T> ValueWrapper<T> wrap(String key, T value) {
+            return new AutoValue_MapValueConverter_ValueWrapper<>(key, value);
         }
-
-        if (opts.has(helpSpec)) {
-            displayHelp(parser);
-            return Optional.empty();
+        
+        ValueWrapper() {
         }
-
-        return Optional.of(opts);
+        
+        public abstract String getKey();
+        
+        public abstract T getValue();
+        
+        @Override
+        public final String toString() {
+            return getKey();
+        }
+        
     }
 
-    private static void displayHelp(OptionParser parser) throws IOException {
-        System.err.println("Usage:");
-        parser.printHelpOn(System.err);
+    private final Map<String, T> values;
+
+    protected MapValueConverter(Map<String, T> values) {
+        this.values = values;
     }
 
-    private JOptCommon() {
+    @Override
+    public ValueWrapper<T> convert(String value) {
+        return ValueWrapper.wrap(value, values.get(value));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends ValueWrapper<T>> valueType() {
+        return (Class<? extends ValueWrapper<T>>) (Object) ValueWrapper.class;
+    }
+
+    @Override
+    public String valuePattern() {
+        return String.join("|", values.keySet());
     }
 
 }

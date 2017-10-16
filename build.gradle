@@ -85,7 +85,7 @@ subprojects {
          failOnVersionConflict()
 
          // force certain versions of dependencies (including transitive)
-        force 'com.google.guava:guava:23.0', 'com.google.code.findbugs:jsr305:3.0.1'
+         force 'com.google.guava:guava:23.0', 'com.google.code.findbugs:jsr305:3.0.1'
 
          cacheDynamicVersionsFor 10, 'minutes'
          // don't cache changing modules at all

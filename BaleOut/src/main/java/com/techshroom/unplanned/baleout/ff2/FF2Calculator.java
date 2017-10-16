@@ -22,17 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
+package com.techshroom.unplanned.baleout.ff2;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Map;
+
+import com.techshroom.unplanned.rp.RId;
+import com.techshroom.unplanned.rp.ff2.FF2Index;
 
 /**
- * BaleOut frontend implementations.
+ * Calculates the FF2Index from the resources.
  */
-public interface Frontend {
+public interface FF2Calculator {
 
-    String getId();
-    
-    void run(String[] args) throws IOException;
+    FF2Index calculate(Map<RId, Path> resources, CalculationOptions options) throws IOException;
 
 }

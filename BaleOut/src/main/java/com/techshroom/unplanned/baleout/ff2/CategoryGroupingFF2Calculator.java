@@ -22,17 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
+package com.techshroom.unplanned.baleout.ff2;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.techshroom.unplanned.baleout.Resource;
+import com.techshroom.unplanned.rp.RId;
+import com.techshroom.unplanned.rp.ff2.FF2Index;
 
 /**
- * BaleOut frontend implementations.
+ * {@link FF2Calculator} that attempts to group resources according to the
+ * domain and category of their ID.
  */
-public interface Frontend {
+public class CategoryGroupingFF2Calculator implements FF2Calculator {
 
-    String getId();
-    
-    void run(String[] args) throws IOException;
+    private static String key(RId id) {
+        return id.getDomain() + ":" + id.getCategory();
+    }
+
+    @Override
+    public FF2Index calculate(Map<RId, Path> resources, CalculationOptions options) throws IOException {
+        Map<String, CalcGroup.Builder> groups = new HashMap<>();
+        for (Entry<RId, Path> p : resources.entrySet()) {
+            CalcGroup.Builder b = groups.computeIfAbsent(key(p.getKey()), k -> CalcGroup.builder());
+            b.addResource(Resource.fromPath(p.getKey(), p.getValue()));
+        }
+        return FF2GroupIndexer.makeIndexFromGroups(groups.values().stream().map(b -> b.build()).iterator(), options);
+    }
 
 }

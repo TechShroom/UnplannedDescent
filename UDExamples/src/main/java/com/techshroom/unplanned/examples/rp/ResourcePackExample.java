@@ -29,8 +29,8 @@ import java.util.Locale;
 
 import com.techshroom.unplanned.app.App;
 import com.techshroom.unplanned.core.util.CombinedId;
+import com.techshroom.unplanned.rp.LangResource;
 import com.techshroom.unplanned.rp.LangResource.Translator;
-import com.techshroom.unplanned.rp.ResourceType;
 
 /**
  * Example of loading resource packs.
@@ -43,7 +43,7 @@ public class ResourcePackExample {
             .build();
 
     public void main() {
-        Translator translator = APP.getResourcePack().loadResource(APP.rId("lang/app"), ResourceType.LANG)
+        Translator translator = new LangResource(APP.rId("lang/app"), APP.getResourcePack())
                 .translator(Locale.getDefault());
         System.err.println(translator.tr("hello", APP.getName()));
     }

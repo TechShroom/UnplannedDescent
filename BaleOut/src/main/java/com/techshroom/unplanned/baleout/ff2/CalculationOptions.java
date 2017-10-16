@@ -22,17 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
+package com.techshroom.unplanned.baleout.ff2;
 
-import java.io.IOException;
+import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.core.util.genericmap.GenericMap;
+import com.techshroom.unplanned.core.util.genericmap.GenericMaps;
 
 /**
- * BaleOut frontend implementations.
+ * Options for {@link FF2Calculator}. Usually tuned by the end user.
  */
-public interface Frontend {
+@AutoValue
+public abstract class CalculationOptions {
 
-    String getId();
-    
-    void run(String[] args) throws IOException;
+    public static CalculationOptions create(GenericMap options) {
+        return new AutoValue_CalculationOptions(GenericMaps.immutableCopy(options));
+    }
+
+    CalculationOptions() {
+    }
+
+    abstract GenericMap getOptions();
+
+    public final <T> T valueOf(CalculationOption<T> opt) {
+        return getOptions().get(opt);
+    }
 
 }

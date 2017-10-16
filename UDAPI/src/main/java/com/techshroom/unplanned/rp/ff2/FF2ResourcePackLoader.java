@@ -30,12 +30,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.google.common.collect.ImmutableMap;
 import com.techshroom.unplanned.rp.RId;
 import com.techshroom.unplanned.rp.ResourceLoadException;
 import com.techshroom.unplanned.rp.ResourcePack;
 import com.techshroom.unplanned.rp.ResourcePackLoaderType;
-import com.techshroom.unplanned.rp.ResourceType;
 import com.techshroom.unplanned.rp.SimpleResourcePackLoader;
 
 public class FF2ResourcePackLoader implements SimpleResourcePackLoader {
@@ -58,21 +56,20 @@ public class FF2ResourcePackLoader implements SimpleResourcePackLoader {
     }
 
     private FF2Index loadIndex(Path indexFile) {
-        ImmutableMap.Builder<RId, FF2Index.Value> indexMap = ImmutableMap.builder();
+        FF2Index.Builder idx = FF2Index.builder();
         try (DataInputStream data = new DataInputStream(new BufferedInputStream(Files.newInputStream(indexFile)))) {
             int entries = data.readInt();
             for (int i = 0; i < entries; i++) {
                 RId id = RId.parse(data.readUTF());
-                ResourceType<?> type = ResourceType.values().get(data.readUnsignedByte());
                 byte index = data.readByte();
                 long offset = data.readLong();
                 int size = data.readInt();
-                indexMap.put(id, FF2Index.Value.create(index, offset, size, type));
+                idx.putValue(id, FF2Index.Value.create(index, offset, size));
             }
         } catch (IOException e) {
             throw new ResourceLoadException(e);
         }
-        return new FF2Index(indexMap.build());
+        return idx.build();
     }
 
 }

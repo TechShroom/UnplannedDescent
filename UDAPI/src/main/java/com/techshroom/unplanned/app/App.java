@@ -38,13 +38,13 @@ import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.techshroom.unplanned.core.util.CombinedId;
 import com.techshroom.unplanned.rp.BasicRPCategory;
+import com.techshroom.unplanned.rp.LangResource;
 import com.techshroom.unplanned.rp.RId;
 import com.techshroom.unplanned.rp.ResourceLoadException;
 import com.techshroom.unplanned.rp.ResourcePack;
 import com.techshroom.unplanned.rp.ResourcePackLoader;
 import com.techshroom.unplanned.rp.ResourcePackLoaderType;
 import com.techshroom.unplanned.rp.ResourcePackLoaders;
-import com.techshroom.unplanned.rp.ResourceType;
 
 /**
  * An App is a representation of some application that uses Unplanned Descent.
@@ -133,7 +133,7 @@ public abstract class App {
     public final String getName() {
         ResourcePack pack = getResourcePack();
         RId rId = rId(BasicRPCategory.LANG.catStr, GENERIC_APP_RESOURCE_ID);
-        return pack.loadResource(rId, ResourceType.LANG).translate(Locale.getDefault(), "name");
+        return new LangResource(rId, pack).translate(Locale.getDefault(), "name");
     }
 
 }

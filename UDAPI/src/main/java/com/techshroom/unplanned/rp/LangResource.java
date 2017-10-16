@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableMap;
  * A language resource allows access to the language keys stored in the data,
  * and will do resolution to the default language file if needed.
  */
-public class LangResource implements Resource {
+public class LangResource implements VirtualResource {
 
     private static final Locale DEFAULT = Locale.US;
 

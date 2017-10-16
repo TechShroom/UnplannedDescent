@@ -22,17 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
-
-import java.io.IOException;
+package com.techshroom.unplanned.rp;
 
 /**
- * BaleOut frontend implementations.
+ * A resource synthesized from other resources.
  */
-public interface Frontend {
-
-    String getId();
-    
-    void run(String[] args) throws IOException;
+public interface VirtualResource {
 
 }

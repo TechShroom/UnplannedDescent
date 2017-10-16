@@ -33,46 +33,37 @@ import java.util.function.Function;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import com.techshroom.unplanned.baleout.MapValueConverter.ValueWrapper;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import joptsimple.ValueConverter;
 
 public class BaleOut {
 
-    private static final class FrontendConverter implements ValueConverter<Frontend> {
+    private static final FrontendConverter FRONTEND_CONV = new FrontendConverter();
+
+    private static final class FrontendConverter extends MapValueConverter<Frontend> {
 
         private static final Map<String, Frontend> FRONTENDS = Streams.stream(ServiceLoader.load(Frontend.class))
                 .collect(toImmutableMap(Frontend::getId, Function.identity()));
 
-        @Override
-        public Frontend convert(String value) {
-            return FRONTENDS.get(value);
-        }
-
-        @Override
-        public Class<? extends Frontend> valueType() {
-            return Frontend.class;
-        }
-
-        @Override
-        public String valuePattern() {
-            return String.join("|", FRONTENDS.keySet());
+        public FrontendConverter() {
+            super(FRONTENDS);
         }
 
     }
 
     private static final OptionParser PARSER = new OptionParser();
 
-    private static final ArgumentAcceptingOptionSpec<Frontend> FRONTEND =
+    private static final ArgumentAcceptingOptionSpec<ValueWrapper<Frontend>> FRONTEND =
             PARSER.accepts("frontend", "Frontend to use")
                     .withRequiredArg()
-                    .withValuesConvertedBy(new FrontendConverter())
-                    .defaultsTo(new ConsoleFrontend());
+                    .withValuesConvertedBy(FRONTEND_CONV)
+                    .defaultsTo(FRONTEND_CONV.convert("console"));
 
-    private static final OptionSpec<String> SUBPARSER_ARGS = PARSER.nonOptions();
+    private static final OptionSpec<String> SUBPARSER_ARGS = PARSER.nonOptions("Options for the front end, use '--frontend <x> -- -h' to access the help.");
 
     public static void main(String[] args) throws Exception {
         PARSER.allowsUnrecognizedOptions();
@@ -84,7 +75,7 @@ public class BaleOut {
 
         OptionSet opts = optsional.get();
 
-        opts.valueOf(FRONTEND).run(Iterables.toArray(opts.valuesOf(SUBPARSER_ARGS), String.class));
+        opts.valueOf(FRONTEND).getValue().run(Iterables.toArray(opts.valuesOf(SUBPARSER_ARGS), String.class));
     }
 
 }

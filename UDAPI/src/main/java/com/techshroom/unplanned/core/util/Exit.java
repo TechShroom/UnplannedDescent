@@ -22,17 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
-
-import java.io.IOException;
+package com.techshroom.unplanned.core.util;
 
 /**
- * BaleOut frontend implementations.
+ * Convenience class for communicating to the compiler that
+ * {@link System#exit(int)} halts execution.
+ * 
+ * <p>
+ * Sample usage:
+ * 
+ * <pre>
+ * throw Exit.with(1);
+ * </pre>
+ * </p>
  */
-public interface Frontend {
+public class Exit {
 
-    String getId();
-    
-    void run(String[] args) throws IOException;
+    public static RuntimeException with(int code) {
+        System.exit(code);
+        throw new AssertionError("Unreachable.");
+    }
+
+    private Exit() {
+    }
 
 }

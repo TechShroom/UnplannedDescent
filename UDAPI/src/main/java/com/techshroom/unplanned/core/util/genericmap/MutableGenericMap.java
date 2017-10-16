@@ -22,12 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.rp;
+package com.techshroom.unplanned.core.util.genericmap;
 
-/**
- * Represents a "loaded" resource. This may still be streamed from disk if it is
- * large enough, or it is specifically requested.
- */
-public interface Resource {
+import java.util.function.Function;
+
+public interface MutableGenericMap extends GenericMap {
+
+    <V> V put(GenericMapKey<V> key, V value);
+
+    default <V> V computeIfAbsent(GenericMapKey<V> key, Function<GenericMapKey<V>, V> func) {
+        if (!containsKey(key)) {
+            put(key, func.apply(key));
+        }
+        return get(key);
+    }
 
 }

@@ -22,17 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.baleout;
+package com.techshroom.unplanned.test;
 
-import java.io.IOException;
+import static org.junit.Assert.*;
 
-/**
- * BaleOut frontend implementations.
- */
-public interface Frontend {
+import org.junit.Test;
 
-    String getId();
+import com.techshroom.unplanned.core.util.MetricUnit;
+
+public class MetricUnitTest {
     
-    void run(String[] args) throws IOException;
+    @Test
+    public void testLoweringAccurracy() throws Exception {
+        assertEquals(0, MetricUnit.NONE.convert(1, MetricUnit.DECA));
+        assertEquals(1, MetricUnit.NONE.convert(10, MetricUnit.DECA));
+        assertEquals(1, MetricUnit.NONE.convert(100, MetricUnit.HECTO));
+    }
+    
+    @Test
+    public void testRaisingAccuracy() throws Exception {
+        assertEquals(10, MetricUnit.DECA.convert(1, MetricUnit.NONE));
+        assertEquals(100, MetricUnit.HECTO.convert(1, MetricUnit.NONE));
+        assertEquals(1000, MetricUnit.KILO.convert(1, MetricUnit.NONE));
+    }
+    
+    @Test
+    public void testNoConversion() throws Exception {
+        assertEquals(0, MetricUnit.NONE.convert(0, MetricUnit.NONE));
+        assertEquals(5, MetricUnit.NONE.convert(5, MetricUnit.NONE));
+        assertEquals(1000, MetricUnit.NONE.convert(1000, MetricUnit.NONE));
+    }
 
 }
