@@ -54,4 +54,6 @@ public interface CompEntAssoc {
 
     boolean hasComponent(int entityId, Component component);
 
+    boolean hasEntity(int entityId);
+
 }

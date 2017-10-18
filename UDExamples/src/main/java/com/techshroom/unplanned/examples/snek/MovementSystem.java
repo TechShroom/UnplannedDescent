@@ -70,6 +70,7 @@ public abstract class MovementSystem implements CSystem {
         if (prevRef == 0) {
             PrevGridPosition.INSTANCE.set(assoc, entityId, ourPrev);
         } else {
+            System.err.println("chaining pos to " + prevRef + " from " + entityId);
             setLocation(prevRef, assoc, ourPrev);
         }
     }

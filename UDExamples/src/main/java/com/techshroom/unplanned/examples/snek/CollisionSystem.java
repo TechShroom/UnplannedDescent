@@ -31,9 +31,9 @@ import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
 import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.Component;
-import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 
 /**
@@ -57,6 +57,10 @@ public abstract class CollisionSystem implements CSystem {
 
     @Override
     public void process(int entityId, CompEntAssoc assoc) {
+        // TODO do killing differently, using a system and integrating into CEA
+        if (!assoc.hasEntity(entityId)) {
+            return;
+        }
         if (!assoc.get(entityId, SnekBody.INSTANCE.getHead())) {
             return;
         }
@@ -66,10 +70,12 @@ public abstract class CollisionSystem implements CSystem {
             kill(entityId, assoc);
             return;
         }
-        if (hit(entityId, Edible.INSTANCE, assoc)) {
+        int hit;
+        if ((hit = hit(entityId, Edible.INSTANCE, assoc)) != 0) {
+            assoc.remove(hit);
             addBody(entityId, assoc);
         }
-        if (hit(entityId, SnekBody.INSTANCE, assoc)) {
+        if (hit(entityId, SnekBody.INSTANCE, assoc) != 0) {
             kill(entityId, assoc);
             return;
         }
@@ -94,15 +100,15 @@ public abstract class CollisionSystem implements CSystem {
         // assign position to tail previous
         GridPosition.INSTANCE.set(assoc, newBody, PrevGridPosition.INSTANCE.get(assoc, tail));
         ColorComponent.INSTANCE.set(assoc, newBody, Color.GREEN);
-        assoc.set(entityId, SnekBody.INSTANCE.getPrev(), newBody);
+        assoc.set(tail, SnekBody.INSTANCE.getPrev(), newBody);
     }
 
-    private boolean hit(int originator, Component comp, CompEntAssoc assoc) {
+    private int hit(int originator, Component comp, CompEntAssoc assoc) {
         Vector2i ourPos = GridPosition.INSTANCE.get(assoc, originator);
-        return assoc.getEntities(comp).anySatisfy(ent -> {
+        return assoc.getEntities(comp).detectIfNone(ent -> {
             Vector2i theirPos = GridPosition.INSTANCE.get(assoc, ent);
             return ent != originator && ourPos.equals(theirPos);
-        });
+        }, 0);
     }
 
     private boolean outOfBounds(Vector2i pos) {

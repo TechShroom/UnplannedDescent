@@ -132,6 +132,9 @@ public class Snek extends Example {
         food.processList(assoc);
         move.processList(assoc);
         coll.processList(assoc);
+        if (!assoc.hasEntity(head)) {
+            window.setCloseRequested(true);
+        }
     }
 
     @Subscribe

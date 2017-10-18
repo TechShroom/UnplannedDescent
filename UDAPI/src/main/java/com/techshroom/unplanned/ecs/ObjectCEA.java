@@ -141,4 +141,9 @@ public class ObjectCEA implements CompEntAssoc {
         return componentLists.get(component).contains(entityId);
     }
 
+    @Override
+    public boolean hasEntity(int entityId) {
+        return entities.containsKey(entityId);
+    }
+
 }

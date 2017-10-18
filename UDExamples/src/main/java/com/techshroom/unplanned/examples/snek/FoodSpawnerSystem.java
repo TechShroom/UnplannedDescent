@@ -63,7 +63,7 @@ public abstract class FoodSpawnerSystem implements CSystem {
             spawnFood(assoc);
         }
     }
-    
+
     private final Random RNGESUS = new Random();
 
     private void spawnFood(CompEntAssoc assoc) {
