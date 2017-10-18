@@ -32,14 +32,14 @@ import org.eclipse.collections.api.set.primitive.IntSet;
  */
 public interface CompEntAssoc {
 
-    void associate(int entityId, Component component);
+    int newEntity(Component component);
 
-    void associate(int entityId, Component... component);
+    int newEntity(Component... component);
 
-    void associate(int entityId, Iterable<Component> component);
+    int newEntity(Iterable<Component> component);
 
-    <T> void associate(int entityId, ComponentField<T> field, T value);
-    
+    <T> void set(int entityId, ComponentField<T> field, T value);
+
     <T> T get(int entityId, ComponentField<T> field);
 
     /**
@@ -48,9 +48,10 @@ public interface CompEntAssoc {
      * @param entityId
      *            - the entity to remove
      */
-    void disassociate(int entityId);
+    void remove(int entityId);
 
-    // valhalla when
     IntSet getEntities(Component component);
+
+    boolean hasComponent(int entityId, Component component);
 
 }

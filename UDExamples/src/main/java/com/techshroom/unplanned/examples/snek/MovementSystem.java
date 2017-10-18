@@ -26,36 +26,52 @@ package com.techshroom.unplanned.examples.snek;
 
 import java.util.Set;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CFType;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.CSystem;
 
 @AutoValue
-public abstract class SnekBody extends ComponentBase {
+public abstract class MovementSystem implements CSystem {
 
-    public static final SnekBody INSTANCE = new AutoValue_SnekBody();
-
-    SnekBody() {
+    public static MovementSystem create() {
+        return new AutoValue_MovementSystem();
     }
 
-    private final ComponentField<Boolean> head = ComponentField.createNoId(getId(), "head", CFType.BOOLEAN);
-    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
-
-    public ComponentField<Boolean> getHead() {
-        return head;
-    }
-
-    public ComponentField<Integer> getPrev() {
-        return prev;
+    MovementSystem() {
     }
 
     @Override
     @Memoized
-    public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(head, prev);
+    public Set<Component> getComponents() {
+        return ImmutableSet.of(GridPosition.INSTANCE, SnekBody.INSTANCE);
+    }
+
+    @Override
+    public void process(int entityId, CompEntAssoc assoc) {
+        if (assoc.get(entityId, SnekBody.INSTANCE.getHead())) {
+            Vector2i dirVec = Direction.INSTANCE.get(assoc, entityId).unit;
+            Vector2i currentLoc = GridPosition.INSTANCE.get(assoc, entityId);
+            Vector2i newLoc = dirVec.add(currentLoc);
+            
+            setLocation(entityId, assoc, newLoc);
+        }
+    }
+
+    private void setLocation(int entityId, CompEntAssoc assoc, Vector2i loc) {
+        Vector2i ourPrev = GridPosition.INSTANCE.get(assoc, entityId);
+        
+        GridPosition.INSTANCE.set(assoc, entityId, loc);
+        
+        int prevRef = assoc.get(entityId, SnekBody.INSTANCE.getPrev());
+        if (prevRef == 0) {
+            PrevGridPosition.INSTANCE.set(assoc, entityId, ourPrev);
+        } else {
+            setLocation(prevRef, assoc, ourPrev);
+        }
     }
 
 }

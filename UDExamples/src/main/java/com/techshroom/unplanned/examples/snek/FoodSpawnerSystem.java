@@ -24,38 +24,53 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
+import java.util.Random;
 import java.util.Set;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CFType;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.CSystem;
+import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 
 @AutoValue
-public abstract class SnekBody extends ComponentBase {
+public abstract class FoodSpawnerSystem implements CSystem {
 
-    public static final SnekBody INSTANCE = new AutoValue_SnekBody();
-
-    SnekBody() {
+    public static FoodSpawnerSystem create() {
+        return new AutoValue_FoodSpawnerSystem();
     }
 
-    private final ComponentField<Boolean> head = ComponentField.createNoId(getId(), "head", CFType.BOOLEAN);
-    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
-
-    public ComponentField<Boolean> getHead() {
-        return head;
-    }
-
-    public ComponentField<Integer> getPrev() {
-        return prev;
+    FoodSpawnerSystem() {
     }
 
     @Override
     @Memoized
-    public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(head, prev);
+    public Set<Component> getComponents() {
+        return ImmutableSet.of(Edible.INSTANCE);
     }
 
+    @Override
+    public void process(int entityId, CompEntAssoc assoc) {
+    }
+
+    @Override
+    public void processList(CompEntAssoc assoc) {
+        if (assoc.getEntities(Edible.INSTANCE).isEmpty()) {
+            spawnFood(assoc);
+        }
+    }
+    
+    private final Random RNGESUS = new Random();
+
+    private void spawnFood(CompEntAssoc assoc) {
+        int food = assoc.newEntity(Edible.INSTANCE, GridPosition.INSTANCE, ColorComponent.INSTANCE);
+        ColorComponent.INSTANCE.set(assoc, food, Color.BLUE);
+        int x = RNGESUS.nextInt(Snek.GRID_SIZE.getX());
+        int y = RNGESUS.nextInt(Snek.GRID_SIZE.getY());
+        GridPosition.INSTANCE.set(assoc, food, Vector2i.from(x, y));
+    }
 }

@@ -24,11 +24,45 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-public class Food extends GridObj {
+import java.util.Set;
+
+import com.flowpowered.math.vector.Vector2i;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.ImmutableSet;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.ComponentField;
+
+@AutoValue
+public abstract class PrevGridPosition extends ComplexComponent<Vector2i> {
+
+    public static final PrevGridPosition INSTANCE = new AutoValue_PrevGridPosition();
+
+    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
+    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
+
+    PrevGridPosition() {
+    }
 
     @Override
-    public String getId() {
-        return "food";
+    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
+        assoc.set(entityId, x, value.getX());
+        assoc.set(entityId, y, value.getY());
+    }
+
+    @Override
+    public Vector2i get(CompEntAssoc assoc, int entityId) {
+        int x = assoc.get(entityId, this.x);
+        int y = assoc.get(entityId, this.y);
+        return Vector2i.from(x, y);
+    }
+
+    @Override
+    @Memoized
+    public Set<ComponentField<?>> getFields() {
+        return ImmutableSet.of(x, y);
     }
 
 }

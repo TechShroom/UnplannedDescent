@@ -26,6 +26,8 @@ package com.techshroom.unplanned.ecs;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Random;
+
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.api.set.primitive.IntSet;
@@ -61,8 +63,16 @@ public class ObjectCEA implements CompEntAssoc {
         return val;
     }
 
-    private Entity addIfNeeded(int entityId) {
-        return entities.getIfAbsentPut(entityId, () -> new Entity(entityId));
+    private static final Random RANDOM = new Random();
+
+    private static int randomId() {
+        return Math.abs(Long.hashCode(java.lang.System.nanoTime()) ^ RANDOM.nextInt());
+    }
+
+    private Entity add() {
+        Entity e = new Entity(randomId());
+        entities.put(e.id, e);
+        return e;
     }
 
     private void associate(Entity e, Component c) {
@@ -73,29 +83,32 @@ public class ObjectCEA implements CompEntAssoc {
     }
 
     @Override
-    public void associate(int entityId, Component component) {
-        Entity e = addIfNeeded(entityId);
+    public int newEntity(Component component) {
+        Entity e = add();
         associate(e, component);
+        return e.id;
     }
 
     @Override
-    public void associate(int entityId, Component... component) {
-        Entity e = addIfNeeded(entityId);
+    public int newEntity(Component... component) {
+        Entity e = add();
         for (Component c : component) {
             associate(e, c);
         }
+        return e.id;
     }
 
     @Override
-    public void associate(int entityId, Iterable<Component> component) {
-        Entity e = addIfNeeded(entityId);
+    public int newEntity(Iterable<Component> component) {
+        Entity e = add();
         for (Component c : component) {
             associate(e, c);
         }
+        return e.id;
     }
 
     @Override
-    public <T> void associate(int entityId, ComponentField<T> field, T value) {
+    public <T> void set(int entityId, ComponentField<T> field, T value) {
         Entity e = entities.get(entityId);
         checkState(e != null, "entity %s is not associated yet!", entityId);
         checkState(e.fields.containsKey(field), "field %s is not associated with entity %s", field, entityId);
@@ -113,13 +126,19 @@ public class ObjectCEA implements CompEntAssoc {
     }
 
     @Override
-    public void disassociate(int entityId) {
+    public void remove(int entityId) {
         entities.removeKey(entityId);
+        componentLists.forEach(s -> s.remove(entityId));
     }
 
     @Override
     public IntSet getEntities(Component component) {
-        return componentLists.get(component).freeze();
+        return componentLists.getIfAbsent(component, IntSets.mutable::empty).freeze();
+    }
+
+    @Override
+    public boolean hasComponent(int entityId, Component component) {
+        return componentLists.get(component).contains(entityId);
     }
 
 }

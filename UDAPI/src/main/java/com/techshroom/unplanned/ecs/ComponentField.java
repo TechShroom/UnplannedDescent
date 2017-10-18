@@ -27,21 +27,22 @@ package com.techshroom.unplanned.ecs;
 import java.util.UUID;
 
 import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.core.util.UUID5;
 
 /**
  * Field information for a component.
  */
 @AutoValue
 public abstract class ComponentField<T> {
-    
-    public static <T> ComponentField<T> create(String name, CFType<T> type) {
-        return create(UUID.randomUUID(), name, type);
+
+    public static <T> ComponentField<T> createNoId(UUID owner, String name, CFType<T> type) {
+        return create(UUID5.create(owner, name), name, type);
     }
-    
+
     public static <T> ComponentField<T> create(UUID id, String name, CFType<T> type) {
         return new AutoValue_ComponentField<>(id, name, type);
     }
-    
+
     ComponentField() {
     }
 

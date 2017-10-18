@@ -22,29 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-public abstract class GridObj {
 
-    private int x;
-    private int y;
-
-    public abstract String getId();
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
+public abstract class ComplexComponent<T> extends ComponentBase {
+    
+    public abstract void set(CompEntAssoc assoc, int entityId, T value);
+    
+    public abstract T get(CompEntAssoc assoc, int entityId);
 
 }

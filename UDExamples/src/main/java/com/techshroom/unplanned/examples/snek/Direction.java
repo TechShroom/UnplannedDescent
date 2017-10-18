@@ -26,36 +26,55 @@ package com.techshroom.unplanned.examples.snek;
 
 import java.util.Set;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
 import com.techshroom.unplanned.ecs.CFType;
-import com.techshroom.unplanned.ecs.ComponentBase;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
 import com.techshroom.unplanned.ecs.ComponentField;
+import com.techshroom.unplanned.examples.snek.Direction.Dir;
 
 @AutoValue
-public abstract class SnekBody extends ComponentBase {
+public abstract class Direction extends ComplexComponent<Dir> {
 
-    public static final SnekBody INSTANCE = new AutoValue_SnekBody();
+    public enum Dir {
+        U(Vector2i.from(0, -1)),
+        D(Vector2i.from(0, 1)),
+        L(Vector2i.from(-1, 0)),
+        R(Vector2i.from(1, 0));
 
-    SnekBody() {
+        public final Vector2i unit;
+
+        Dir(Vector2i unit) {
+            this.unit = unit;
+        }
+
     }
 
-    private final ComponentField<Boolean> head = ComponentField.createNoId(getId(), "head", CFType.BOOLEAN);
-    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
+    public static final Direction INSTANCE = new AutoValue_Direction();
 
-    public ComponentField<Boolean> getHead() {
-        return head;
+    private final ComponentField<Byte> ordinal = ComponentField.createNoId(getId(), "ordinal", CFType.BYTE);
+
+    Direction() {
     }
 
-    public ComponentField<Integer> getPrev() {
-        return prev;
+    @Override
+    public void set(CompEntAssoc assoc, int entityId, Dir value) {
+        assoc.set(entityId, ordinal, (byte) value.ordinal());
+    }
+
+    @Override
+    public Dir get(CompEntAssoc assoc, int entityId) {
+        int ord = assoc.get(entityId, this.ordinal);
+        return Dir.values()[ord];
     }
 
     @Override
     @Memoized
     public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(head, prev);
+        return ImmutableSet.of(ordinal);
     }
 
 }

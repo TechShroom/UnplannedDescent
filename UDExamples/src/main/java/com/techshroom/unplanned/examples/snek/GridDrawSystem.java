@@ -26,36 +26,47 @@ package com.techshroom.unplanned.examples.snek;
 
 import java.util.Set;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CFType;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import com.techshroom.unplanned.blitter.pen.DigitalPen;
+import com.techshroom.unplanned.ecs.CSystem;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 
+/**
+ * Draws entities with the {@link GridPosition} and ColorComponent components.
+ */
 @AutoValue
-public abstract class SnekBody extends ComponentBase {
+public abstract class GridDrawSystem implements CSystem {
 
-    public static final SnekBody INSTANCE = new AutoValue_SnekBody();
-
-    SnekBody() {
+    public static GridDrawSystem create(DigitalPen digiPen) {
+        return new AutoValue_GridDrawSystem(digiPen);
     }
 
-    private final ComponentField<Boolean> head = ComponentField.createNoId(getId(), "head", CFType.BOOLEAN);
-    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
-
-    public ComponentField<Boolean> getHead() {
-        return head;
+    GridDrawSystem() {
     }
 
-    public ComponentField<Integer> getPrev() {
-        return prev;
-    }
+    public abstract DigitalPen digiPen();
 
     @Override
     @Memoized
-    public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(head, prev);
+    public Set<Component> getComponents() {
+        return ImmutableSet.of(GridPosition.INSTANCE, ColorComponent.INSTANCE);
+    }
+
+    @Override
+    public void process(int entityId, CompEntAssoc assoc) {
+        Vector2i stepVec = Snek.CELL_DIM.add(Snek.BORDER_DIM.mul(2));
+        Vector2i size = Snek.CELL_DIM;
+        Vector2i pos = GridPosition.INSTANCE.get(assoc, entityId);
+        Vector2i rectPos = pos.mul(stepVec).add(Snek.BORDER_DIM);
+        digiPen().fill(() -> {
+            digiPen().setColor(ColorComponent.INSTANCE.get(assoc, entityId));
+            digiPen().rect(rectPos.getX(), rectPos.getY(), size.getX(), size.getY());
+        });
     }
 
 }

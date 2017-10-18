@@ -24,37 +24,35 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.core.util.Sync;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ObjectCEA;
+import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.examples.Example;
+import com.techshroom.unplanned.examples.snek.Direction.Dir;
 import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.window.Window;
 
 @AutoService(Example.class)
 public class Snek extends Example {
 
-    private static final Vector2i GRID_SIZE = Vector2i.from(20);
+    public static final Vector2i GRID_SIZE = Vector2i.from(20);
     // sizeof cell, no border
-    private static final Vector2i CELL_DIM = Vector2i.from(16, 16);
-    private static final Vector2i BORDER_DIM = Vector2i.from(1);
-    private static final Vector2i GRID_DIM = GRID_SIZE.mul(CELL_DIM.add(BORDER_DIM.mul(2)));
+    public static final Vector2i CELL_DIM = Vector2i.from(16, 16);
+    public static final Vector2i BORDER_DIM = Vector2i.from(1);
+    public static final Vector2i GRID_DIM = GRID_SIZE.mul(CELL_DIM.add(BORDER_DIM.mul(2)));
 
-    private final List<GridObj> objects = new ArrayList<>();
+    private final CompEntAssoc assoc = new ObjectCEA();
     private Vector2d scale = Vector2d.ONE;
     private Window window;
 
@@ -72,6 +70,9 @@ public class Snek extends Example {
 
         DigitalPen pen = ctx.getPen();
         Sync sync = new Sync();
+        GridDrawSystem gridDrawSys = GridDrawSystem.create(pen);
+
+        addHead();
 
         while (!window.isCloseRequested()) {
             // sync to 3fps, SNEK SPEED
@@ -84,7 +85,9 @@ public class Snek extends Example {
             pen.scale(scale);
 
             pen.draw(this::drawGrid);
-            pen.draw(this::drawGridContent);
+            pen.draw(() -> {
+                gridDrawSys.processList(assoc);
+            });
 
             playSnek();
 
@@ -97,10 +100,6 @@ public class Snek extends Example {
     }
 
     private static final Color COLOR_BORDER = Color.LIGHT_GRAY;
-    private static final Map<String, Color> COLOR_MAP = ImmutableMap.of(
-            "snek_head", Color.GREEN,
-            "snek_body", Color.BLUE,
-            "food", Color.RED);
 
     private void drawGrid(DigitalPen pen) {
         Vector2i stepVec = CELL_DIM.add(BORDER_DIM.mul(2));
@@ -116,93 +115,23 @@ public class Snek extends Example {
         }
     }
 
-    private void drawGridContent(DigitalPen pen) {
-        Vector2i stepVec = CELL_DIM.add(BORDER_DIM.mul(2));
-        Vector2i size = CELL_DIM;
-        for (GridObj obj : objects) {
-            int x = obj.getX() * stepVec.getX() + BORDER_DIM.getX();
-            int y = obj.getY() * stepVec.getY() + BORDER_DIM.getY();
-            pen.fill(() -> {
-                pen.setColor(COLOR_MAP.getOrDefault(obj.getId(), Color.WHITE));
-                pen.rect(x, y, size.getX(), size.getY());
-            });
-        }
+    private int head;
+
+    private void addHead() {
+        head = assoc.newEntity(Direction.INSTANCE, GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBody.INSTANCE, ColorComponent.INSTANCE);
+        GridPosition.INSTANCE.set(assoc, head, GRID_SIZE.div(2));
+        assoc.set(head, SnekBody.INSTANCE.getHead(), true);
+        ColorComponent.INSTANCE.set(assoc, head, Color.RED);
     }
 
-    private enum Dir {
-        U(Vector2i.from(0, -1)),
-        D(Vector2i.from(0, 1)),
-        L(Vector2i.from(-1, 0)),
-        R(Vector2i.from(1, 0));
-
-        public final Vector2i unit;
-
-        Dir(Vector2i unit) {
-            this.unit = unit;
-        }
-
-    }
-
-    private final Random RNGESUS = new Random();
-    private Dir dir = Dir.R;
-    private SnekHead head = new SnekHead();
-    {
-        head.setX(GRID_SIZE.getX() / 2);
-        head.setY(GRID_SIZE.getY() / 2);
-        objects.add(head);
-    }
-    private Food activeFood;
+    private final CollisionSystem coll = CollisionSystem.create();
+    private final FoodSpawnerSystem food = FoodSpawnerSystem.create();
+    private final MovementSystem move = MovementSystem.create();
 
     private void playSnek() {
-        if (head == null) {
-            return;
-        }
-        if (activeFood == null) {
-            spawnFood();
-        }
-        head.move(dir.unit);
-        if (outOfBounds() || hit(SnekBody.class)) {
-            objects.remove(head);
-            head = null;
-            return;
-        }
-        if (hit(Food.class)) {
-            objects.remove(activeFood);
-            activeFood = null;
-            SnekBody prev = head;
-            while (prev.getPrev() != null) {
-                prev = prev.getPrev();
-            }
-            SnekBody body = new SnekBody();
-            prev.setPrev(body);
-            objects.add(body);
-        }
-    }
-
-    private boolean outOfBounds() {
-        int x = head.getX();
-        int y = head.getY();
-        boolean insideX = 0 <= x && x < GRID_SIZE.getX();
-        boolean insideY = 0 <= y && y < GRID_SIZE.getY();
-        return !insideX || !insideY;
-    }
-
-    private boolean hit(Class<?> clazz) {
-        for (GridObj obj : objects) {
-            if (clazz.isInstance(obj) && obj != head) {
-                if (obj.getX() == head.getX() && obj.getY() == head.getY()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void spawnFood() {
-        activeFood = new Food();
-        activeFood.setX(RNGESUS.nextInt(GRID_SIZE.getX()));
-        activeFood.setY(RNGESUS.nextInt(GRID_SIZE.getY()));
-        objects.add(activeFood);
+        food.processList(assoc);
+        move.processList(assoc);
+        coll.processList(assoc);
     }
 
     @Subscribe
@@ -211,6 +140,7 @@ public class Snek extends Example {
             window.setCloseRequested(true);
         }
         if (event.getState() == KeyState.RELEASED) {
+            Dir dir;
             switch (event.getKey()) {
                 case A:
                 case LEFT:
@@ -229,8 +159,9 @@ public class Snek extends Example {
                     dir = Dir.D;
                     break;
                 default:
-                    break;
+                    return;
             }
+            Direction.INSTANCE.set(assoc, head, dir);
         }
     }
 

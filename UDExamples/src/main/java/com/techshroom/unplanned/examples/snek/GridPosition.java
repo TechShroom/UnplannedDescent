@@ -24,22 +24,45 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
+import java.util.Set;
+
 import com.flowpowered.math.vector.Vector2i;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.ImmutableSet;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-public class SnekGrid {
+@AutoValue
+public abstract class GridPosition extends ComplexComponent<Vector2i> {
 
-    private final GridObj[][] grid;
+    public static final GridPosition INSTANCE = new AutoValue_GridPosition();
 
-    public SnekGrid(Vector2i size) {
-        this.grid = new GridObj[size.getX()][size.getY()];
+    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
+    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
+
+    GridPosition() {
     }
 
-    public GridObj get(int x, int y) {
-        return grid[x][y];
+    @Override
+    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
+        assoc.set(entityId, x, value.getX());
+        assoc.set(entityId, y, value.getY());
     }
 
-    public void set(int x, int y, GridObj obj) {
-        grid[x][y] = obj;
+    @Override
+    public Vector2i get(CompEntAssoc assoc, int entityId) {
+        int x = assoc.get(entityId, this.x);
+        int y = assoc.get(entityId, this.y);
+        return Vector2i.from(x, y);
+    }
+
+    @Override
+    @Memoized
+    public Set<ComponentField<?>> getFields() {
+        return ImmutableSet.of(x, y);
     }
 
 }

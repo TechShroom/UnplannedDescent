@@ -29,33 +29,21 @@ import java.util.Set;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CFType;
 import com.techshroom.unplanned.ecs.ComponentBase;
 import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
-public abstract class SnekBody extends ComponentBase {
+public abstract class Edible extends ComponentBase {
 
-    public static final SnekBody INSTANCE = new AutoValue_SnekBody();
+    public static final Edible INSTANCE = new AutoValue_Edible();
 
-    SnekBody() {
-    }
-
-    private final ComponentField<Boolean> head = ComponentField.createNoId(getId(), "head", CFType.BOOLEAN);
-    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
-
-    public ComponentField<Boolean> getHead() {
-        return head;
-    }
-
-    public ComponentField<Integer> getPrev() {
-        return prev;
+    Edible() {
     }
 
     @Override
     @Memoized
     public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(head, prev);
+        return ImmutableSet.of();
     }
 
 }

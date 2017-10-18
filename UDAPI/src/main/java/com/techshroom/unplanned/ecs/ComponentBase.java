@@ -22,13 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-public class SnekHead extends SnekBody {
+import java.util.UUID;
+
+import com.techshroom.unplanned.core.util.UUID5;
+
+public abstract class ComponentBase implements Component {
+
+    /**
+     * Namespace used for UUID generation, to preserve them across reloads.
+     */
+    public static final UUID NAMESPACE = UUID.fromString("aaf1d6a1-7972-420c-b82c-43f0af1dfa82");
+
+    private final UUID id = UUID5.create(NAMESPACE, getClass().getName());
 
     @Override
-    public String getId() {
-        return "snek_head";
+    public UUID getId() {
+        return id;
     }
 
 }
