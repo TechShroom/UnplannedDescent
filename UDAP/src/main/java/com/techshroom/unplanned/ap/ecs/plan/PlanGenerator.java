@@ -67,6 +67,13 @@ public class PlanGenerator {
             spec.superclass(extension);
         }
 
+        // starter method
+        spec.addMethod(MethodSpec.methodBuilder("start")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(className)
+                .addStatement("return new $T()", className)
+                .build());
+
         // fields
         spec.addFields(generateFields());
 

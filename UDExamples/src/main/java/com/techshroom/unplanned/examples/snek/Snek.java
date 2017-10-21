@@ -37,9 +37,7 @@ import com.techshroom.unplanned.core.util.Sync;
 import com.techshroom.unplanned.core.util.time.Timer;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.ObjectCEAFactory;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 import com.techshroom.unplanned.ecs.defaults.RemovalSystem;
-import com.techshroom.unplanned.ecs.defaults.Removed;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
@@ -134,11 +132,10 @@ public class Snek extends Example {
     private int head;
 
     private void addHead() {
-        head = assoc.newEntity(Direction.INSTANCE, GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBody.INSTANCE, ColorComponent.INSTANCE,
-                Removed.INSTANCE);
-        GridPosition.INSTANCE.set(assoc, head, GRID_SIZE.div(2));
-        assoc.set(head, SnekBody.INSTANCE.getHead(), true);
-        ColorComponent.INSTANCE.set(assoc, head, Color.RED);
+        head = SnekHeadPlan.start()
+                .gridPosition(GRID_SIZE.div(2))
+                .color(Color.RED)
+                .build(assoc);
     }
 
     @Subscribe

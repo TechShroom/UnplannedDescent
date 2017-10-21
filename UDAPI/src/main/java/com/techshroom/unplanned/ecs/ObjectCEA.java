@@ -24,6 +24,7 @@
  */
 package com.techshroom.unplanned.ecs;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Random;
@@ -119,6 +120,7 @@ public class ObjectCEA implements CompEntAssoc {
 
     @Override
     public <T> void set(int entityId, ComponentField<T> field, T value) {
+        checkArgument(value != null, "values may not be null");
         Entity e = entities.get(entityId);
         checkState(e != null, "entity %s is not associated yet!", entityId);
         checkState(e.fields.containsKey(field), "field %s is not associated with entity %s", field, entityId);
@@ -158,6 +160,7 @@ public class ObjectCEA implements CompEntAssoc {
 
     @Override
     public void tick(long nano) {
+        systems.forEach(sys -> sys.processList(this));
     }
 
 }

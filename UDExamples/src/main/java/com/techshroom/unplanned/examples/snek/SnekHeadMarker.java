@@ -24,52 +24,26 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import java.util.Set;
+import java.util.Map;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CSystem;
-import com.techshroom.unplanned.ecs.CompEntAssoc;
-import com.techshroom.unplanned.ecs.Component;
+import com.google.common.collect.ImmutableMap;
+import com.techshroom.unplanned.ecs.ComponentBase;
+import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
-public abstract class MovementSystem implements CSystem {
+public abstract class SnekHeadMarker extends ComponentBase {
 
-    public static MovementSystem create() {
-        return new AutoValue_MovementSystem();
-    }
+    public static final SnekHeadMarker INSTANCE = new AutoValue_SnekHeadMarker();
 
-    MovementSystem() {
+    SnekHeadMarker() {
     }
 
     @Override
     @Memoized
-    public Set<Component> getComponents() {
-        return ImmutableSet.of(Direction.INSTANCE, GridPosition.INSTANCE, SnekHeadMarker.INSTANCE);
-    }
-
-    @Override
-    public void process(int entityId, CompEntAssoc assoc) {
-        Vector2i dirVec = Direction.INSTANCE.get(assoc, entityId).unit;
-        Vector2i currentLoc = GridPosition.INSTANCE.get(assoc, entityId);
-        Vector2i newLoc = dirVec.add(currentLoc);
-
-        setLocation(entityId, assoc, newLoc);
-    }
-
-    private void setLocation(int entityId, CompEntAssoc assoc, Vector2i loc) {
-        Vector2i ourPrev = GridPosition.INSTANCE.get(assoc, entityId);
-
-        GridPosition.INSTANCE.set(assoc, entityId, loc);
-
-        int prevRef = assoc.get(entityId, SnekBodyParts.INSTANCE.getPrev());
-        if (prevRef == 0) {
-            PrevGridPosition.INSTANCE.set(assoc, entityId, ourPrev);
-        } else {
-            setLocation(prevRef, assoc, ourPrev);
-        }
+    public Map<String, ComponentField<?>> getFields() {
+        return ImmutableMap.of();
     }
 
 }

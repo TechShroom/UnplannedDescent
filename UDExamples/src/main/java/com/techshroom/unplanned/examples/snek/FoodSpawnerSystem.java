@@ -27,15 +27,13 @@ package com.techshroom.unplanned.examples.snek;
 import java.util.Random;
 import java.util.Set;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
 import com.techshroom.unplanned.core.util.Color;
+import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.Component;
-import com.techshroom.unplanned.ecs.CSystem;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 
 @AutoValue
 public abstract class FoodSpawnerSystem implements CSystem {
@@ -67,10 +65,10 @@ public abstract class FoodSpawnerSystem implements CSystem {
     private final Random RNGESUS = new Random();
 
     private void spawnFood(CompEntAssoc assoc) {
-        int food = assoc.newEntity(Edible.INSTANCE, GridPosition.INSTANCE, ColorComponent.INSTANCE);
-        ColorComponent.INSTANCE.set(assoc, food, Color.BLUE);
-        int x = RNGESUS.nextInt(Snek.GRID_SIZE.getX());
-        int y = RNGESUS.nextInt(Snek.GRID_SIZE.getY());
-        GridPosition.INSTANCE.set(assoc, food, Vector2i.from(x, y));
+        FoodPlan.start()
+                .color(Color.BLUE)
+                .gridPositionX(RNGESUS.nextInt(Snek.GRID_SIZE.getX()))
+                .gridPositionY(RNGESUS.nextInt(Snek.GRID_SIZE.getY()))
+                .build(assoc);
     }
 }

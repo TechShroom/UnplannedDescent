@@ -81,6 +81,7 @@ public final class PCMSimple implements PlanCodeManager {
             String nameOfField = compField.getSimpleName().toString();
             String name = setterName(component.getName(), nameOfField);
             return config.apply(MethodSpec.methodBuilder(name)
+                    .addModifiers(Modifier.PUBLIC)
                     .addParameter(TypeName.get(declType.getTypeArguments().get(0)), nameOfField)
                     .addStatement("this.$L = $L", fieldName(component.getName(), nameOfField), nameOfField)).build();
         }).collect(toImmutableList());
@@ -90,14 +91,17 @@ public final class PCMSimple implements PlanCodeManager {
     public CodeBlock generateAssignment(String entityArg, String assocArg, TypeName source, PlanComponent component) {
         CodeBlock.Builder cb = CodeBlock.builder();
         component.getFields().forEach(compField -> {
+            String fieldName = fieldName(component.getName(), compField.getSimpleName().toString());
+            cb.beginControlFlow("if ($L != null)", fieldName);
             cb.addNamed("$assoc:L.set($entity:L, $source:T.$comp:L().getField($name:S), this.$value:L);\n", new ImmutableMap.Builder<String, Object>()
                     .put("assoc", assocArg)
                     .put("entity", entityArg)
                     .put("source", source)
                     .put("comp", component.getName())
                     .put("name", compField.getSimpleName().toString())
-                    .put("value", fieldName(component.getName(), compField.getSimpleName().toString()))
+                    .put("value", fieldName)
                     .build());
+            cb.endControlFlow();
         });
         return cb.build();
     }

@@ -25,30 +25,16 @@
 package com.techshroom.unplanned.examples.snek;
 
 import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
 
 @EntityPlan
-class SnekBody {
+class SnekHead extends SnekBody {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+    public static Direction direction() {
+        return Direction.INSTANCE;
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    public static SnekHeadMarker snekHead() {
+        return SnekHeadMarker.INSTANCE;
     }
 
 }

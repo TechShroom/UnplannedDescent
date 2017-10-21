@@ -29,26 +29,22 @@ import com.techshroom.unplanned.ecs.defaults.ColorComponent;
 import com.techshroom.unplanned.ecs.defaults.Removed;
 
 @EntityPlan
-class SnekBody {
+class Food {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+    public static Edible edible() {
+        return Edible.INSTANCE;
+    }
+
+    public static Removed removed() {
+        return Removed.INSTANCE;
     }
 
     public static GridPosition gridPosition() {
         return GridPosition.INSTANCE;
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    public static ColorComponent color() {
+        return ColorComponent.INSTANCE;
     }
 
 }

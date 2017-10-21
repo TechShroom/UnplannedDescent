@@ -34,7 +34,7 @@ import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.Component;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
+import com.techshroom.unplanned.ecs.defaults.Removed;
 
 /**
  * Handles collisions with body and {@link Edible}.
@@ -52,18 +52,11 @@ public abstract class CollisionSystem implements CSystem {
     @Override
     @Memoized
     public Set<Component> getComponents() {
-        return ImmutableSet.of(GridPosition.INSTANCE, SnekBody.INSTANCE);
+        return ImmutableSet.of(GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBodyParts.INSTANCE, SnekHeadMarker.INSTANCE);
     }
 
     @Override
     public void process(int entityId, CompEntAssoc assoc) {
-        // TODO do killing differently, using a system and integrating into CEA
-        if (!assoc.hasEntity(entityId)) {
-            return;
-        }
-        if (!assoc.get(entityId, SnekBody.INSTANCE.getHead())) {
-            return;
-        }
         // we only process collisions using the head
         Vector2i pos = GridPosition.INSTANCE.get(assoc, entityId);
         if (outOfBounds(pos)) {
@@ -72,10 +65,10 @@ public abstract class CollisionSystem implements CSystem {
         }
         int hit;
         if ((hit = hit(entityId, Edible.INSTANCE, assoc)) != 0) {
-            assoc.remove(hit);
+            Removed.INSTANCE.set(assoc, hit, true);
             addBody(entityId, assoc);
         }
-        if (hit(entityId, SnekBody.INSTANCE, assoc) != 0) {
+        if (hit(entityId, SnekBodyParts.INSTANCE, assoc) != 0) {
             kill(entityId, assoc);
             return;
         }
@@ -85,22 +78,22 @@ public abstract class CollisionSystem implements CSystem {
         int prev = entityId;
         while (prev != 0) {
             int k = prev;
-            prev = assoc.get(k, SnekBody.INSTANCE.getPrev());
-            assoc.remove(k);
+            prev = assoc.get(k, SnekBodyParts.INSTANCE.getPrev());
+            Removed.INSTANCE.set(assoc, k, true);
         }
     }
 
     private void addBody(int entityId, CompEntAssoc assoc) {
         int tail = entityId;
         int prev;
-        while ((prev = assoc.get(tail, SnekBody.INSTANCE.getPrev())) != 0) {
+        while ((prev = assoc.get(tail, SnekBodyParts.INSTANCE.getPrev())) != 0) {
             tail = prev;
         }
-        int newBody = assoc.newEntity(GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBody.INSTANCE, ColorComponent.INSTANCE);
-        // assign position to tail previous
-        GridPosition.INSTANCE.set(assoc, newBody, PrevGridPosition.INSTANCE.get(assoc, tail));
-        ColorComponent.INSTANCE.set(assoc, newBody, Color.GREEN);
-        assoc.set(tail, SnekBody.INSTANCE.getPrev(), newBody);
+        int newBody = SnekBodyPlan.start()
+                .color(Color.GREEN)
+                .gridPosition(PrevGridPosition.INSTANCE.get(assoc, tail))
+                .build(assoc);
+        assoc.set(tail, SnekBodyParts.INSTANCE.getPrev(), newBody);
     }
 
     private int hit(int originator, Component comp, CompEntAssoc assoc) {

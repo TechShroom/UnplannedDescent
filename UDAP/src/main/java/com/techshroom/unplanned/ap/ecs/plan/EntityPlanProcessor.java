@@ -33,10 +33,12 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -45,10 +47,12 @@ import javax.tools.Diagnostic.Kind;
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.common.MoreElements;
 import com.google.auto.common.MoreTypes;
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
@@ -57,10 +61,12 @@ import com.techshroom.unplanned.ap.MissingTypeException;
 import com.techshroom.unplanned.ecs.Component;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
+@AutoService(Processor.class)
 public class EntityPlanProcessor extends BasicAnnotationProcessor {
 
     private static final class GenerationStep implements ProcessingStep {
 
+        private static final Set<Modifier> PUBLIC_STATIC = Sets.immutableEnumSet(Modifier.PUBLIC, Modifier.STATIC);
         private final ProcessingEnvironment env;
 
         public GenerationStep(ProcessingEnvironment env) {
@@ -110,7 +116,7 @@ public class EntityPlanProcessor extends BasicAnnotationProcessor {
             while (true) {
                 TypeElement top = Iterables.getLast(candidates);
                 TypeMirror sup = top.getSuperclass();
-                if (sup.getKind() == TypeKind.NONE) {
+                if (TypeName.get(sup).equals(TypeName.OBJECT)) {
                     break;
                 }
                 candidates.add(MoreTypes.asTypeElement(sup));
@@ -120,8 +126,15 @@ public class EntityPlanProcessor extends BasicAnnotationProcessor {
                         .filter(e -> e.getKind() == ElementKind.METHOD)
                         .map(e -> MoreElements.asExecutable(e))
                         .filter(method -> {
+                            return method.getModifiers().containsAll(PUBLIC_STATIC);
+                        })
+                        .filter(method -> {
+                            TypeMirror retType = method.getReturnType();
+                            if (retType.getKind() == TypeKind.NONE) {
+                                return false;
+                            }
                             return env.getTypeUtils().isAssignable(
-                                    env.getTypeUtils().erasure(method.getReturnType()),
+                                    env.getTypeUtils().erasure(retType),
                                     componentType);
                         })
                         .map(method -> PlanComponent.from(env, method.getReturnType(), method.getSimpleName().toString()));

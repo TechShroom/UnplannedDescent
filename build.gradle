@@ -181,7 +181,8 @@ project(':implementation') {
 project(':examples') {
     dependencies {
         compile project(':api')
-        addAPTReqWComp project(':ap')
+        apt project(':ap')
+        compileOnly project(':ap')
         runtime project(':implementation')
     }
     apply plugin: 'com.github.johnrengelman.shadow'

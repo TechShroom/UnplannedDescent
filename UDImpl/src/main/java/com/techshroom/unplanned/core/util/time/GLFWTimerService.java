@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.auto.service.AutoService;
 
 @AutoService(TimerService.class)
-class GLFWTimerService implements TimerService {
+public class GLFWTimerService implements TimerService {
 
     private static final class GLFWTimer implements Timer {
 

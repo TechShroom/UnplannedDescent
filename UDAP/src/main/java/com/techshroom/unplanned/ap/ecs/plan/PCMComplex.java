@@ -154,12 +154,13 @@ public final class PCMComplex implements PlanCodeManager {
 
     private MethodSpec complexSetter(UnaryOperator<MethodSpec.Builder> config, PlanComponent component) {
         String backingFieldName = fieldName(component.getName(), "complex");
+        String paramName = component.getName();
         return config.apply(MethodSpec.methodBuilder(component.getName())
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(extractCCGeneric(component.getComponent()), backingFieldName)
+                .addParameter(extractCCGeneric(component.getComponent()), paramName)
                 .addCode(CodeBlock.builder()
                         .addStatement("this.$L = true", useComplexFieldName(component.getName()))
-                        .addStatement("this.$1L = $1L", backingFieldName)
+                        .addStatement("this.$L = $L", backingFieldName, paramName)
                         .build()))
                 .build();
     }
