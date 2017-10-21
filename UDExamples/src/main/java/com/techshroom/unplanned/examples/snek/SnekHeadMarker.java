@@ -24,31 +24,26 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Map;
 
-@EntityPlan
-class SnekBody {
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.ImmutableMap;
+import com.techshroom.unplanned.ecs.ComponentBase;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+@AutoValue
+public abstract class SnekHeadMarker extends ComponentBase {
+
+    public static final SnekHeadMarker INSTANCE = new AutoValue_SnekHeadMarker();
+
+    SnekHeadMarker() {
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return ImmutableMap.of();
     }
 
 }

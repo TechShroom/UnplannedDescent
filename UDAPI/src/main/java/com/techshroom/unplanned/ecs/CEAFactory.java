@@ -22,33 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Arrays;
 
-@EntityPlan
-class SnekBody {
+public interface CEAFactory {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+    default CompEntAssoc build(CSystem... systems) {
+        return build(Arrays.asList(systems));
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    CompEntAssoc build(Iterable<CSystem> systems);
 
 }

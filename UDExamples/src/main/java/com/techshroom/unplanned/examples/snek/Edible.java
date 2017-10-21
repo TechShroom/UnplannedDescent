@@ -24,22 +24,26 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import com.flowpowered.math.vector.Vector2i;
+import java.util.Map;
 
-public class SnekGrid {
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.ImmutableMap;
+import com.techshroom.unplanned.ecs.ComponentBase;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    private final GridObj[][] grid;
+@AutoValue
+public abstract class Edible extends ComponentBase {
 
-    public SnekGrid(Vector2i size) {
-        this.grid = new GridObj[size.getX()][size.getY()];
+    public static final Edible INSTANCE = new AutoValue_Edible();
+
+    Edible() {
     }
 
-    public GridObj get(int x, int y) {
-        return grid[x][y];
-    }
-
-    public void set(int x, int y, GridObj obj) {
-        grid[x][y] = obj;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return ImmutableMap.of();
     }
 
 }

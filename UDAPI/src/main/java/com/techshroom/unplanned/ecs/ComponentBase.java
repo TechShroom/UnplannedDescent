@@ -22,33 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.UUID;
 
-@EntityPlan
-class SnekBody {
+import com.techshroom.unplanned.core.util.UUID5;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
-    }
+public abstract class ComponentBase implements Component {
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    /**
+     * Namespace used for UUID generation, to preserve them across reloads.
+     */
+    public static final UUID NAMESPACE = UUID.fromString("aaf1d6a1-7972-420c-b82c-43f0af1dfa82");
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
+    private final UUID id = UUID5.create(NAMESPACE, getClass().getName());
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    public UUID getId() {
+        return id;
     }
 
 }

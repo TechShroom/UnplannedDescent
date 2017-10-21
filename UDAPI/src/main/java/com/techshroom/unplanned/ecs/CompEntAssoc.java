@@ -22,33 +22,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import org.eclipse.collections.api.set.primitive.IntSet;
 
-@EntityPlan
-class SnekBody {
+/**
+ * Component - Entity associations: Associations between entity IDs and the
+ * components attached to them.
+ */
+public interface CompEntAssoc {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
-    }
+    int newEntity(Component component);
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    int newEntity(Component... component);
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
+    int newEntity(Iterable<Component> component);
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
+    <T> void set(int entityId, ComponentField<T> field, T value);
 
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    <T> T get(int entityId, ComponentField<T> field);
+
+    /**
+     * Removes an entity from this association table.
+     * 
+     * @param entityId
+     *            - the entity to remove
+     */
+    void remove(int entityId);
+
+    IntSet getEntities(Component component);
+
+    IntSet getEntities(Iterable<Component> components);
+
+    boolean hasComponent(int entityId, Component component);
+
+    boolean hasEntity(int entityId);
+
+    /**
+     * Ticks all systems.
+     * 
+     * @param nano
+     *            - nanoseconds since last tick
+     */
+    void tick(long nano);
 
 }

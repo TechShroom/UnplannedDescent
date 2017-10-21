@@ -22,33 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs.defaults;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Set;
 
-@EntityPlan
-class SnekBody {
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.ImmutableSet;
+import com.techshroom.unplanned.ecs.CSystem;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.Component;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+/**
+ * Removes components marked with {@link Removed}.
+ */
+@AutoValue
+public abstract class RemovalSystem implements CSystem {
+
+    public static RemovalSystem create() {
+        return new AutoValue_RemovalSystem();
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    RemovalSystem() {
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
+    @Override
+    @Memoized
+    public Set<Component> getComponents() {
+        return ImmutableSet.of(Removed.INSTANCE);
     }
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    public void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
+        if (Removed.INSTANCE.get(assoc, entityId)) {
+            assoc.remove(entityId);
+        }
     }
 
 }

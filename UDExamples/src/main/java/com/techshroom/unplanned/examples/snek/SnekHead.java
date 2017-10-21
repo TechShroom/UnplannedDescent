@@ -24,11 +24,17 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-public class SnekHead extends SnekBody {
+import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
 
-    @Override
-    public String getId() {
-        return "snek_head";
+@EntityPlan
+class SnekHead extends SnekBody {
+
+    public static Direction direction() {
+        return Direction.INSTANCE;
+    }
+
+    public static SnekHeadMarker snekHead() {
+        return SnekHeadMarker.INSTANCE;
     }
 
 }

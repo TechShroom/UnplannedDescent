@@ -22,33 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs.defaults;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Map;
 
-@EntityPlan
-class SnekBody {
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+@AutoValue
+public abstract class Removed extends ComplexComponent<Boolean> {
+
+    public static final Removed INSTANCE = new AutoValue_Removed();
+
+    private final ComponentField<Boolean> removed = ComponentField.createNoId(getId(), "removed", CFType.BOOLEAN);
+
+    Removed() {
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    @Override
+    public void set(CompEntAssoc assoc, int entityId, Boolean removed) {
+        assoc.set(entityId, this.removed, removed);
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
+    @Override
+    public Boolean get(CompEntAssoc assoc, int entityId) {
+        return assoc.get(entityId, this.removed);
     }
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(removed);
     }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
-
 }

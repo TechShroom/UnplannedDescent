@@ -24,27 +24,45 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-public abstract class GridObj {
+import java.util.Map;
 
-    private int x;
-    private int y;
+import com.flowpowered.math.vector.Vector2i;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    public abstract String getId();
+@AutoValue
+public abstract class GridPosition extends ComplexComponent<Vector2i> {
 
-    public int getX() {
-        return x;
+    public static final GridPosition INSTANCE = new AutoValue_GridPosition();
+
+    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
+    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
+
+    GridPosition() {
     }
 
-    public void setX(int x) {
-        this.x = x;
+    @Override
+    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
+        assoc.set(entityId, x, value.getX());
+        assoc.set(entityId, y, value.getY());
     }
 
-    public int getY() {
-        return y;
+    @Override
+    public Vector2i get(CompEntAssoc assoc, int entityId) {
+        int x = assoc.get(entityId, this.x);
+        int y = assoc.get(entityId, this.y);
+        return Vector2i.from(x, y);
     }
 
-    public void setY(int y) {
-        this.y = y;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(x, y);
     }
 
 }

@@ -22,33 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Set;
 
-@EntityPlan
-class SnekBody {
+/**
+ * Manages interactions between components.
+ */
+public interface CSystem {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
-    }
+    Set<Component> getComponents();
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    void process(int entityId, CompEntAssoc assoc, long nanoDiff);
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    default void processList(CompEntAssoc assoc, long nanoDiff) {
+        assoc.getEntities(getComponents()).forEach(e -> process(e, assoc, nanoDiff));
     }
 
 }

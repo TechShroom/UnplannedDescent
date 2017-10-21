@@ -24,31 +24,45 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Map;
 
-@EntityPlan
-class SnekBody {
+import com.flowpowered.math.vector.Vector2i;
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
+import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+@AutoValue
+public abstract class PrevGridPosition extends ComplexComponent<Vector2i> {
+
+    public static final PrevGridPosition INSTANCE = new AutoValue_PrevGridPosition();
+
+    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
+    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
+
+    PrevGridPosition() {
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    @Override
+    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
+        assoc.set(entityId, x, value.getX());
+        assoc.set(entityId, y, value.getY());
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
+    @Override
+    public Vector2i get(CompEntAssoc assoc, int entityId) {
+        int x = assoc.get(entityId, this.x);
+        int y = assoc.get(entityId, this.y);
+        return Vector2i.from(x, y);
     }
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(x, y);
     }
 
 }

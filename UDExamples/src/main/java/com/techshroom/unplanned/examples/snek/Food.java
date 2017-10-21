@@ -24,11 +24,27 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-public class Food extends GridObj {
+import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
+import com.techshroom.unplanned.ecs.defaults.ColorComponent;
+import com.techshroom.unplanned.ecs.defaults.Removed;
 
-    @Override
-    public String getId() {
-        return "food";
+@EntityPlan
+class Food {
+
+    public static Edible edible() {
+        return Edible.INSTANCE;
+    }
+
+    public static Removed removed() {
+        return Removed.INSTANCE;
+    }
+
+    public static GridPosition gridPosition() {
+        return GridPosition.INSTANCE;
+    }
+
+    public static ColorComponent color() {
+        return ColorComponent.INSTANCE;
     }
 
 }

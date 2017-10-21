@@ -22,33 +22,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
-@EntityPlan
-class SnekBody {
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+/**
+ * Component is made of fields stored in packed arrays.
+ * 
+ * Components define what fields they are made of, but they do NOT define the
+ * storage order of these fields. This is handled by the association system, to
+ * allow for optimal packing.
+ */
+public interface Component {
+
+    static Map<String, ComponentField<?>> makeFieldMap(ComponentField<?>... fields) {
+        return Stream.of(fields).collect(toImmutableMap(f -> f.getName(), Function.identity()));
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    UUID getId();
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
+    Map<String, ComponentField<?>> getFields();
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    /**
+     * Unsafe accessor for field-by-name. This is used by the annotation
+     * processor when the type of the field is known, and this cast is safe,
+     * assuming no malicious runtime changes.
+     * 
+     * @param name
+     *            - the name of the field to retrieve
+     * @return the field
+     */
+    default <T> ComponentField<T> getField(String name) {
+        @SuppressWarnings("unchecked")
+        ComponentField<T> cast = (ComponentField<T>) getFields().get(name);
+        return cast;
     }
 
 }

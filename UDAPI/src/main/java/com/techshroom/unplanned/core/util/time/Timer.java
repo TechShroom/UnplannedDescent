@@ -22,33 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.concurrent.TimeUnit;
 
-@EntityPlan
-class SnekBody {
+/**
+ * Simple time keeper class. Implementations should be high-precision and
+ * monotonic.
+ */
+public interface Timer {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+    static Timer getInstance() {
+        return TimerService.TIMER_INSTANCE;
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    long getValue(TimeUnit unit);
 
 }

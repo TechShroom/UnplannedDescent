@@ -22,33 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ap.ecs.plan;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-@EntityPlan
-class SnekBody {
+import javax.tools.JavaFileObject;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+import org.junit.Test;
+
+import com.google.common.io.CharStreams;
+import com.google.testing.compile.Compilation;
+import com.google.testing.compile.CompilationSubject;
+import com.google.testing.compile.Compiler;
+import com.google.testing.compile.JavaFileObjects;
+
+public class SimpleCompileTest {
+
+    private JavaFileObject readSrcResource(String name, String res) throws IOException {
+        try (Reader r = Files.newBufferedReader(Paths.get("src/test/resources", res))) {
+            String data = CharStreams.toString(r);
+            return JavaFileObjects.forSourceString(name, data);
+        }
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Test
+    public void testCompile() throws Exception {
+        Compilation compile = Compiler.javac().withProcessors(new EntityPlanProcessor())
+                .compile(readSrcResource("Test", "java/Test.java.txt"));
+        CompilationSubject.assertThat(compile).succeededWithoutWarnings();
     }
 
 }

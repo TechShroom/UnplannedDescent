@@ -22,33 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs.defaults;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import com.techshroom.unplanned.ecs.CSystem;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
 
-@EntityPlan
-class SnekBody {
+public abstract class IntervalCSystem implements CSystem {
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+    private int tick;
+    private long accNanoDiff;
+
+    @Override
+    public final void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
+        throw new UnsupportedOperationException("Processing individual IDs is not supported by Interval systems.");
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    @Override
+    public final void processList(CompEntAssoc assoc, long nanoDiff) {
+        accNanoDiff += nanoDiff;
+        tick++;
+        if (tick > getInterval()) {
+            try {
+                assoc.getEntities(getComponents()).forEach(e -> processInterval(e, assoc, accNanoDiff));
+            } finally {
+                tick = 0;
+                accNanoDiff = 0;
+            }
+        }
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
+    protected abstract int getInterval();
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    public abstract void processInterval(int entityId, CompEntAssoc assoc, long nanoDiff);
 
 }

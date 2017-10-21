@@ -22,33 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.UUID;
 
-@EntityPlan
-class SnekBody {
+import com.google.auto.value.AutoValue;
+import com.techshroom.unplanned.core.util.UUID5;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+/**
+ * Field information for a component.
+ */
+@AutoValue
+public abstract class ComponentField<T> {
+
+    public static <T> ComponentField<T> createNoId(UUID owner, String name, CFType<T> type) {
+        return create(UUID5.create(owner, name), name, type);
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    public static <T> ComponentField<T> create(UUID id, String name, CFType<T> type) {
+        return new AutoValue_ComponentField<>(id, name, type);
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
+    ComponentField() {
     }
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
+    public abstract UUID getId();
 
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    public abstract String getName();
+
+    public abstract CFType<T> getType();
 
 }

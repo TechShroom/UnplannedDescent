@@ -24,31 +24,33 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.Map;
 
-@EntityPlan
-class SnekBody {
+import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
+import com.techshroom.unplanned.ecs.CFType;
+import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.ComponentBase;
+import com.techshroom.unplanned.ecs.ComponentField;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+@AutoValue
+public abstract class SnekBodyParts extends ComponentBase {
+
+    public static final SnekBodyParts INSTANCE = new AutoValue_SnekBodyParts();
+
+    SnekBodyParts() {
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
+    private final ComponentField<Integer> prev = ComponentField.createNoId(getId(), "prev", CFType.INTEGER);
+
+    public ComponentField<Integer> getPrev() {
+        return prev;
     }
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    @Memoized
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(prev);
     }
 
 }

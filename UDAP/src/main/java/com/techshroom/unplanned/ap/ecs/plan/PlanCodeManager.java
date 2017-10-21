@@ -22,33 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ap.ecs.plan;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
-@EntityPlan
-class SnekBody {
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
-    }
+public interface PlanCodeManager {
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    List<FieldSpec> generateFields(PlanComponent component);
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
+    List<MethodSpec> generateBuilderSetters(UnaryOperator<MethodSpec.Builder> config, PlanComponent component);
 
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    CodeBlock generateAssignment(String entityArg, String assocArg, TypeName source, PlanComponent component);
 
 }

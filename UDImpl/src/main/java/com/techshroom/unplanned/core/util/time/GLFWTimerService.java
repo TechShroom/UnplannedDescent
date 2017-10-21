@@ -22,33 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-@EntityPlan
-class SnekBody {
+import java.util.concurrent.TimeUnit;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
+import com.google.auto.service.AutoService;
+
+@AutoService(TimerService.class)
+public class GLFWTimerService implements TimerService {
+
+    private static final class GLFWTimer implements Timer {
+
+        private static final long NANO_CONV = TimeUnit.SECONDS.toNanos(1);
+
+        @Override
+        public long getValue(TimeUnit unit) {
+            double secondsTime = glfwGetTime();
+            double nanoTime = secondsTime * NANO_CONV;
+            return unit.convert((long) nanoTime, TimeUnit.NANOSECONDS);
+        }
+
     }
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
-
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
+    @Override
+    public Timer getTimer() {
+        return new GLFWTimer();
     }
 
 }

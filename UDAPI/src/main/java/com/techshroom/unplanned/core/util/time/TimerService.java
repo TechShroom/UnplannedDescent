@@ -22,33 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
-import com.techshroom.unplanned.ecs.defaults.ColorComponent;
-import com.techshroom.unplanned.ecs.defaults.Removed;
+import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 
-@EntityPlan
-class SnekBody {
+import com.google.common.collect.Iterables;
 
-    public static ColorComponent color() {
-        return ColorComponent.INSTANCE;
-    }
+public interface TimerService {
 
-    public static GridPosition gridPosition() {
-        return GridPosition.INSTANCE;
-    }
+    /**
+     * First available {@link TimerService} implementation, or
+     * {@link System#nanoTime()} if none are available.
+     */
+    TimerService INSTANCE = Iterables.getFirst(ServiceLoader.load(TimerService.class), () -> {
+        return unit -> unit.convert(System.nanoTime(), TimeUnit.NANOSECONDS);
+    });
+    Timer TIMER_INSTANCE = INSTANCE.getTimer();
 
-    public static PrevGridPosition prevGridPosition() {
-        return PrevGridPosition.INSTANCE;
-    }
-
-    public static SnekBodyParts bodyVars() {
-        return SnekBodyParts.INSTANCE;
-    }
-
-    public static Removed removed() {
-        return Removed.INSTANCE;
-    }
+    Timer getTimer();
 
 }
