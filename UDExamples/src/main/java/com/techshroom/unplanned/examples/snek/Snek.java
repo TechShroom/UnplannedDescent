@@ -49,9 +49,9 @@ import com.techshroom.unplanned.window.Window;
 @AutoService(Example.class)
 public class Snek extends Example {
 
-    public static final Vector2i GRID_SIZE = Vector2i.from(20);
+    public static final Vector2i GRID_SIZE = Vector2i.from(30);
     // sizeof cell, no border
-    public static final Vector2i CELL_DIM = Vector2i.from(16, 16);
+    public static final Vector2i CELL_DIM = Vector2i.from(8, 8);
     public static final Vector2i BORDER_DIM = Vector2i.from(1);
     public static final Vector2i GRID_DIM = GRID_SIZE.mul(CELL_DIM.add(BORDER_DIM.mul(2)));
 

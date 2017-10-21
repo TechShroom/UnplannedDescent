@@ -52,7 +52,7 @@ public abstract class MovementSystem extends IntervalCSystem {
 
     @Override
     protected int getInterval() {
-        return 20;
+        return 10;
     }
 
     @Override
