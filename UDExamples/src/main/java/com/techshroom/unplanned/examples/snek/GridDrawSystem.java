@@ -58,7 +58,7 @@ public abstract class GridDrawSystem implements CSystem {
     }
 
     @Override
-    public void process(int entityId, CompEntAssoc assoc) {
+    public void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
         Vector2i stepVec = Snek.CELL_DIM.add(Snek.BORDER_DIM.mul(2));
         Vector2i size = Snek.CELL_DIM;
         Vector2i pos = GridPosition.INSTANCE.get(assoc, entityId);

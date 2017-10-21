@@ -27,6 +27,7 @@ package com.techshroom.unplanned.ecs;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import org.eclipse.collections.api.list.ImmutableList;
@@ -145,7 +146,25 @@ public class ObjectCEA implements CompEntAssoc {
 
     @Override
     public IntSet getEntities(Component component) {
-        return componentLists.getIfAbsent(component, IntSets.mutable::empty).freeze();
+        return getEntitiesNoFreeze(component).freeze();
+    }
+
+    private MutableIntSet getEntitiesNoFreeze(Component component) {
+        return componentLists.getIfAbsent(component, IntSets.mutable::empty);
+    }
+
+    @Override
+    public IntSet getEntities(Iterable<Component> components) {
+        Iterator<Component> iter = components.iterator();
+        if (!iter.hasNext()) {
+            return IntSets.immutable.empty();
+        }
+        MutableIntSet intsersection = IntSets.mutable.ofAll(getEntitiesNoFreeze(iter.next()));
+        while (iter.hasNext()) {
+            IntSet next = getEntitiesNoFreeze(iter.next());
+            intsersection.retainAll(next);
+        }
+        return intsersection.freeze();
     }
 
     @Override
@@ -160,7 +179,7 @@ public class ObjectCEA implements CompEntAssoc {
 
     @Override
     public void tick(long nano) {
-        systems.forEach(sys -> sys.processList(this));
+        systems.forEach(sys -> sys.processList(this, nano));
     }
 
 }

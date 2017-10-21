@@ -24,14 +24,7 @@
  */
 package com.techshroom.unplanned.ecs;
 
-import static com.google.common.base.Preconditions.checkState;
-
-import java.util.Iterator;
 import java.util.Set;
-
-import org.eclipse.collections.api.set.primitive.IntSet;
-import org.eclipse.collections.api.set.primitive.MutableIntSet;
-import org.eclipse.collections.impl.factory.primitive.IntSets;
 
 /**
  * Manages interactions between components.
@@ -40,17 +33,10 @@ public interface CSystem {
 
     Set<Component> getComponents();
 
-    void process(int entityId, CompEntAssoc assoc);
+    void process(int entityId, CompEntAssoc assoc, long nanoDiff);
 
-    default void processList(CompEntAssoc assoc) {
-        Iterator<Component> iter = getComponents().iterator();
-        checkState(iter.hasNext(), "there are no components for this system!");
-        MutableIntSet intsersection = IntSets.mutable.ofAll(assoc.getEntities(iter.next()));
-        while (iter.hasNext()) {
-            IntSet next = assoc.getEntities(iter.next());
-            intsersection.retainAll(next);
-        }
-        intsersection.forEach(e -> process(e, assoc));
+    default void processList(CompEntAssoc assoc, long nanoDiff) {
+        assoc.getEntities(getComponents()).forEach(e -> process(e, assoc, nanoDiff));
     }
 
 }

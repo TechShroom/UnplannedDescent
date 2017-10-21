@@ -87,7 +87,7 @@ public class Snek extends Example {
 
         while (!window.isCloseRequested()) {
             // sync to 3fps, SNEK SPEED
-            sync.sync(3);
+            sync.sync(60);
             window.processEvents();
             ctx.clearGraphicsState();
 

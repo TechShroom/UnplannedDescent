@@ -52,11 +52,11 @@ public abstract class FoodSpawnerSystem implements CSystem {
     }
 
     @Override
-    public void process(int entityId, CompEntAssoc assoc) {
+    public void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
     }
 
     @Override
-    public void processList(CompEntAssoc assoc) {
+    public void processList(CompEntAssoc assoc, long nanoDiff) {
         if (assoc.getEntities(Edible.INSTANCE).isEmpty()) {
             spawnFood(assoc);
         }

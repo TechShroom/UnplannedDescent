@@ -56,7 +56,7 @@ public abstract class CollisionSystem implements CSystem {
     }
 
     @Override
-    public void process(int entityId, CompEntAssoc assoc) {
+    public void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
         // we only process collisions using the head
         Vector2i pos = GridPosition.INSTANCE.get(assoc, entityId);
         if (outOfBounds(pos)) {

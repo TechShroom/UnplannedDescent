@@ -22,48 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.ecs;
+package com.techshroom.unplanned.ecs.defaults;
 
-import org.eclipse.collections.api.set.primitive.IntSet;
+import com.techshroom.unplanned.ecs.CSystem;
+import com.techshroom.unplanned.ecs.CompEntAssoc;
 
-/**
- * Component - Entity associations: Associations between entity IDs and the
- * components attached to them.
- */
-public interface CompEntAssoc {
+public abstract class IntervalCSystem implements CSystem {
 
-    int newEntity(Component component);
+    private int tick;
+    private long accNanoDiff;
 
-    int newEntity(Component... component);
+    @Override
+    public final void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
+        throw new UnsupportedOperationException("Processing individual IDs is not supported by Interval systems.");
+    }
 
-    int newEntity(Iterable<Component> component);
+    @Override
+    public final void processList(CompEntAssoc assoc, long nanoDiff) {
+        accNanoDiff += nanoDiff;
+        tick++;
+        if (tick > getInterval()) {
+            try {
+                assoc.getEntities(getComponents()).forEach(e -> processInterval(e, assoc, accNanoDiff));
+            } finally {
+                tick = 0;
+                accNanoDiff = 0;
+            }
+        }
+    }
 
-    <T> void set(int entityId, ComponentField<T> field, T value);
+    protected abstract int getInterval();
 
-    <T> T get(int entityId, ComponentField<T> field);
-
-    /**
-     * Removes an entity from this association table.
-     * 
-     * @param entityId
-     *            - the entity to remove
-     */
-    void remove(int entityId);
-
-    IntSet getEntities(Component component);
-
-    IntSet getEntities(Iterable<Component> components);
-
-    boolean hasComponent(int entityId, Component component);
-
-    boolean hasEntity(int entityId);
-
-    /**
-     * Ticks all systems.
-     * 
-     * @param nano
-     *            - nanoseconds since last tick
-     */
-    void tick(long nano);
+    public abstract void processInterval(int entityId, CompEntAssoc assoc, long nanoDiff);
 
 }

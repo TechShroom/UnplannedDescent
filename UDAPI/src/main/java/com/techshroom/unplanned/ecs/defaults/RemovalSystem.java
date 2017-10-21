@@ -53,7 +53,7 @@ public abstract class RemovalSystem implements CSystem {
     }
 
     @Override
-    public void process(int entityId, CompEntAssoc assoc) {
+    public void process(int entityId, CompEntAssoc assoc, long nanoDiff) {
         if (Removed.INSTANCE.get(assoc, entityId)) {
             assoc.remove(entityId);
         }

@@ -30,12 +30,12 @@ import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.ImmutableSet;
-import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.Component;
+import com.techshroom.unplanned.ecs.defaults.IntervalCSystem;
 
 @AutoValue
-public abstract class MovementSystem implements CSystem {
+public abstract class MovementSystem extends IntervalCSystem {
 
     public static MovementSystem create() {
         return new AutoValue_MovementSystem();
@@ -51,7 +51,12 @@ public abstract class MovementSystem implements CSystem {
     }
 
     @Override
-    public void process(int entityId, CompEntAssoc assoc) {
+    protected int getInterval() {
+        return 20;
+    }
+
+    @Override
+    public void processInterval(int entityId, CompEntAssoc assoc, long nanoDiff) {
         Vector2i dirVec = Direction.INSTANCE.get(assoc, entityId).unit;
         Vector2i currentLoc = GridPosition.INSTANCE.get(assoc, entityId);
         Vector2i newLoc = dirVec.add(currentLoc);
