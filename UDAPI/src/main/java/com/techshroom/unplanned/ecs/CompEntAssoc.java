@@ -56,4 +56,12 @@ public interface CompEntAssoc {
 
     boolean hasEntity(int entityId);
 
+    /**
+     * Ticks all systems.
+     * 
+     * @param nano
+     *            - nanoseconds since last tick
+     */
+    void tick(long nano);
+
 }

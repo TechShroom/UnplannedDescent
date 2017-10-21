@@ -166,4 +166,10 @@ public final class UDStrings {
         return String.valueOf(Character.toChars(firstLowerCp)) + input.substring(afterFirstCp);
     }
 
+    public static String uppercaseFirstLetter(String input) {
+        int afterFirstCp = input.offsetByCodePoints(0, 1);
+        int firstUpperCp = Character.toUpperCase(input.codePointAt(0));
+        return String.valueOf(Character.toChars(firstUpperCp)) + input.substring(afterFirstCp);
+    }
+
 }

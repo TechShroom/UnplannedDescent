@@ -22,28 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs;
 
-import java.util.Map;
-
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
-
-@AutoValue
-public abstract class Edible extends ComponentBase {
-
-    public static final Edible INSTANCE = new AutoValue_Edible();
-
-    Edible() {
-    }
+public enum ObjectCEAFactory implements CEAFactory {
+    $;
 
     @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
+    public CompEntAssoc build(Iterable<CSystem> systems) {
+        return new ObjectCEA(systems);
     }
 
 }

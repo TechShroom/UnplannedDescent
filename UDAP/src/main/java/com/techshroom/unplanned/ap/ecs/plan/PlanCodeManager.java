@@ -22,28 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ap.ecs.plan;
 
-import java.util.Map;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 
-@AutoValue
-public abstract class Edible extends ComponentBase {
+public interface PlanCodeManager {
 
-    public static final Edible INSTANCE = new AutoValue_Edible();
+    List<FieldSpec> generateFields(PlanComponent component);
 
-    Edible() {
-    }
+    List<MethodSpec> generateBuilderSetters(UnaryOperator<MethodSpec.Builder> config, PlanComponent component);
 
-    @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
-    }
+    CodeBlock generateAssignment(String entityArg, String assocArg, TypeName source, PlanComponent component);
 
 }

@@ -24,8 +24,12 @@
  */
 package com.techshroom.unplanned.ecs;
 
-import java.util.Set;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Component is made of fields stored in packed arrays.
@@ -35,9 +39,28 @@ import java.util.UUID;
  * allow for optimal packing.
  */
 public interface Component {
-    
+
+    static Map<String, ComponentField<?>> makeFieldMap(ComponentField<?>... fields) {
+        return Stream.of(fields).collect(toImmutableMap(f -> f.getName(), Function.identity()));
+    }
+
     UUID getId();
-    
-    Set<ComponentField<?>> getFields();
+
+    Map<String, ComponentField<?>> getFields();
+
+    /**
+     * Unsafe accessor for field-by-name. This is used by the annotation
+     * processor when the type of the field is known, and this cast is safe,
+     * assuming no malicious runtime changes.
+     * 
+     * @param name
+     *            - the name of the field to retrieve
+     * @return the field
+     */
+    default <T> ComponentField<T> getField(String name) {
+        @SuppressWarnings("unchecked")
+        ComponentField<T> cast = (ComponentField<T>) getFields().get(name);
+        return cast;
+    }
 
 }

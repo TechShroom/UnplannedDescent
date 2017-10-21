@@ -28,10 +28,13 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Random;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
 import org.eclipse.collections.api.set.primitive.IntSet;
 import org.eclipse.collections.api.set.primitive.MutableIntSet;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
@@ -49,17 +52,24 @@ public class ObjectCEA implements CompEntAssoc {
 
     }
 
-    private final MutableMap<Component, MutableIntSet> componentLists = Maps.mutable.empty();
+    private final ImmutableList<CSystem> systems;
+    private final ImmutableMap<Component, MutableIntSet> componentLists;
     private final MutableIntObjectMap<Entity> entities = IntObjectMaps.mutable.empty();
 
-    private MutableIntSet cl(Component key, boolean add) {
-        MutableIntSet val = componentLists.get(key);
-        if (val == null) {
-            val = IntSets.mutable.empty();
-            if (add) {
-                componentLists.put(key, val);
+    ObjectCEA(Iterable<CSystem> csys) {
+        this.systems = Lists.immutable.withAll(csys);
+        MutableMap<Component, MutableIntSet> cl = Maps.mutable.empty();
+        this.systems.forEach(cs -> {
+            for (Component c : cs.getComponents()) {
+                cl.put(c, IntSets.mutable.empty());
             }
-        }
+        });
+        componentLists = cl.toImmutable();
+    }
+
+    private MutableIntSet cl(Component key) {
+        MutableIntSet val = componentLists.get(key);
+        checkState(val != null, "Component %s is not part of this CEA", key.getId());
         return val;
     }
 
@@ -76,8 +86,8 @@ public class ObjectCEA implements CompEntAssoc {
     }
 
     private void associate(Entity e, Component c) {
-        cl(c, true).add(e.id);
-        c.getFields().forEach(f -> {
+        cl(c).add(e.id);
+        c.getFields().forEach((name, f) -> {
             e.fields.put(f, f.getType().defaultValue);
         });
     }
@@ -144,6 +154,10 @@ public class ObjectCEA implements CompEntAssoc {
     @Override
     public boolean hasEntity(int entityId) {
         return entities.containsKey(entityId);
+    }
+
+    @Override
+    public void tick(long nano) {
     }
 
 }

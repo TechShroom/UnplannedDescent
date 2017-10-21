@@ -22,28 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import java.util.Map;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import java.util.concurrent.TimeUnit;
 
-@AutoValue
-public abstract class Edible extends ComponentBase {
+import com.google.auto.service.AutoService;
 
-    public static final Edible INSTANCE = new AutoValue_Edible();
+@AutoService(TimerService.class)
+class GLFWTimerService implements TimerService {
 
-    Edible() {
+    private static final class GLFWTimer implements Timer {
+
+        private static final long NANO_CONV = TimeUnit.SECONDS.toNanos(1);
+
+        @Override
+        public long getValue(TimeUnit unit) {
+            double secondsTime = glfwGetTime();
+            double nanoTime = secondsTime * NANO_CONV;
+            return unit.convert((long) nanoTime, TimeUnit.NANOSECONDS);
+        }
+
     }
 
     @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
+    public Timer getTimer() {
+        return new GLFWTimer();
     }
 
 }

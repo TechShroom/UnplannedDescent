@@ -24,6 +24,8 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
+import java.util.concurrent.TimeUnit;
+
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.service.AutoService;
@@ -32,9 +34,12 @@ import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.core.util.Sync;
+import com.techshroom.unplanned.core.util.time.Timer;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
-import com.techshroom.unplanned.ecs.ObjectCEA;
+import com.techshroom.unplanned.ecs.ObjectCEAFactory;
 import com.techshroom.unplanned.ecs.defaults.ColorComponent;
+import com.techshroom.unplanned.ecs.defaults.RemovalSystem;
+import com.techshroom.unplanned.ecs.defaults.Removed;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
@@ -52,7 +57,7 @@ public class Snek extends Example {
     public static final Vector2i BORDER_DIM = Vector2i.from(1);
     public static final Vector2i GRID_DIM = GRID_SIZE.mul(CELL_DIM.add(BORDER_DIM.mul(2)));
 
-    private final CompEntAssoc assoc = new ObjectCEA();
+    private CompEntAssoc assoc;
     private Vector2d scale = Vector2d.ONE;
     private Window window;
 
@@ -70,9 +75,17 @@ public class Snek extends Example {
 
         DigitalPen pen = ctx.getPen();
         Sync sync = new Sync();
-        GridDrawSystem gridDrawSys = GridDrawSystem.create(pen);
+
+        assoc = ObjectCEAFactory.$.build(
+                GridDrawSystem.create(pen),
+                CollisionSystem.create(),
+                FoodSpawnerSystem.create(),
+                MovementSystem.create(),
+                RemovalSystem.create());
 
         addHead();
+
+        long lastNanos = Timer.getInstance().getValue(TimeUnit.NANOSECONDS);
 
         while (!window.isCloseRequested()) {
             // sync to 3fps, SNEK SPEED
@@ -85,11 +98,14 @@ public class Snek extends Example {
             pen.scale(scale);
 
             pen.draw(this::drawGrid);
-            pen.draw(() -> {
-                gridDrawSys.processList(assoc);
-            });
 
-            playSnek();
+            long diff = Timer.getInstance().getValue(TimeUnit.NANOSECONDS) - lastNanos;
+            lastNanos += diff;
+            assoc.tick(diff);
+
+            if (!assoc.hasEntity(head)) {
+                window.setCloseRequested(true);
+            }
 
             pen.cap();
 
@@ -118,23 +134,11 @@ public class Snek extends Example {
     private int head;
 
     private void addHead() {
-        head = assoc.newEntity(Direction.INSTANCE, GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBody.INSTANCE, ColorComponent.INSTANCE);
+        head = assoc.newEntity(Direction.INSTANCE, GridPosition.INSTANCE, PrevGridPosition.INSTANCE, SnekBody.INSTANCE, ColorComponent.INSTANCE,
+                Removed.INSTANCE);
         GridPosition.INSTANCE.set(assoc, head, GRID_SIZE.div(2));
         assoc.set(head, SnekBody.INSTANCE.getHead(), true);
         ColorComponent.INSTANCE.set(assoc, head, Color.RED);
-    }
-
-    private final CollisionSystem coll = CollisionSystem.create();
-    private final FoodSpawnerSystem food = FoodSpawnerSystem.create();
-    private final MovementSystem move = MovementSystem.create();
-
-    private void playSnek() {
-        food.processList(assoc);
-        move.processList(assoc);
-        coll.processList(assoc);
-        if (!assoc.hasEntity(head)) {
-            window.setCloseRequested(true);
-        }
     }
 
     @Subscribe

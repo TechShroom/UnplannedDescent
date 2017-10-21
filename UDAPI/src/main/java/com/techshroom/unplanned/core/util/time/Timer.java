@@ -22,28 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+/**
+ * Simple time keeper class. Implementations should be high-precision and
+ * monotonic.
+ */
+public interface Timer {
 
-@AutoValue
-public abstract class Edible extends ComponentBase {
-
-    public static final Edible INSTANCE = new AutoValue_Edible();
-
-    Edible() {
+    static Timer getInstance() {
+        return TimerService.TIMER_INSTANCE;
     }
 
-    @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
-    }
+    long getValue(TimeUnit unit);
 
 }

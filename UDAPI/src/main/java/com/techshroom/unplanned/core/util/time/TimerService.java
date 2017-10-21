@@ -22,28 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.core.util.time;
 
-import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import com.google.common.collect.Iterables;
 
-@AutoValue
-public abstract class Edible extends ComponentBase {
+public interface TimerService {
 
-    public static final Edible INSTANCE = new AutoValue_Edible();
+    /**
+     * First available {@link TimerService} implementation, or
+     * {@link System#nanoTime()} if none are available.
+     */
+    TimerService INSTANCE = Iterables.getFirst(ServiceLoader.load(TimerService.class), () -> {
+        return unit -> unit.convert(System.nanoTime(), TimeUnit.NANOSECONDS);
+    });
+    Timer TIMER_INSTANCE = INSTANCE.getTimer();
 
-    Edible() {
-    }
-
-    @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
-    }
+    Timer getTimer();
 
 }

@@ -1,0 +1,18 @@
+package java;
+
+import com.techshroom.unplanned.ap.ecs.plan.EntityPlan;
+import com.techshroom.unplanned.ecs.defaults.ColorComponent;
+import com.techshroom.unplanned.ecs.defaults.Removed;
+
+@EntityPlan
+public class Test {
+
+    public static ColorComponent color() {
+        return ColorComponent.INSTANCE;
+    }
+
+    public static Removed removed() {
+        return Removed.INSTANCE;
+    }
+
+}

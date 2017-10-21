@@ -22,47 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs.defaults;
 
-import java.util.Map;
+import java.util.Set;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
-import com.techshroom.unplanned.ecs.CFType;
+import com.google.common.collect.ImmutableSet;
+import com.techshroom.unplanned.ecs.CSystem;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
-import com.techshroom.unplanned.ecs.ComplexComponent;
 import com.techshroom.unplanned.ecs.Component;
-import com.techshroom.unplanned.ecs.ComponentField;
 
+/**
+ * Removes components marked with {@link Removed}.
+ */
 @AutoValue
-public abstract class GridPosition extends ComplexComponent<Vector2i> {
+public abstract class RemovalSystem implements CSystem {
 
-    public static final GridPosition INSTANCE = new AutoValue_GridPosition();
-
-    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
-    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
-
-    GridPosition() {
+    public static RemovalSystem create() {
+        return new AutoValue_RemovalSystem();
     }
 
-    @Override
-    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
-        assoc.set(entityId, x, value.getX());
-        assoc.set(entityId, y, value.getY());
-    }
-
-    @Override
-    public Vector2i get(CompEntAssoc assoc, int entityId) {
-        int x = assoc.get(entityId, this.x);
-        int y = assoc.get(entityId, this.y);
-        return Vector2i.from(x, y);
+    RemovalSystem() {
     }
 
     @Override
     @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return Component.makeFieldMap(x, y);
+    public Set<Component> getComponents() {
+        return ImmutableSet.of(Removed.INSTANCE);
+    }
+
+    @Override
+    public void process(int entityId, CompEntAssoc assoc) {
+        if (Removed.INSTANCE.get(assoc, entityId)) {
+            assoc.remove(entityId);
+        }
     }
 
 }

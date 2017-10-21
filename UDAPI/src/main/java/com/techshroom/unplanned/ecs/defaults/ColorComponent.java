@@ -24,15 +24,15 @@
  */
 package com.techshroom.unplanned.ecs.defaults;
 
-import java.util.Set;
+import java.util.Map;
 
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableSet;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.ecs.CFType;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
 import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
@@ -83,8 +83,8 @@ public abstract class ColorComponent extends ComplexComponent<Color> {
 
     @Override
     @Memoized
-    public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(r, g, b, a);
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(r, g, b, a);
     }
 
 }

@@ -24,15 +24,15 @@
  */
 package com.techshroom.unplanned.examples.snek;
 
-import java.util.Set;
+import java.util.Map;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableSet;
 import com.techshroom.unplanned.ecs.CFType;
 import com.techshroom.unplanned.ecs.CompEntAssoc;
 import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
 import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
@@ -61,8 +61,8 @@ public abstract class PrevGridPosition extends ComplexComponent<Vector2i> {
 
     @Override
     @Memoized
-    public Set<ComponentField<?>> getFields() {
-        return ImmutableSet.of(x, y);
+    public Map<String, ComponentField<?>> getFields() {
+        return Component.makeFieldMap(x, y);
     }
 
 }

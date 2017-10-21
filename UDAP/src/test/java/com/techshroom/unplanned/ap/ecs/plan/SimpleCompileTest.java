@@ -22,28 +22,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ap.ecs.plan;
 
-import java.util.Map;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import com.google.auto.value.AutoValue;
-import com.google.auto.value.extension.memoized.Memoized;
-import com.google.common.collect.ImmutableMap;
-import com.techshroom.unplanned.ecs.ComponentBase;
-import com.techshroom.unplanned.ecs.ComponentField;
+import javax.tools.JavaFileObject;
 
-@AutoValue
-public abstract class Edible extends ComponentBase {
+import org.junit.Test;
 
-    public static final Edible INSTANCE = new AutoValue_Edible();
+import com.google.common.io.CharStreams;
+import com.google.testing.compile.Compilation;
+import com.google.testing.compile.CompilationSubject;
+import com.google.testing.compile.Compiler;
+import com.google.testing.compile.JavaFileObjects;
 
-    Edible() {
+public class SimpleCompileTest {
+
+    private JavaFileObject readSrcResource(String name, String res) throws IOException {
+        try (Reader r = Files.newBufferedReader(Paths.get("src/test/resources", res))) {
+            String data = CharStreams.toString(r);
+            return JavaFileObjects.forSourceString(name, data);
+        }
     }
 
-    @Override
-    @Memoized
-    public Map<String, ComponentField<?>> getFields() {
-        return ImmutableMap.of();
+    @Test
+    public void testCompile() throws Exception {
+        Compilation compile = Compiler.javac().withProcessors(new EntityPlanProcessor())
+                .compile(readSrcResource("Test", "java/Test.java.txt"));
+        CompilationSubject.assertThat(compile).succeededWithoutWarnings();
     }
 
 }

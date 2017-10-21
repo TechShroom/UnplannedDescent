@@ -22,11 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.techshroom.unplanned.examples.snek;
+package com.techshroom.unplanned.ecs.defaults;
 
 import java.util.Map;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
 import com.techshroom.unplanned.ecs.CFType;
@@ -36,33 +35,28 @@ import com.techshroom.unplanned.ecs.Component;
 import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
-public abstract class GridPosition extends ComplexComponent<Vector2i> {
+public abstract class Removed extends ComplexComponent<Boolean> {
 
-    public static final GridPosition INSTANCE = new AutoValue_GridPosition();
+    public static final Removed INSTANCE = new AutoValue_Removed();
 
-    private final ComponentField<Integer> x = ComponentField.createNoId(getId(), "x", CFType.INTEGER);
-    private final ComponentField<Integer> y = ComponentField.createNoId(getId(), "y", CFType.INTEGER);
+    private final ComponentField<Boolean> removed = ComponentField.createNoId(getId(), "removed", CFType.BOOLEAN);
 
-    GridPosition() {
+    Removed() {
     }
 
     @Override
-    public void set(CompEntAssoc assoc, int entityId, Vector2i value) {
-        assoc.set(entityId, x, value.getX());
-        assoc.set(entityId, y, value.getY());
+    public void set(CompEntAssoc assoc, int entityId, Boolean removed) {
+        assoc.set(entityId, this.removed, removed);
     }
 
     @Override
-    public Vector2i get(CompEntAssoc assoc, int entityId) {
-        int x = assoc.get(entityId, this.x);
-        int y = assoc.get(entityId, this.y);
-        return Vector2i.from(x, y);
+    public Boolean get(CompEntAssoc assoc, int entityId) {
+        return assoc.get(entityId, this.removed);
     }
 
     @Override
     @Memoized
     public Map<String, ComponentField<?>> getFields() {
-        return Component.makeFieldMap(x, y);
+        return Component.makeFieldMap(removed);
     }
-
 }
