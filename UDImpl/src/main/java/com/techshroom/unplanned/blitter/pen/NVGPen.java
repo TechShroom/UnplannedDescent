@@ -25,7 +25,6 @@
 package com.techshroom.unplanned.blitter.pen;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BASELINE;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BOTTOM;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_CENTER;
@@ -33,11 +32,13 @@ import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_LEFT;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_MIDDLE;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_RIGHT;
 import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_TOP;
+import static org.lwjgl.nanovg.NanoVG.NVG_IMAGE_NEAREST;
+import static org.lwjgl.nanovg.NanoVG.NVG_IMAGE_PREMULTIPLIED;
 import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
 import static org.lwjgl.nanovg.NanoVG.nvgBeginPath;
 import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
 import static org.lwjgl.nanovg.NanoVG.nvgFill;
-import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
+import static org.lwjgl.nanovg.NanoVG.nvgImagePattern;
 import static org.lwjgl.nanovg.NanoVG.nvgRect;
 import static org.lwjgl.nanovg.NanoVG.nvgRestore;
 import static org.lwjgl.nanovg.NanoVG.nvgRoundedRect;
@@ -45,44 +46,33 @@ import static org.lwjgl.nanovg.NanoVG.nvgRoundedRectVarying;
 import static org.lwjgl.nanovg.NanoVG.nvgSave;
 import static org.lwjgl.nanovg.NanoVG.nvgScale;
 import static org.lwjgl.nanovg.NanoVG.nvgStroke;
-import static org.lwjgl.nanovg.NanoVG.nvgStrokeColor;
 import static org.lwjgl.nanovg.NanoVG.nvgText;
 import static org.lwjgl.nanovg.NanoVG.nvgTextAlign;
 import static org.lwjgl.nanovg.NanoVG.nvgTranslate;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_IMAGE_NODELETE;
+import static org.lwjgl.nanovg.NanoVGGL3.nvglCreateImageFromHandle;
 
-import org.lwjgl.nanovg.NVGColor;
+import org.lwjgl.nanovg.NVGPaint;
 
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector4f;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
 import com.techshroom.unplanned.blitter.font.Font;
 import com.techshroom.unplanned.blitter.font.FontDefault;
-import com.techshroom.unplanned.blitter.font.FontDescriptor;
 import com.techshroom.unplanned.blitter.font.NVGFont;
+import com.techshroom.unplanned.blitter.textures.GLTexture;
+import com.techshroom.unplanned.blitter.textures.Texture;
+import com.techshroom.unplanned.blitter.textures.TextureData;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 
 public class NVGPen implements DigitalPen {
 
-    private static NVGColor allocateNvgColor(Color color) {
-        NVGColor nvg = NVGColor.calloc();
-        colorNvgColor(nvg, color);
-        return nvg;
-    }
-
-    private static void colorNvgColor(NVGColor nvg, Color color) {
-        Vector4f c = color.asVector4f();
-        nvg.r(c.getX()).g(c.getY()).b(c.getZ()).a(c.getW());
-    }
-
     private final GLGraphicsContext graphics;
     private Vector2i winSize;
     private Vector2i fbSize;
-    private Color color = Color.BLACK;
-    private NVGColor nvgColor = allocateNvgColor(color);
     private NVGFont font;
 
     public NVGPen(GLGraphicsContext graphics) {
@@ -146,15 +136,20 @@ public class NVGPen implements DigitalPen {
     }
 
     @Override
-    public void setColor(Color color) {
-        checkNotNull(color);
-        this.color = color;
-        colorNvgColor(nvgColor, color);
+    public PenInk getInk(Color color) {
+        return new NVGColorInk(color);
     }
 
     @Override
-    public Color getColor() {
-        return color;
+    public PenInk getInk(int w, int h, Texture texture) {
+        checkArgument(texture instanceof GLTexture, "texture must be an OpenGL texture, not %s", texture.getClass());
+        GLTexture glTexture = (GLTexture) texture;
+        TextureData data = glTexture.getData();
+        int glId = glTexture.getTextureId();
+        NVGPaint paint = NVGPaint.create();
+        int img = nvglCreateImageFromHandle(ctx(), glId, data.getWidth(), data.getHeight(), NVG_IMAGE_NODELETE | NVG_IMAGE_PREMULTIPLIED | NVG_IMAGE_NEAREST);
+        nvgImagePattern(ctx(), 0, 0, w, h, 0, img, 1, paint);
+        return new NVGPaintInk(paint);
     }
 
     @Override
@@ -174,15 +169,20 @@ public class NVGPen implements DigitalPen {
     }
 
     @Override
-    public void fill() {
-        nvgFillColor(ctx(), nvgColor);
+    public void fill(PenInk ink) {
+        validateInk(ink).applyFill(ctx());
         nvgFill(ctx());
     }
 
     @Override
-    public void stroke() {
-        nvgStrokeColor(ctx(), nvgColor);
+    public void stroke(PenInk ink) {
+        validateInk(ink).applyStroke(ctx());
         nvgStroke(ctx());
+    }
+
+    private NVGInk validateInk(PenInk ink) {
+        checkArgument(ink instanceof NVGInk, "polluted ink detected!", ink);
+        return (NVGInk) ink;
     }
 
     @Override
@@ -235,16 +235,10 @@ public class NVGPen implements DigitalPen {
     }
 
     @Override
-    public void fillText(int x, int y, String text) {
+    public void fillText(int x, int y, PenInk ink, String text) {
         font.setAsCurrentFont();
-        nvgFillColor(ctx(), nvgColor);
+        validateInk(ink).applyFill(ctx());
         nvgText(ctx(), x, y, text);
-    }
-
-    @Override
-    public Vector2d sizeText(String text, FontDescriptor fontDesc) {
-        NVGFont font = (NVGFont) graphics.getFontCache().getOrLoadFont(fontDesc);
-        return font.getBoundingBox(text).toDouble();
     }
 
 }

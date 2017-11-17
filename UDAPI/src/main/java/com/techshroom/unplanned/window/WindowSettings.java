@@ -44,11 +44,16 @@ public abstract class WindowSettings {
         Vector2i size = WINDOW_GENERATOR.getDefaultFullscreenSize();
         return new AutoValue_WindowSettings.Builder().screenSize(size).monitor((Monitor) null)
                 .sharedWindow((Window) null).fullScreen(false).resizable(true).msaa(false)
-                .alwaysOnTop(false);
+                .alwaysOnTop(false).maximized(false).undecorated(false);
     }
 
     @AutoValue.Builder
     public static abstract class Builder {
+
+        public final Builder withDialogDefaults() {
+            return resizable(false)
+                    .alwaysOnTop(true);
+        }
 
         public final Builder screenSize(int width, int height) {
             return screenSize(new Vector2i(width, height));
@@ -65,6 +70,10 @@ public abstract class WindowSettings {
         public abstract Builder msaa(boolean msaa);
 
         public abstract Builder alwaysOnTop(boolean alwaysOnTop);
+
+        public abstract Builder maximized(boolean maximized);
+
+        public abstract Builder undecorated(boolean undecorated);
 
         public final Builder monitor(@Nullable Monitor monitor) {
             return monitor(Optional.ofNullable(monitor));
@@ -109,6 +118,10 @@ public abstract class WindowSettings {
     public abstract boolean isMsaa();
 
     public abstract boolean isAlwaysOnTop();
+
+    public abstract boolean isMaximized();
+
+    public abstract boolean isUndecorated();
 
     public abstract Optional<Monitor> getMonitor();
 

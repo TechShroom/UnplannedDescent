@@ -110,23 +110,36 @@ public class GLTexture implements Texture {
         this.settings = settings;
     }
 
+    public int getTextureId() {
+        checkState(textureId != NO_TEXTURE, "unintialized");
+        return textureId;
+    }
+
+    public TextureData getData() {
+        return data;
+    }
+
     @Override
     public void initialize() {
         checkState(textureId == NO_TEXTURE, "already initialized!");
         GLErrorCheck.preflightCheck();
         textureId = glGenTextures();
+        GLErrorCheck.check();
 
         bind();
         try {
             // upload data to card
             IntBuffer pixels = data.getDataAsSingleArray();
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.getWidth(), data.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            GLErrorCheck.check();
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getMagFilter(settings.getUpscaling()));
+            GLErrorCheck.check();
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter(settings.getDownscaling()));
+            GLErrorCheck.check();
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, getTextureWrap(settings.getTextureWrapping()));
+            GLErrorCheck.check();
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, getTextureWrap(settings.getTextureWrapping()));
-
             GLErrorCheck.check();
         } finally {
             unbind();

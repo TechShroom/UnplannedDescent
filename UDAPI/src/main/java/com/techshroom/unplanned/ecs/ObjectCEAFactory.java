@@ -28,8 +28,8 @@ public enum ObjectCEAFactory implements CEAFactory {
     $;
 
     @Override
-    public CompEntAssoc build(Iterable<CSystem> systems) {
-        return new ObjectCEA(systems);
+    public Builder builder() {
+        return new CEAFactoryBuilderBase(ObjectCEA::new);
     }
 
 }

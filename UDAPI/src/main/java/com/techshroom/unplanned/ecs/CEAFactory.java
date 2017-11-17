@@ -24,14 +24,22 @@
  */
 package com.techshroom.unplanned.ecs;
 
-import java.util.Arrays;
-
 public interface CEAFactory {
 
-    default CompEntAssoc build(CSystem... systems) {
-        return build(Arrays.asList(systems));
+    interface Builder {
+
+        Builder systems(CSystem... systems);
+
+        Builder systems(Iterable<CSystem> systems);
+
+        Builder components(Component... components);
+
+        Builder components(Iterable<Component> components);
+
+        CompEntAssoc build();
+
     }
 
-    CompEntAssoc build(Iterable<CSystem> systems);
+    Builder builder();
 
 }

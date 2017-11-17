@@ -38,6 +38,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwHideWindow;
 import static org.lwjgl.glfw.GLFW.glfwIconifyWindow;
+import static org.lwjgl.glfw.GLFW.glfwMaximizeWindow;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwRestoreWindow;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
@@ -59,11 +60,9 @@ import org.lwjgl.system.MemoryStack;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.blitter.GLGraphicsContext;
-import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.core.util.GLFWUtil;
 import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
-import com.techshroom.unplanned.gui.model.parent.RootElement;
 import com.techshroom.unplanned.input.GLFWKeyboard;
 import com.techshroom.unplanned.input.GLFWMouse;
 import com.techshroom.unplanned.input.Keyboard;
@@ -89,7 +88,6 @@ public class GLFWWindow implements Window {
 
     private final EventBus eventBus;
     private final GLGraphicsContext graphicsContext;
-    private final RootElement rootElement;
     private final Mouse mouse;
     private final Keyboard keyboard;
     private final long pointer;
@@ -102,11 +100,8 @@ public class GLFWWindow implements Window {
         this.pointer = pointer;
         this.eventBus = new EventBus("window-0x" + Long.toHexString(pointer));
         this.graphicsContext = new GLGraphicsContext(this);
-        this.rootElement = new GLFWRootElement();
         this.mouse = new GLFWMouse(this);
         this.keyboard = new GLFWKeyboard(this);
-        
-        eventBus.register(rootElement);
 
         setupEventPublishers();
 
@@ -240,6 +235,11 @@ public class GLFWWindow implements Window {
     }
 
     @Override
+    public void maximize() {
+        glfwMaximizeWindow(pointer);
+    }
+
+    @Override
     public void setVisible(boolean visible) {
         if (visible) {
             glfwShowWindow(pointer);
@@ -255,13 +255,8 @@ public class GLFWWindow implements Window {
     }
 
     @Override
-    public GraphicsContext getGraphicsContext() {
+    public GLGraphicsContext getGraphicsContext() {
         return graphicsContext;
-    }
-
-    @Override
-    public RootElement getRootElement() {
-        return rootElement;
     }
 
     @Override

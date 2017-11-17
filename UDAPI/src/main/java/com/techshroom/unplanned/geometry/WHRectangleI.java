@@ -58,4 +58,15 @@ public abstract class WHRectangleI {
         return xIn && yIn;
     }
 
+    public final boolean intersects(WHRectangleI rect) {
+        return doIntersects(this, rect) || doIntersects(rect, this);
+    }
+
+    private boolean doIntersects(WHRectangleI a, WHRectangleI b) {
+        return a.contains(Vector2i.from(b.getX(), b.getY()))
+                || a.contains(Vector2i.from(b.getX() + b.getWidth(), b.getY()))
+                || a.contains(Vector2i.from(b.getX(), b.getY() + b.getHeight()))
+                || a.contains(Vector2i.from(b.getX() + b.getWidth(), b.getY() + b.getHeight()));
+    }
+
 }

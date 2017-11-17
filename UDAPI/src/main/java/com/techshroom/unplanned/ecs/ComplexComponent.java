@@ -24,11 +24,18 @@
  */
 package com.techshroom.unplanned.ecs;
 
+import java.util.function.Function;
 
 public abstract class ComplexComponent<T> extends ComponentBase {
-    
+
     public abstract void set(CompEntAssoc assoc, int entityId, T value);
-    
+
     public abstract T get(CompEntAssoc assoc, int entityId);
+
+    public final void modify(CompEntAssoc assoc, int entityId, Function<T, T> op) {
+        T oldVal = get(assoc, entityId);
+        T newVal = op.apply(oldVal);
+        set(assoc, entityId, newVal);
+    }
 
 }

@@ -27,7 +27,6 @@ package com.techshroom.unplanned.window;
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.eventbus.EventBus;
 import com.techshroom.unplanned.blitter.GraphicsContext;
-import com.techshroom.unplanned.gui.model.parent.RootElement;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.input.Mouse;
 
@@ -92,24 +91,13 @@ public interface Window {
 
     void setMinimized(boolean minimized);
 
+    void maximize();
+
     void setVisible(boolean visible);
 
     void setTitle(String title);
 
     GraphicsContext getGraphicsContext();
-
-    /**
-     * An element that can be used as the root of a GUI tree. This is useful for
-     * creating percent-sized roots, as they will be sized to the window size.
-     * 
-     * <p>
-     * This element will also automatically handle mouse and keyboard events.
-     * It's really useful!
-     * </p>
-     * 
-     * @return the window root element
-     */
-    RootElement getRootElement();
 
     void destroy();
 

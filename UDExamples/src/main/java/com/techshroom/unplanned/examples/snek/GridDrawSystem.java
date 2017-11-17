@@ -63,8 +63,7 @@ public abstract class GridDrawSystem implements CSystem {
         Vector2i size = Snek.CELL_DIM;
         Vector2i pos = GridPosition.INSTANCE.get(assoc, entityId);
         Vector2i rectPos = pos.mul(stepVec).add(Snek.BORDER_DIM);
-        digiPen().fill(() -> {
-            digiPen().setColor(ColorComponent.INSTANCE.get(assoc, entityId));
+        digiPen().fill(digiPen().getInk(ColorComponent.INSTANCE.get(assoc, entityId)), () -> {
             digiPen().rect(rectPos.getX(), rectPos.getY(), size.getX(), size.getY());
         });
     }

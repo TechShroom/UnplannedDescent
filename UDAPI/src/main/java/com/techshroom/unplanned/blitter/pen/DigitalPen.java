@@ -28,11 +28,11 @@ import java.util.function.Consumer;
 
 import com.flowpowered.math.vector.Vector2d;
 import com.techshroom.unplanned.blitter.font.Font;
+import com.techshroom.unplanned.blitter.textures.Texture;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.CornerVector4i;
-import com.techshroom.unplanned.gui.hooks.TextSizer;
 
-public interface DigitalPen extends TextSizer {
+public interface DigitalPen {
 
     /**
      * Start a frame for the pen. Must be called before any draw calls.
@@ -66,9 +66,9 @@ public interface DigitalPen extends TextSizer {
 
     void translate(Vector2d vec);
 
-    void setColor(Color color);
+    PenInk getInk(Color color);
 
-    Color getColor();
+    PenInk getInk(int width, int height, Texture texture);
 
     void setFont(Font font);
 
@@ -76,20 +76,20 @@ public interface DigitalPen extends TextSizer {
 
     void begin();
 
-    void fill();
+    void fill(PenInk ink);
 
-    default void fill(Runnable path) {
+    default void fill(PenInk ink, Runnable path) {
         begin();
         path.run();
-        fill();
+        fill(ink);
     }
 
-    void stroke();
+    void stroke(PenInk ink);
 
-    default void stroke(Runnable path) {
+    default void stroke(PenInk ink, Runnable path) {
         begin();
         path.run();
-        stroke();
+        stroke(ink);
     }
 
     void rect(float x, float y, float w, float h);
@@ -104,6 +104,6 @@ public interface DigitalPen extends TextSizer {
 
     void textAlignment(TextAlignmentH alignHorizontal, TextAlignmentV alignVertical);
 
-    void fillText(int x, int y, String text);
+    void fillText(int x, int y, PenInk ink, String text);
 
 }

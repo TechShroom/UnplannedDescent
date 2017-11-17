@@ -58,7 +58,7 @@ public class ObjectCEA implements CompEntAssoc {
     private final ImmutableMap<Component, MutableIntSet> componentLists;
     private final MutableIntObjectMap<Entity> entities = IntObjectMaps.mutable.empty();
 
-    ObjectCEA(Iterable<CSystem> csys) {
+    ObjectCEA(ImmutableList<CSystem> csys, ImmutableList<Component> comps) {
         this.systems = Lists.immutable.withAll(csys);
         MutableMap<Component, MutableIntSet> cl = Maps.mutable.empty();
         this.systems.forEach(cs -> {
@@ -66,6 +66,9 @@ public class ObjectCEA implements CompEntAssoc {
                 cl.put(c, IntSets.mutable.empty());
             }
         });
+        for (Component c : comps) {
+            cl.put(c, IntSets.mutable.empty());
+        }
         componentLists = cl.toImmutable();
     }
 

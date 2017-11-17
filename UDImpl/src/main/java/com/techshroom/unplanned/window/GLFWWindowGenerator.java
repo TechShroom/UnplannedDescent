@@ -28,8 +28,10 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.glfw.GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_DECORATED;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_FLOATING;
+import static org.lwjgl.glfw.GLFW.GLFW_MAXIMIZED;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
@@ -84,6 +86,12 @@ public class GLFWWindowGenerator implements WindowGenerator {
         }
         if (settings.isAlwaysOnTop()) {
             glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+        }
+        if (settings.isMaximized()) {
+            glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+        }
+        if (settings.isUndecorated()) {
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
         }
 
         Vector2i screenSize = settings.getScreenSize();

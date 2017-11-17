@@ -26,17 +26,25 @@ package com.techshroom.unplanned.ap.ecs.plan;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.impl.factory.Lists;
+
 import com.google.auto.common.MoreElements;
+import com.google.auto.common.MoreTypes;
 import com.google.auto.value.AutoValue;
 import com.google.auto.value.extension.memoized.Memoized;
+import com.google.common.collect.Iterables;
 import com.techshroom.unplanned.ecs.ComplexComponent;
+import com.techshroom.unplanned.ecs.Component;
 import com.techshroom.unplanned.ecs.ComponentField;
 
 @AutoValue
@@ -56,14 +64,34 @@ public abstract class PlanComponent {
     public List<VariableElement> getFields() {
         TypeMirror basicCompFieldType = getEnv().getElementUtils().getTypeElement(ComponentField.class.getCanonicalName()).asType();
         TypeMirror compFieldType = getEnv().getTypeUtils().erasure(basicCompFieldType);
-        return getEnv().getTypeUtils().asElement(getComponent()).getEnclosedElements().stream()
-                .filter(e -> e.getKind() == ElementKind.FIELD)
-                .map(f -> MoreElements.asVariable(f))
-                .filter(f -> {
-                    TypeMirror typeOfField = f.asType();
-                    return getEnv().getTypeUtils().isAssignable(typeOfField, compFieldType);
-                })
+        return getConstituentComponents().stream()
+                .flatMap(cc -> cc.getEnclosedElements().stream()
+                        .filter(e -> e.getKind() == ElementKind.FIELD)
+                        .map(f -> MoreElements.asVariable(f))
+                        .filter(f -> {
+                            TypeMirror typeOfField = f.asType();
+                            return getEnv().getTypeUtils().isAssignable(typeOfField, compFieldType);
+                        }))
                 .collect(toImmutableList());
+    }
+
+    private ImmutableList<TypeElement> getConstituentComponents() {
+        TypeMirror ccMirror = getEnv().getTypeUtils().erasure(
+                getEnv().getElementUtils().getTypeElement(Component.class.getCanonicalName())
+                        .asType());
+        // pull out the ComplexComponent subclass
+        TypeElement clazz = MoreTypes.asTypeElement(getComponent());
+        List<TypeElement> candidates = new ArrayList<>();
+        candidates.add(clazz);
+        while (true) {
+            TypeElement top = Iterables.getLast(candidates);
+            TypeMirror sup = top.getSuperclass();
+            if (!getEnv().getTypeUtils().isAssignable(sup, ccMirror)) {
+                break;
+            }
+            candidates.add(MoreTypes.asTypeElement(sup));
+        }
+        return Lists.immutable.ofAll(candidates);
     }
 
     @Memoized

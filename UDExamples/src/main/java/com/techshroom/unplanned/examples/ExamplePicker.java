@@ -43,6 +43,7 @@ import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.event.ActionEvent;
+import com.techshroom.unplanned.gui.hooks.WindowHooks;
 import com.techshroom.unplanned.gui.model.Button;
 import com.techshroom.unplanned.gui.model.Size;
 import com.techshroom.unplanned.gui.model.SizeValue;
@@ -94,7 +95,8 @@ public class ExamplePicker {
 
         HBox base = new HBox();
         base.setBackgroundColor(Color.GREEN);
-        window.getRootElement().setChild(base);
+        WindowHooks hooks = WindowHooks.forWindow(window);
+        hooks.getRootElement().setChild(base);
         base.setPreferredSize(Size.of(SizeValue.percent(100), SizeValue.percent(100)));
         VBox buttonList = new VBox();
         buttonList.setLayout(VBoxLayout.builder().fillWidth(false).spacing(10).build());
@@ -102,10 +104,9 @@ public class ExamplePicker {
         base.addChild(buttonList);
 
         EXAMPLES.forEach((name, ex) -> {
-            Button b = Button.builder()
-                    .text(name)
-                    .textSizer(ctx.getPen())
-                    .build();
+            Button b = new Button();
+            b.setText(name);
+            b.setTextSizer(hooks.getTextSizer());
             b.getEventBus().register(new Object() {
 
                 @Subscribe

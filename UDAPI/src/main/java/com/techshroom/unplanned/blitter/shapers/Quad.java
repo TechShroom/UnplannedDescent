@@ -38,6 +38,18 @@ import com.techshroom.unplanned.geometry.Plane;
  */
 public interface Quad extends SinglePlaneVertexShaper {
 
+    /**
+     * A pre-calculated argument for
+     * {@link #shape(Plane, Vector2i, Vector2i, List)}, that uses the standard
+     * method of laying out quad textures, putting 0 and 1 at the appropriate
+     * corners.
+     */
+    List<Vector2d> SIMPLE_TEXTURE = ImmutableList.of(
+            Vector2d.from(0, 0),
+            Vector2d.from(1, 0),
+            Vector2d.from(0, 1),
+            Vector2d.from(1, 1));
+
     @Override
     default int getSize() {
         return 4;

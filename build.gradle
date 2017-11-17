@@ -166,6 +166,14 @@ project(':ap') {
     }
 }
 
+project(':gui') {
+    dependencies {
+        compile project(':api')
+        apt project(':ap')
+        compileOnly project(':ap')
+    }
+}
+
 project(':implementation') {
     dependencies {
         addLWJGL(project, '', true);
@@ -178,9 +186,16 @@ project(':implementation') {
         compile project(':api')
     }
 }
+project(':implementation-gui') {
+    dependencies {
+        compile project(':implementation')
+        compile project(':gui')
+    }
+}
 project(':examples') {
     dependencies {
         compile project(':api')
+        compile project(':gui')
         apt project(':ap')
         compileOnly project(':ap')
         runtime project(':implementation')

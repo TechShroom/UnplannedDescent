@@ -40,7 +40,7 @@ import com.techshroom.unplanned.core.util.LifecycleObject;
 public interface Shape extends Drawable, LifecycleObject {
 
     default Optional<BindableShape> asBindable() {
-        return Optional.of(this).filter(BindableShape.class::isInstance).map(BindableShape.class::cast);
+        return Optional.empty();
     }
 
 }

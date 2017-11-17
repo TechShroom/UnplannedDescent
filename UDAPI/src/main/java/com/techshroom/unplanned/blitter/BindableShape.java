@@ -24,6 +24,8 @@
  */
 package com.techshroom.unplanned.blitter;
 
+import java.util.Optional;
+
 import com.techshroom.unplanned.blitter.binding.Bindable;
 import com.techshroom.unplanned.blitter.binding.BindableDrawable;
 
@@ -31,5 +33,10 @@ import com.techshroom.unplanned.blitter.binding.BindableDrawable;
  * {@link Shape} implementing {@link Bindable}.
  */
 public interface BindableShape extends Shape, BindableDrawable {
+
+    @Override
+    default Optional<BindableShape> asBindable() {
+        return Optional.of(this);
+    }
 
 }

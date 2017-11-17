@@ -37,6 +37,26 @@ import org.lwjgl.BufferUtils;
  */
 public final class TextureData implements UVMapper.BySize {
 
+    /**
+     * Helper for creating the correct integer.
+     * 
+     * @param r
+     *            - red component
+     * @param g
+     *            - green component
+     * @param b
+     *            - blue component
+     * @param a
+     *            - alpha component
+     * @return the RGBA integer as described in {@link TextureData}
+     */
+    public static int makeRGBAInt(int r, int g, int b, int a) {
+        return ((a & 0xFF) << 24)
+                | ((b & 0xFF) << 16)
+                | ((g & 0xFF) << 8)
+                | ((r & 0xFF));
+    }
+
     public static TextureData wrap(int[][] data) {
         checkArgument(data.length > 0 && data[0].length > 0, "must have at least 1 pixel!");
         return new TextureData(new TextureData(data).getData());

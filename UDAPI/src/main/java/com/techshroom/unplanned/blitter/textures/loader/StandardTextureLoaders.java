@@ -30,6 +30,12 @@ public final class StandardTextureLoaders {
      * Loads using stb_image from LWJGL, from a file on disk.
      */
     public static final FileTextureLoader FILE_STB_IMAGE_LOADER = new FileStbImageLoader();
+
+    /**
+     * Loads using stb_image from LWJGL, from a stream.
+     */
+    public static final StreamTextureLoader STREAM_STB_IMAGE_LOADER = new StreamStbImageLoader();
+
     /**
      * Loads using RGBA color vector and size.
      */

@@ -60,7 +60,7 @@ final class FileStbImageLoader implements FileTextureLoader {
                     int g = data.get() & 0xFF;
                     int b = data.get() & 0xFF;
                     int a = data.get() & 0xFF;
-                    row[y] = (r << 0) & (g << 8) & (b << 16) & (a << 24);
+                    row[y] = TextureData.makeRGBAInt(r, g, b, a);
                 }
             }
         }

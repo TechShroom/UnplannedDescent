@@ -32,6 +32,7 @@ import com.google.auto.service.AutoService;
 import com.google.common.eventbus.Subscribe;
 import com.techshroom.unplanned.blitter.GraphicsContext;
 import com.techshroom.unplanned.blitter.pen.DigitalPen;
+import com.techshroom.unplanned.blitter.pen.PenInk;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.core.util.Sync;
 import com.techshroom.unplanned.core.util.time.Timer;
@@ -74,12 +75,13 @@ public class Snek extends Example {
         DigitalPen pen = ctx.getPen();
         Sync sync = new Sync();
 
-        assoc = ObjectCEAFactory.$.build(
+        assoc = ObjectCEAFactory.$.builder().systems(
                 GridDrawSystem.create(pen),
                 CollisionSystem.create(),
                 FoodSpawnerSystem.create(),
                 MovementSystem.create(),
-                RemovalSystem.create());
+                RemovalSystem.create())
+                .build();
 
         addHead();
 
@@ -114,15 +116,18 @@ public class Snek extends Example {
     }
 
     private static final Color COLOR_BORDER = Color.LIGHT_GRAY;
+    private static transient PenInk BORDER_INK;
 
     private void drawGrid(DigitalPen pen) {
+        if (BORDER_INK == null) {
+            BORDER_INK = pen.getInk(COLOR_BORDER);
+        }
         Vector2i stepVec = CELL_DIM.add(BORDER_DIM.mul(2));
         for (int i = 0; i < GRID_SIZE.getX(); i++) {
             for (int j = 0; j < GRID_SIZE.getY(); j++) {
                 int x = i * stepVec.getX();
                 int y = j * stepVec.getY();
-                pen.stroke(() -> {
-                    pen.setColor(COLOR_BORDER);
+                pen.stroke(BORDER_INK, () -> {
                     pen.rect(x, y, stepVec.getX(), stepVec.getY());
                 });
             }

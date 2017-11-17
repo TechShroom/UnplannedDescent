@@ -110,6 +110,13 @@ public abstract class Color {
         return fromInt(r, g, b, a);
     }
 
+    public static Color fromABGRInt(int abgr) {
+        return filterStatic(((abgr >> 0) & 0xFF),
+                ((abgr >> 8) & 0xFF),
+                ((abgr >> 16) & 0xFF),
+                ((abgr >> 24) & 0xFF));
+    }
+
     public static Color fromInt(int red, int green, int blue, int alpha) {
         return filterStatic(red, green, blue, alpha);
     }
