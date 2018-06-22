@@ -3,6 +3,7 @@ package com.techshroom.unplanned.core.util;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import com.flowpowered.math.vector.Vector4d;
 import com.flowpowered.math.vector.Vector4f;
@@ -10,6 +11,7 @@ import com.flowpowered.math.vector.Vector4i;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.hash.Hashing;
 import com.google.common.primitives.Doubles;
 
 @AutoValue
@@ -69,6 +71,20 @@ public abstract class Color {
         return createDirect(red, green, blue, alpha);
     }
 
+    public static Color hashed(Object... components) {
+        int hash = Objects.hash(components);
+        hash = Hashing.goodFastHash(24).hashInt(hash).asInt();
+        Color primary = fromABGRInt(hash);
+        int r = primary.getRed();
+        int g = primary.getGreen();
+        int b = primary.getBlue();
+        int a = primary.getAlpha();
+        r ^= a;
+        g ^= a;
+        b ^= a;
+        return fromInt(r, g, b, 0xFF);
+    }
+
     @SuppressWarnings("fallthrough")
     public static Color fromString(String color) {
         String c;
@@ -111,10 +127,17 @@ public abstract class Color {
     }
 
     public static Color fromABGRInt(int abgr) {
-        return filterStatic(((abgr >> 0) & 0xFF),
+        return fromInt(((abgr >> 0) & 0xFF),
                 ((abgr >> 8) & 0xFF),
                 ((abgr >> 16) & 0xFF),
                 ((abgr >> 24) & 0xFF));
+    }
+
+    public static Color fromRGBInt(int rgb) {
+        return fromInt(((rgb >> 16) & 0xFF),
+                ((rgb >> 8) & 0xFF),
+                ((rgb >> 0) & 0xFF),
+                0xFF);
     }
 
     public static Color fromInt(int red, int green, int blue, int alpha) {
@@ -219,6 +242,7 @@ public abstract class Color {
         if (hsl.getZ() == 0) {
             hsl = hsl.add(0, 0, 0.05, 0);
         }
+        hsl = hsl.min(1, 1, 1, 1);
         return fromHsl(hsl);
     }
 

@@ -116,8 +116,8 @@ subprojects {
         compile group: 'com.flowpowered', name: 'flow-math', version: '1.0.3'
 
         addAPTReqWComp group: 'com.google.guava', name: 'guava', version: '23.0'
-        addAPT group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc3'
-        addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.5.2'
+        addAPT group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc4'
+        addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.5.4'
         addAPTReq name: 'aopalliance'
         addAPTReq name: 'asm'
         addAPTReq name: 'auto-value'

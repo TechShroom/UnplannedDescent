@@ -50,7 +50,7 @@ public final class TextureData implements UVMapper.BySize {
      *            - alpha component
      * @return the RGBA integer as described in {@link TextureData}
      */
-    public static int makeRGBAInt(int r, int g, int b, int a) {
+    public static int makeABGRInt(int r, int g, int b, int a) {
         return ((a & 0xFF) << 24)
                 | ((b & 0xFF) << 16)
                 | ((g & 0xFF) << 8)

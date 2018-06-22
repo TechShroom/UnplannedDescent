@@ -33,7 +33,15 @@ import static org.lwjgl.opengl.GL11.GL_OUT_OF_MEMORY;
 import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL30.GL_INVALID_FRAMEBUFFER_OPERATION;
 
+import com.techshroom.unplanned.core.Settings;
+
 public class GLErrorCheck {
+
+    public static void checkIfDebug() {
+        if (Settings.GRAPHICS_DEBUG) {
+            check();
+        }
+    }
 
     public static void check() {
         int err = glGetError();

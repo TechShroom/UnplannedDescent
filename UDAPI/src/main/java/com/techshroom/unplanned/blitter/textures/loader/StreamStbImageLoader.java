@@ -62,7 +62,7 @@ final class StreamStbImageLoader implements StreamTextureLoader {
                     int g = data.get() & 0xFF;
                     int b = data.get() & 0xFF;
                     int a = data.get() & 0xFF;
-                    row[y] = TextureData.makeRGBAInt(r, g, b, a);
+                    row[y] = TextureData.makeABGRInt(r, g, b, a);
                 }
             }
         }
