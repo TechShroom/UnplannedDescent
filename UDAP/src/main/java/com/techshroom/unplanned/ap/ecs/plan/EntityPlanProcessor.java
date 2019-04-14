@@ -60,7 +60,6 @@ import com.techshroom.unplanned.ap.AbortProcessingException;
 import com.techshroom.unplanned.ap.MissingTypeException;
 import com.techshroom.unplanned.ecs.Component;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
 public class EntityPlanProcessor extends BasicAnnotationProcessor {
 
@@ -141,6 +140,11 @@ public class EntityPlanProcessor extends BasicAnnotationProcessor {
             }).collect(toImmutableList());
         }
 
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
 
     @Override

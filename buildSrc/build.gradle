@@ -18,7 +18,7 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
 
-    compile group: 'gradle.plugin.edu.sc.seis.gradle', name: 'launch4j', version: '2.4.2'
+    compile group: 'gradle.plugin.edu.sc.seis.gradle', name: 'launch4j', version: '2.4.5'
 
     compile group: 'com.googlecode.plist', name: 'dd-plist', version: '1.16'
     compile group: 'org.kohsuke', name: 'github-api', version: '1.82'

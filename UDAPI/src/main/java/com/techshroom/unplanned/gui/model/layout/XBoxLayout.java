@@ -29,8 +29,6 @@ import com.techshroom.unplanned.geometry.SidedVector4i;
 import com.techshroom.unplanned.gui.model.GuiElement;
 import com.techshroom.unplanned.gui.model.parent.GroupElement;
 
-import javafx.scene.layout.Priority;
-
 /**
  * Base layout for HBox and VBox.
  */
