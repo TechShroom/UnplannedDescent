@@ -24,34 +24,6 @@
  */
 package com.techshroom.unplanned.blitter.pen;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BASELINE;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BOTTOM;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_CENTER;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_LEFT;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_MIDDLE;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_RIGHT;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_TOP;
-import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
-import static org.lwjgl.nanovg.NanoVG.nvgBeginPath;
-import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
-import static org.lwjgl.nanovg.NanoVG.nvgFill;
-import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
-import static org.lwjgl.nanovg.NanoVG.nvgRect;
-import static org.lwjgl.nanovg.NanoVG.nvgRestore;
-import static org.lwjgl.nanovg.NanoVG.nvgRoundedRect;
-import static org.lwjgl.nanovg.NanoVG.nvgRoundedRectVarying;
-import static org.lwjgl.nanovg.NanoVG.nvgSave;
-import static org.lwjgl.nanovg.NanoVG.nvgScale;
-import static org.lwjgl.nanovg.NanoVG.nvgStroke;
-import static org.lwjgl.nanovg.NanoVG.nvgStrokeColor;
-import static org.lwjgl.nanovg.NanoVG.nvgText;
-import static org.lwjgl.nanovg.NanoVG.nvgTextAlign;
-import static org.lwjgl.nanovg.NanoVG.nvgTranslate;
-
-import org.lwjgl.nanovg.NVGColor;
-
 import com.flowpowered.math.vector.Vector2d;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector4f;
@@ -64,6 +36,36 @@ import com.techshroom.unplanned.blitter.font.NVGFont;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.window.WindowFramebufferResizeEvent;
 import com.techshroom.unplanned.event.window.WindowResizeEvent;
+import org.lwjgl.nanovg.NVGColor;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BASELINE;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BOTTOM;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_CENTER;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_LEFT;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_MIDDLE;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_RIGHT;
+import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_TOP;
+import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
+import static org.lwjgl.nanovg.NanoVG.nvgBeginPath;
+import static org.lwjgl.nanovg.NanoVG.nvgClosePath;
+import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
+import static org.lwjgl.nanovg.NanoVG.nvgFill;
+import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
+import static org.lwjgl.nanovg.NanoVG.nvgLineTo;
+import static org.lwjgl.nanovg.NanoVG.nvgMoveTo;
+import static org.lwjgl.nanovg.NanoVG.nvgRect;
+import static org.lwjgl.nanovg.NanoVG.nvgRestore;
+import static org.lwjgl.nanovg.NanoVG.nvgRoundedRect;
+import static org.lwjgl.nanovg.NanoVG.nvgRoundedRectVarying;
+import static org.lwjgl.nanovg.NanoVG.nvgSave;
+import static org.lwjgl.nanovg.NanoVG.nvgScale;
+import static org.lwjgl.nanovg.NanoVG.nvgStroke;
+import static org.lwjgl.nanovg.NanoVG.nvgStrokeColor;
+import static org.lwjgl.nanovg.NanoVG.nvgText;
+import static org.lwjgl.nanovg.NanoVG.nvgTextAlign;
+import static org.lwjgl.nanovg.NanoVG.nvgTranslate;
 
 public class NVGPen implements DigitalPen {
 
@@ -183,6 +185,21 @@ public class NVGPen implements DigitalPen {
     public void stroke() {
         nvgStrokeColor(ctx(), nvgColor);
         nvgStroke(ctx());
+    }
+
+    @Override
+    public void moveTo(float x, float y) {
+        nvgMoveTo(ctx(), x, y);
+    }
+
+    @Override
+    public void lineTo(float x, float y) {
+        nvgLineTo(ctx(), x, y);
+    }
+
+    @Override
+    public void closePath() {
+        nvgClosePath(ctx());
     }
 
     @Override

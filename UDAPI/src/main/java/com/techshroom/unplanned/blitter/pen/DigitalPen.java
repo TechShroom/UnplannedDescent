@@ -24,13 +24,13 @@
  */
 package com.techshroom.unplanned.blitter.pen;
 
-import java.util.function.Consumer;
-
 import com.flowpowered.math.vector.Vector2d;
 import com.techshroom.unplanned.blitter.font.Font;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.geometry.CornerVector4i;
 import com.techshroom.unplanned.gui.hooks.TextSizer;
+
+import java.util.function.Consumer;
 
 public interface DigitalPen extends TextSizer {
 
@@ -91,6 +91,17 @@ public interface DigitalPen extends TextSizer {
         path.run();
         stroke();
     }
+
+    void moveTo(float x, float y);
+
+    void lineTo(float x, float y);
+
+    default void lineBetween(float x1, float y1, float x2, float y2) {
+        moveTo(x1, y1);
+        lineTo(x2, y2);
+    }
+
+    void closePath();
 
     void rect(float x, float y, float w, float h);
 
