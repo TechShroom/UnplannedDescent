@@ -10,4 +10,4 @@ if [[ $TRAVIS_BRANCH != 'master' ]] ; then
     exit 0
 fi
 echo 'Running upload...'
-./gradlew uploadArchives -PossrhUsername=kenzierocks
+./gradlew publish
