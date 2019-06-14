@@ -179,11 +179,27 @@ public abstract class Color {
 
     public abstract int getRed();
 
+    public Color withRed(int red) {
+        return fromInt(red, getGreen(), getBlue(), getAlpha());
+    }
+
     public abstract int getGreen();
+
+    public Color withGreen(int green) {
+        return fromInt(getRed(), green, getBlue(), getAlpha());
+    }
 
     public abstract int getBlue();
 
+    public Color withBlue(int blue) {
+        return fromInt(getRed(), getGreen(), blue, getAlpha());
+    }
+
     public abstract int getAlpha();
+
+    public Color withAlpha(int alpha) {
+        return fromInt(getRed(), getGreen(), getBlue(), alpha);
+    }
 
     /**
      * @return an integer with the colors order (least significant to most)
