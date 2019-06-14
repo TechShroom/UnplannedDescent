@@ -9,7 +9,6 @@ plugins {
 
 subprojects {
     version = rootProject.version
-    apply(plugin = "net.researchgate.release")
     apply(plugin = "com.techshroom.incise-blue")
     apply(plugin = "java-library")
 
@@ -19,10 +18,6 @@ subprojects {
         }
         ide()
         license()
-        maven {
-            projectDescription = "UnplannedDescent"
-            coords("TechShroom", "UnplannedDescent")
-        }
         lwjgl {
             lwjglVersion = "3.1.3"
         }
@@ -34,21 +29,7 @@ subprojects {
     }
 
     dependencies {
-        "api"("org.slf4j", "slf4j-api", "1.7.25")
-        "implementation"("ch.qos.logback", "logback-classic", "1.2.3")
-        "implementation"("ch.qos.logback", "logback-core", "1.2.3")
-
-        "implementation"("com.google.code.gson", "gson", "2.8.2")
-
-        "implementation"("com.techshroom", "jsr305-plus", "0.0.1")
-
-        "implementation"("com.squareup", "javapoet", "1.9.0")
-
-        "implementation"("com.squareup.okio", "okio", "1.13.0")
-
-        "implementation"("com.flowpowered", "flow-math", "1.0.3")
-
-        "api"("com.google.guava", "guava", "23.0")
+        "compileOnly"("com.techshroom", "jsr305-plus", "0.0.1")
 
         commonLib("com.google.auto.service", "auto-service", "1.0-rc5") {
             "compileOnly"(lib())
@@ -61,6 +42,18 @@ subprojects {
         }
 
         "testImplementation"("junit", "junit", "4.12")
+        "testImplementation"("ch.qos.logback", "logback-classic", "1.2.3")
+        "testImplementation"("ch.qos.logback", "logback-core", "1.2.3")
+    }
+}
+
+listOf("api", "ap", "implementation", "bale-out").map { project(":$it") }.forEach {
+    it.apply(plugin = "net.researchgate.release")
+}
+listOf("api", "ap", "implementation").map { project(":$it") }.forEach {
+    it.inciseBlue.maven {
+        projectDescription = "UnplannedDescent"
+        coords("TechShroom", "UnplannedDescent")
     }
 }
 
@@ -70,6 +63,9 @@ project(":api") {
         addDependency("stb")
     }
     dependencies {
+        "api"("org.slf4j", "slf4j-api", "1.7.25")
+        "api"("com.flowpowered", "flow-math", "1.0.3")
+        "api"("com.google.guava", "guava", "23.0")
         "implementation"("net.java.dev.jna", "jna", "4.5.0")
         "implementation"("com.github.luben", "zstd-jni", "1.3.2-2")
         commonLib("org.eclipse.collections", "eclipse-collections", "9.0.0") {
@@ -83,6 +79,7 @@ project(":ap") {
     dependencies {
         "implementation"(project(":api"))
         "implementation"("com.google.auto", "auto-common", "0.8")
+        "implementation"("com.squareup", "javapoet", "1.9.0")
 
         "testImplementation"("com.google.testing.compile", "compile-testing", "0.12")
     }
@@ -100,7 +97,8 @@ project(":implementation") {
     }
 
     dependencies {
-        "compile"(project(":api"))
+        "implementation"(project(":api"))
+        "implementation"("com.squareup", "javapoet", "1.9.0")
     }
 }
 project(":examples") {
@@ -109,6 +107,8 @@ project(":examples") {
         "annotationProcessor"(project(":ap"))
         "compileOnly"(project(":ap"))
         "runtime"(project(":implementation"))
+        "implementation"("ch.qos.logback", "logback-classic", "1.2.3")
+        "implementation"("ch.qos.logback", "logback-core", "1.2.3")
     }
     apply(plugin = "com.github.johnrengelman.shadow")
     tasks.named<Jar>("jar") {
