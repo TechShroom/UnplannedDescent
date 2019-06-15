@@ -260,24 +260,12 @@ public class SimpleRotatingCube extends Example {
                 this.cameraRot.getX(),
                 this.cameraRot.getY(),
                 this.cameraRot.getZ());
-        // camera is looking at (0,0,0) by default, not rotated
-        // if we want the camera to be at (1000,0,0)
-        // (90deg off from (0,0,1000), the default)
-        // and looking -90, so it looks towards the center.
-        // this should end up rotating the world by 90deg in some dir
-
-        // compute the ACTUAL camera position by pulling back in the dir of the
-        // rotation
         Vector3f cameraPos = cameraRot.getDirection().mul(cameraPullback);
-        // compute world transform as inverse
-        Vector3f worldTranslate = cameraPos.negate();
-
-        // compute ACTUAL rotation as cameraRot
-        // compute world transform as inverse (conjugate)
-        Quaternionf worldRotation = cameraRot.conjugate().normalize();
-
-        // return combined world transform
-        view = Matrix4f.createTranslation(worldTranslate).rotate(worldRotation);
+        view = Matrices.lookAt(
+            cameraPos,
+            Vector3f.ZERO,
+            Vector3f.UP
+        );
     }
 
     @Subscribe

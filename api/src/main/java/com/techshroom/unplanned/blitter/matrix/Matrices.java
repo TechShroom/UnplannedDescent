@@ -49,16 +49,15 @@ public final class Matrices {
         return Matrix4f.createOrthographic(halfW, -halfW, -halfH, halfH, zNear, zFar);
     }
 
-    public static Matrix4f lookAt(Vector3f cameraPos, Vector3f targetView, Vector3f up) {
-        final Vector3f f = GenericMath.normalizeSafe(targetView.sub(cameraPos));
+    public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up) {
+        final Vector3f f = GenericMath.normalizeSafe(center.sub(eye));
         final Vector3f s = GenericMath.normalizeSafe(f.cross(up));
         final Vector3f u = s.cross(f);
-        final Matrix4f mat = new Matrix4f(
+        return new Matrix4f(
                 s.getX(), s.getY(), s.getZ(), 0,
                 u.getX(), u.getY(), u.getZ(), 0,
                 -f.getX(), -f.getY(), -f.getZ(), 0,
-                0, 0, 0, 1);
-        return mat.translate(cameraPos.negate());
+                -s.dot(eye), -u.dot(eye), f.dot(eye), 1).transpose();
     }
 
     public static Matrix4f buildMVPMatrix(Matrix4f model, Matrix4f view, Matrix4f proj) {
