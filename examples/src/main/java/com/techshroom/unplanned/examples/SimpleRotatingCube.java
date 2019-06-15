@@ -25,12 +25,6 @@
 
 package com.techshroom.unplanned.examples;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
-
 import com.flowpowered.math.imaginary.Quaternionf;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector2d;
@@ -56,6 +50,7 @@ import com.techshroom.unplanned.blitter.textures.loader.ColorTextureLoader;
 import com.techshroom.unplanned.blitter.textures.loader.StandardTextureLoaders;
 import com.techshroom.unplanned.blitter.textures.map.TextureAtlas;
 import com.techshroom.unplanned.blitter.textures.map.TextureCollection;
+import com.techshroom.unplanned.core.Settings;
 import com.techshroom.unplanned.core.util.Color;
 import com.techshroom.unplanned.event.keyboard.KeyState;
 import com.techshroom.unplanned.event.keyboard.KeyStateEvent;
@@ -65,6 +60,12 @@ import com.techshroom.unplanned.input.Key;
 import com.techshroom.unplanned.input.Keyboard;
 import com.techshroom.unplanned.window.Window;
 
+import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 @AutoService(Example.class)
 public class SimpleRotatingCube extends Example {
 
@@ -72,7 +73,7 @@ public class SimpleRotatingCube extends Example {
     private Matrix4f proj;
     private Matrix4f view;
     private Vector2f cursorTotalDx = Vector2f.ZERO;
-    private double cameraPullback = 1000;
+    private double cameraPullback = 50;
     private Vector2d centerScreen;
     private Vector3f cameraRot = Vector3f.ZERO;
     private List<Vector2d> cubeLayout;
@@ -115,10 +116,10 @@ public class SimpleRotatingCube extends Example {
         TextureAtlas atlas = TextureAtlas.create(256, 256, base);
 
         TextureSettings settings = TextureSettings.builder()
-                .downscaling(Downscaling.NEAREST)
-                .upscaling(Upscaling.NEAREST)
-                .textureWrapping(TextureWrap.CLAMP_TO_EDGE)
-                .build();
+            .downscaling(Downscaling.NEAREST)
+            .upscaling(Upscaling.NEAREST)
+            .textureWrapping(TextureWrap.REPEAT)
+            .build();
 
         // load atlas into card
         Texture texture = ctx.getTextureProvider().load(atlas.getData(), settings);
@@ -128,25 +129,25 @@ public class SimpleRotatingCube extends Example {
 
         // load secondary atlases
         List<Texture> textures = getColors(settings).stream()
-                .map(t -> ctx.getTextureProvider().load(t.getData(), settings))
-                .peek(Texture::initialize)
-                .collect(toImmutableList());
+            .map(t -> ctx.getTextureProvider().load(t.getData(), settings))
+            .peek(Texture::initialize)
+            .collect(toImmutableList());
 
         cubeLayout = new CubeLayout(atlas, base)
-                .front("red")
-                .back("green")
-                .left("blue")
-                .right("vinyl1")
-                .top("vinyl2")
-                .bottom("vinyl3")
-                .build();
+            .front("red")
+            .back("green")
+            .left("blue")
+            .right("vinyl1")
+            .top("vinyl2")
+            .bottom("vinyl3")
+            .build();
 
         initShape();
 
         // somewhere in the center
         centerScreen = size.toDouble().div(2);
         updateViewMatrix();
-        ctx.setLight(new Vector3d(centerScreen.add(10000, 0), 10000), new Vector3d(1.0, 1.0, 1.0));
+        ctx.setLight(new Vector3d(centerScreen.add(1000, 0), 1000), new Vector3d(1.0, 1.0, 1.0));
 
         // BindableDrawableSequence texturedShape =
         // BindableDrawableSequence.of(ImmutableList.of(texture),
@@ -170,19 +171,19 @@ public class SimpleRotatingCube extends Example {
             p += 5;
             y += 3;
 
-            setRotatatedMVP(ctx, translate, new Vector3d(p, y, r));
+            setRotatedMVP(ctx, translate, new Vector3d(p, y, r));
             drawShape(shape, texture);
-            setRotatatedMVP(ctx, translate.add(200, 0, 0), new Vector3d(p, y, r));
+            setRotatedMVP(ctx, translate.add(200, 0, 0), new Vector3d(p, y, r));
             drawShape(shape, texture);
-            setRotatatedMVP(ctx, translate.sub(200, 0, 0), new Vector3d(p, y, r));
+            setRotatedMVP(ctx, translate.sub(200, 0, 0), new Vector3d(p, y, r));
             drawShape(shape, texture);
             drawShape(shape, texture);
-            setRotatatedMVP(ctx, translate.add(0, 200, 0), new Vector3d(p, y, r));
+            setRotatedMVP(ctx, translate.add(0, 200, 0), new Vector3d(p, y, r));
             drawShape(shape, texture);
-            setRotatatedMVP(ctx, translate.sub(0, 200, 0), new Vector3d(p, y, r));
+            setRotatedMVP(ctx, translate.sub(0, 200, 0), new Vector3d(p, y, r));
             drawShape(shape, texture);
 
-            setRotatatedMVP(ctx, translate, Vector3d.ZERO);
+            setRotatedMVP(ctx, translate, Vector3d.ZERO);
             drawShape(lightSource, redTex);
 
             handleCamera();
@@ -194,14 +195,19 @@ public class SimpleRotatingCube extends Example {
         window.getEventBus().unregister(this);
     }
 
-    public void setRotatatedMVP(GraphicsContext ctx, Vector3f translate, Vector3d pyr) {
+    public void setRotatedMVP(GraphicsContext ctx, Vector3f translate, Vector3d pyr) {
         Matrix4f model = Matrix4f.createRotation(Quaternionf.fromAxesAnglesDeg(pyr.getX(), pyr.getY(), pyr.getZ()))
-                .translate(translate);
+            .translate(translate);
+
+        model = model.scale(0.1, 0.1, 0.1, 1);
 
         setMVP(ctx, model);
     }
 
     public void setMVP(GraphicsContext ctx, Matrix4f model) {
+        if (proj == null) {
+            return;
+        }
         ctx.getMatrixUploader().upload(model, view, proj);
     }
 
@@ -243,23 +249,23 @@ public class SimpleRotatingCube extends Example {
             lightSource.destroy();
         }
         shape = window.getGraphicsContext().getShapes().rectPrism().shape(
-                new Vector3d(-100, -100, -100),
-                new Vector3d(100, 100, 100),
-                cubeLayout);
+            new Vector3d(-100, -100, -100),
+            new Vector3d(100, 100, 100),
+            cubeLayout);
         shape.initialize();
 
         lightSource = window.getGraphicsContext().getShapes().triangle().shape(
-                Vertex.at(-25, 0, 200).texture(0, 0).build(),
-                Vertex.at(25, 0, 200).texture(1, 0).build(),
-                Vertex.at(0, 50, 200).texture(0.5, 1).build());
+            Vertex.at(-25, 0, 200).texture(0, 0).build(),
+            Vertex.at(25, 0, 200).texture(1, 0).build(),
+            Vertex.at(0, 50, 200).texture(0.5, 1).build());
         lightSource.initialize();
     }
 
     private void updateViewMatrix() {
         Quaternionf cameraRot = Quaternionf.fromAxesAnglesDeg(
-                this.cameraRot.getX(),
-                this.cameraRot.getY(),
-                this.cameraRot.getZ());
+            this.cameraRot.getX(),
+            this.cameraRot.getY(),
+            this.cameraRot.getZ());
         Vector3f cameraPos = cameraRot.getDirection().mul(cameraPullback);
         view = Matrices.lookAt(
             cameraPos,
@@ -276,7 +282,8 @@ public class SimpleRotatingCube extends Example {
     @Subscribe
     public void resize(WindowResizeEvent event) {
         Vector2i size = event.getSize();
-        proj = Matrices.orthographicProjection(size.getX(), size.getY(), -10000, 10000);
+        double aspect = size.getX() / (double) size.getY();
+        proj = Matrices.perspectiveProjection(Math.toRadians(45), aspect, 0.1, 1000);
     }
 
     @Subscribe
@@ -290,7 +297,7 @@ public class SimpleRotatingCube extends Example {
 
     private boolean handleCamera() {
         Keyboard kbd = window.getKeyboard();
-        final double change = 5;
+        final double change = 0.1;
         boolean any = false;
         if (kbd.isKeyDown(Key.W)) {
             cameraRot = cameraRot.add(change, 0, 0);

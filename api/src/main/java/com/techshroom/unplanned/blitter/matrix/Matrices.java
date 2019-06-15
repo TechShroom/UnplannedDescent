@@ -25,11 +25,12 @@
 
 package com.techshroom.unplanned.blitter.matrix;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector3f;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Matrix helper. All matrices are row-major, and translation should be handled
@@ -37,11 +38,46 @@ import com.flowpowered.math.vector.Vector3f;
  */
 public final class Matrices {
 
-    // TODO perspective projection
-    // figure out what it is and what needs to be added to compute it
-    // public static Matrix4f perspectiveProjection(Window window) {
-    //
-    // }
+    public static Matrix4f perspectiveProjection(double fov, double aspect, double near, double far) {
+        checkArgument(0 < fov && fov < 180, "FOV must be in (0, 180)");
+        checkArgument(aspect > 0, "Aspect ratio must be greater than zero");
+        checkArgument(near < far, "Near must be closer than far");
+        checkArgument(near > 0, "Near must be greater than zero");
+
+        double top = near * Math.tan(fov / 2);
+        double bottom = -top;
+        double right = top * aspect;
+        double left = -right;
+        return uncheckedFrustumProjection(left, right, bottom, top, near, far);
+    }
+
+    private static Matrix4f frustumProjection(double left, double right,
+                                              double bottom, double top,
+                                              double near, double far) {
+        checkArgument(left != right, "Left must be different from right");
+        checkArgument(bottom != top, "Bottom must be different from top");
+        checkArgument(near != far, "Near must be different from far");
+
+        return uncheckedFrustumProjection(left, right, bottom, top, near, far);
+    }
+
+    private static Matrix4f uncheckedFrustumProjection(double left, double right,
+                                                       double bottom, double top,
+                                                       double near, double far) {
+
+        double sx = (2 * near) / (right - left);
+        double sy = (2 * near) / (top - bottom);
+        double a = (right + left) / (right - left);
+        double b = (top + bottom) / (top - bottom);
+        double c2 = (-(far + near)) / (far - near);
+        double c1 = (-2 * near * far) / (far - near);
+        return new Matrix4f(
+            sx, 0, a, 0,
+            0, sy, b, 0,
+            0, 0, c2, c1,
+            0, 0, -1, 0
+        );
+    }
 
     public static Matrix4f orthographicProjection(double width, double height, double zNear, double zFar) {
         double halfW = width / 2;
@@ -54,10 +90,10 @@ public final class Matrices {
         final Vector3f s = GenericMath.normalizeSafe(f.cross(up));
         final Vector3f u = s.cross(f);
         return new Matrix4f(
-                s.getX(), s.getY(), s.getZ(), 0,
-                u.getX(), u.getY(), u.getZ(), 0,
-                -f.getX(), -f.getY(), -f.getZ(), 0,
-                -s.dot(eye), -u.dot(eye), f.dot(eye), 1).transpose();
+            s.getX(), s.getY(), s.getZ(), 0,
+            u.getX(), u.getY(), u.getZ(), 0,
+            -f.getX(), -f.getY(), -f.getZ(), 0,
+            -s.dot(eye), -u.dot(eye), f.dot(eye), 1).transpose();
     }
 
     public static Matrix4f buildMVPMatrix(Matrix4f model, Matrix4f view, Matrix4f proj) {

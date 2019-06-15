@@ -43,8 +43,9 @@ public class GLMatrixUploader implements MatrixUploader {
 
     @Override
     public void upload(Matrix4f model, Matrix4f view, Matrix4f projection) {
-        setMat(Uniform.MVP, Matrices.buildMVPMatrix(model, view, projection));
         setMat(Uniform.MODEL, model);
+        setMat(Uniform.VIEW, view);
+        setMat(Uniform.PROJECTION, projection);
         // compute normal matrix: transpose inverse model
         Matrix3f normal = model.toMatrix3().invert().transpose();
         setMat(Uniform.NORMAL, normal);

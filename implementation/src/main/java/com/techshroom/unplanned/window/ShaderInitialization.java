@@ -62,7 +62,12 @@ import com.techshroom.unplanned.core.util.GLErrorCheck;
 public class ShaderInitialization {
 
     public enum Uniform {
-        MVP("mvpMat"), MODEL("modelMat"), NORMAL("normalMat"), LIGHT_POSITION("lightPos"), LIGHT_COLOR("lightColor");
+        MODEL("modelMat"),
+        VIEW("viewMat"),
+        PROJECTION("projectionMat"),
+        NORMAL("normalMat"),
+        LIGHT_POSITION("lightPos"),
+        LIGHT_COLOR("lightColor");
 
         private final String shaderName;
 

@@ -25,6 +25,10 @@
 
 package com.techshroom.unplanned.blitter.textures;
 
+import com.techshroom.unplanned.core.util.GLErrorCheck;
+
+import java.nio.IntBuffer;
+
 import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
@@ -34,6 +38,7 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
@@ -43,16 +48,13 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL11.glTexSubImage2D;
 import static org.lwjgl.opengl.GL13.GL_CLAMP_TO_BORDER;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL14.GL_MIRRORED_REPEAT;
-
-import java.nio.IntBuffer;
-
-import com.techshroom.unplanned.core.util.GLErrorCheck;
+import static org.lwjgl.opengl.GL42.glTexStorage2D;
 
 public class GLTexture implements Texture {
 
@@ -121,7 +123,8 @@ public class GLTexture implements Texture {
         try {
             // upload data to card
             IntBuffer pixels = data.getDataAsSingleArray();
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.getWidth(), data.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, data.getWidth(), data.getHeight());
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data.getWidth(), data.getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getMagFilter(settings.getUpscaling()));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter(settings.getDownscaling()));
