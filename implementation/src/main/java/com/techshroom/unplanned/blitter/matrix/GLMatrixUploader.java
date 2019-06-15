@@ -25,13 +25,13 @@
 
 package com.techshroom.unplanned.blitter.matrix;
 
-import static org.lwjgl.opengl.GL20.glUniformMatrix3fv;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-
 import com.flowpowered.math.matrix.Matrix3f;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.techshroom.unplanned.window.ShaderInitialization;
 import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
+
+import static org.lwjgl.opengl.GL20.glUniformMatrix3fv;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 public class GLMatrixUploader implements MatrixUploader {
 
@@ -43,12 +43,18 @@ public class GLMatrixUploader implements MatrixUploader {
 
     @Override
     public void upload(Matrix4f model, Matrix4f view, Matrix4f projection) {
-        setMat(Uniform.MODEL, model);
-        setMat(Uniform.VIEW, view);
-        setMat(Uniform.PROJECTION, projection);
-        // compute normal matrix: transpose inverse model
-        Matrix3f normal = model.toMatrix3().invert().transpose();
-        setMat(Uniform.NORMAL, normal);
+        if (model != null) {
+            setMat(Uniform.MODEL, model);
+            // compute normal matrix: transpose inverse model
+            Matrix3f normal = model.toMatrix3().invert().transpose();
+            setMat(Uniform.NORMAL, normal);
+        }
+        if (view != null) {
+            setMat(Uniform.VIEW, view);
+        }
+        if (projection != null) {
+            setMat(Uniform.PROJECTION, projection);
+        }
     }
 
     private void setMat(Uniform uniform, Matrix4f mat) {

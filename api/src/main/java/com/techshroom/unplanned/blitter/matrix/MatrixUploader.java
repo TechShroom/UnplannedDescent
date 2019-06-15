@@ -27,8 +27,10 @@ package com.techshroom.unplanned.blitter.matrix;
 
 import com.flowpowered.math.matrix.Matrix4f;
 
+import javax.annotation.Nullable;
+
 public interface MatrixUploader {
 
-    void upload(Matrix4f model, Matrix4f view, Matrix4f projection);
+    void upload(@Nullable Matrix4f model, @Nullable Matrix4f view, @Nullable Matrix4f projection);
 
 }
