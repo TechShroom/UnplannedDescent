@@ -29,6 +29,8 @@ import com.flowpowered.math.imaginary.Quaternionf;
 import com.flowpowered.math.matrix.Matrix4f;
 import com.flowpowered.math.vector.Vector3f;
 
+import java.util.function.UnaryOperator;
+
 public interface MatrixTransformer {
 
     default MatrixTransformer reset() {
@@ -36,24 +38,34 @@ public interface MatrixTransformer {
         return this;
     }
 
-    void set(Matrix4f matrix);
+    default void set(Matrix4f matrix) {
+        transform(m -> matrix);
+    }
 
     default MatrixTransformer translate(float x, float y, float z) {
         return translate(new Vector3f(x, y, z));
     }
 
-    MatrixTransformer translate(Vector3f translation);
+    default MatrixTransformer translate(Vector3f translation) {
+        return transform(m -> m.translate(translation));
+    }
 
     default MatrixTransformer rotate(Vector3f eulerAngles) {
         return rotate(Quaternionf.fromAxesAnglesDeg(eulerAngles.getX(), eulerAngles.getY(), eulerAngles.getZ()));
     }
 
-    MatrixTransformer rotate(Quaternionf quat);
+    default MatrixTransformer rotate(Quaternionf quat) {
+        return transform(m -> m.rotate(quat));
+    }
 
     default MatrixTransformer scale(float x, float y, float z) {
         return scale(new Vector3f(x, y, z));
     }
 
-    MatrixTransformer scale(Vector3f scale);
+    default MatrixTransformer scale(Vector3f scale) {
+        return transform(m -> m.scale(scale.toVector4(1.0)));
+    }
+
+    MatrixTransformer transform(UnaryOperator<Matrix4f> transformation);
 
 }

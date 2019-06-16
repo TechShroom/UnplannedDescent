@@ -25,19 +25,16 @@
 
 package com.techshroom.unplanned.blitter.transform;
 
+import com.flowpowered.math.matrix.Matrix4f;
+import com.google.common.collect.ImmutableList;
+import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
+
+import javax.annotation.Nullable;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-
-import javax.annotation.Nullable;
-
-import com.flowpowered.math.imaginary.Quaternionf;
-import com.flowpowered.math.matrix.Matrix4f;
-import com.flowpowered.math.vector.Vector3f;
-import com.flowpowered.math.vector.Vector4f;
-import com.google.common.collect.ImmutableList;
-import com.techshroom.unplanned.blitter.matrix.MatrixUploader;
+import java.util.function.UnaryOperator;
 
 public class DefaultTransformer implements TransformStack {
 
@@ -57,9 +54,8 @@ public class DefaultTransformer implements TransformStack {
             }
         }
 
-        M4fRef m(Function<Matrix4f, Matrix4f> mod) {
+        void m(Function<Matrix4f, Matrix4f> mod) {
             ref = mod.apply(ref);
-            return this;
         }
 
     }
@@ -67,10 +63,8 @@ public class DefaultTransformer implements TransformStack {
     private static final class M4fTransformer implements MatrixTransformer {
 
         private final Deque<M4fRef> stack = new LinkedList<>();
-        private final boolean inverted;
 
-        M4fTransformer(boolean inverted) {
-            this.inverted = inverted;
+        M4fTransformer() {
         }
 
         void push() {
@@ -86,51 +80,15 @@ public class DefaultTransformer implements TransformStack {
         }
 
         @Override
-        public void set(Matrix4f matrix) {
-            ref().ref = matrix;
-        }
-
-        @Override
-        public M4fTransformer translate(Vector3f translation) {
-            Vector3f v;
-            if (inverted) {
-                v = translation.negate();
-            } else {
-                v = translation;
-            }
-            ref().m(m -> m.translate(v));
+        public MatrixTransformer transform(UnaryOperator<Matrix4f> transformation) {
+            ref().m(transformation);
             return this;
         }
-
-        @Override
-        public M4fTransformer rotate(Quaternionf quat) {
-            Quaternionf q;
-            if (inverted) {
-                q = quat.conjugate().normalize();
-            } else {
-                q = quat;
-            }
-            ref().m(m -> m.rotate(q));
-            return this;
-        }
-
-        @Override
-        public M4fTransformer scale(Vector3f scale) {
-            Vector4f s;
-            if (inverted) {
-                s = scale.toVector4().negate();
-            } else {
-                s = scale.toVector4();
-            }
-            ref().m(m -> m.scale(s));
-            return this;
-        }
-
     }
 
-    private final M4fTransformer model = new M4fTransformer(false);
-    private final M4fTransformer camera = new M4fTransformer(true);
-    private final M4fTransformer projection = new M4fTransformer(false);
+    private final M4fTransformer model = new M4fTransformer();
+    private final M4fTransformer camera = new M4fTransformer();
+    private final M4fTransformer projection = new M4fTransformer();
     private final List<M4fTransformer> m4fts = ImmutableList.of(model, camera, projection);
 
     private DefaultTransformer() {
@@ -138,7 +96,7 @@ public class DefaultTransformer implements TransformStack {
 
     @Override
     public void apply(MatrixUploader uploader) {
-        uploader.upload(model.ref().ref, camera.ref().ref, projection.ref().ref);
+        uploader.upload(model.ref().ref, camera.ref().ref.invert(), projection.ref().ref);
     }
 
     @Override
