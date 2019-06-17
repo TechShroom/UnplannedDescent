@@ -66,6 +66,7 @@ public class ShaderInitialization {
         VIEW("viewMat"),
         PROJECTION("projectionMat"),
         NORMAL("normalMat"),
+        LIGHT_ENABLED("lightEnabled"),
         LIGHT_POSITION("lightPos"),
         LIGHT_COLOR("lightColor");
 

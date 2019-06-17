@@ -12,7 +12,7 @@ out vec4 color;
 uniform sampler2D texSample;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
-
+uniform float lightEnabled;
 
 vec3 calculateAmbient() {
 	float ambStrength = 0.5f;
@@ -27,10 +27,13 @@ vec3 calculateDiffuse() {
 	return diffuse;
 }
 
-void main() {
+vec4 getColor() {
 	// Output color = color of the texture at the specified UV
 	// TODO deal with alpha for lighting purposes :)
 	vec4 objColor = texture(texSample, texCoord);
+	if (lightEnabled < 0.5) {
+		return objColor;
+	}
 	float alpha = objColor.w;
 	vec3 opColor = vec3(objColor);
 
@@ -42,5 +45,9 @@ void main() {
 
 	vec3 coreColor = finalLight * opColor;
 
-	color = vec4(coreColor, alpha);
+	return vec4(coreColor, alpha);
+}
+
+void main() {
+	color = getColor();
 }

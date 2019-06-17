@@ -25,29 +25,6 @@
 
 package com.techshroom.unplanned.blitter;
 
-import static com.google.common.base.Preconditions.checkState;
-import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
-import static org.lwjgl.nanovg.NanoVGGL3.NVG_DEBUG;
-import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUseProgram;
-
-import org.lwjgl.opengl.GL;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.eventbus.Subscribe;
@@ -68,6 +45,29 @@ import com.techshroom.unplanned.event.window.WindowResizeEvent;
 import com.techshroom.unplanned.window.GLFWWindow;
 import com.techshroom.unplanned.window.ShaderInitialization;
 import com.techshroom.unplanned.window.ShaderInitialization.Uniform;
+import org.lwjgl.opengl.GL;
+
+import static com.google.common.base.Preconditions.checkState;
+import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
+import static org.lwjgl.nanovg.NanoVGGL3.NVG_DEBUG;
+import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform3f;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class GLGraphicsContext implements GraphicsContext {
 
@@ -120,6 +120,7 @@ public class GLGraphicsContext implements GraphicsContext {
         glUseProgram(shaders.getProgram());
         glClearColor(0, 0, 0, 1);
         setLight(Vector3d.ZERO, Vector3d.ONE);
+        setLightEnabled(false);
 
         window.getEventBus().register(this);
         Vector2i size = window.getSize();
@@ -163,17 +164,19 @@ public class GLGraphicsContext implements GraphicsContext {
     }
 
     @Override
+    public void setLightEnabled(boolean enabled) {
+        glUniform1f(shaders.getUniform(Uniform.LIGHT_ENABLED), enabled ? 1 : 0);
+    }
+
+    @Override
     public void setLight(Vector3d pos, Vector3d color) {
+        setLightEnabled(true);
         setVec3(Uniform.LIGHT_POSITION, pos);
         setVec3(Uniform.LIGHT_COLOR, color);
     }
 
     private void setVec3(Uniform uniform, Vector3d vec) {
         glUniform3f(shaders.getUniform(uniform), (float) vec.getX(), (float) vec.getY(), (float) vec.getZ());
-    }
-
-    public ShaderInitialization getShaders() {
-        return shaders;
     }
 
     @Override

@@ -45,6 +45,8 @@ public interface GraphicsContext {
 
     void swapBuffers();
 
+    void setLightEnabled(boolean enabled);
+
     void setLight(Vector3d pos, Vector3d color);
 
     TextureProvider getTextureProvider();
@@ -56,7 +58,7 @@ public interface GraphicsContext {
     DigitalPen getPen();
 
     FontLoader getFontLoader();
-    
+
     FontCache getFontCache();
 
     default TransformStack pushTransformer() {
