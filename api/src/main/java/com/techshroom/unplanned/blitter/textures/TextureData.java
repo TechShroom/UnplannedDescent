@@ -25,100 +25,54 @@
 
 package com.techshroom.unplanned.blitter.textures;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.nio.IntBuffer;
-import java.util.Arrays;
-
 import org.lwjgl.BufferUtils;
 
+import java.nio.ByteBuffer;
+
 /**
- * Container for texture data. 2D array of RGBA integers, packaged like so:
- * {@code Ax8-Bx8-Gx8-Rx8}.
+ * Container for texture data.
  */
 public final class TextureData implements UVMapper.BySize {
 
-    public static TextureData wrap(int[][] data) {
-        checkArgument(data.length > 0 && data[0].length > 0, "must have at least 1 pixel!");
-        return new TextureData(new TextureData(data).getData());
-    }
-
-    private final int[][] data;
-
-    private TextureData(int[][] data) {
-        this.data = data;
-    }
-
-    public IntBuffer getDataAsSingleArray() {
-        IntBuffer buffer = BufferUtils.createIntBuffer(data.length * data[0].length);
-        for (int i = 0; i < data.length; i++) {
-            int[] col = data[i];
-            for (int j = 0; j < col.length; j++) {
-                buffer.put(i + j * data.length, col[j]);
-            }
-        }
+    public static TextureData wrap(int width, int height, ByteBuffer data, TextureFormat format) {
+        ByteBuffer buffer = BufferUtils.createByteBuffer(data.remaining()).put(data);
         buffer.flip();
-        return buffer;
+        return new TextureData(width, height, buffer, format);
+    }
+
+    private final int width;
+    private final int height;
+    private final ByteBuffer data;
+    private final TextureFormat format;
+
+    private TextureData(int width, int height, ByteBuffer data, TextureFormat format) {
+        this.width = width;
+        this.height = height;
+        this.data = data;
+        this.format = format;
     }
 
     @Override
     public int getWidth() {
-        return data.length;
+        return width;
     }
 
     @Override
     public int getHeight() {
-        return data[0].length;
+        return height;
     }
 
-    public int[][] getData() {
-        int[][] clone = data.clone();
-        for (int i = 0; i < clone.length; i++) {
-            clone[i] = clone[i].clone();
-        }
-        return clone;
+    public ByteBuffer getData() {
+        return data;
     }
 
-    public int getRGBA(int x, int y) {
-        return data[x][y];
-    }
-
-    public byte getRed(int x, int y) {
-        return (byte) ((getRGBA(x, y) /* 0 */) & 0xFF);
-    }
-
-    public byte getGreen(int x, int y) {
-        return (byte) ((getRGBA(x, y) >> 0x0F) & 0xFF);
-    }
-
-    public byte getBlue(int x, int y) {
-        return (byte) ((getRGBA(x, y) >> 0x10) & 0xFF);
-    }
-
-    public byte getAlpha(int x, int y) {
-        return (byte) ((getRGBA(x, y) >> 0x1F) & 0xFF);
+    public TextureFormat getFormat() {
+        return format;
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.deepHashCode(data);
-        return result;
+    public String toString() {
+        return String.format("%s[size=%s,width=%s,height=%s,format=%s]",
+            getClass().getName(), data.remaining(), width, height, format);
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        TextureData other = (TextureData) obj;
-        if (!Arrays.deepEquals(data, other.data))
-            return false;
-        return true;
-    }
-
 }

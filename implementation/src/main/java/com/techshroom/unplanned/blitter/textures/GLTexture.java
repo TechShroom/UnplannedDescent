@@ -27,7 +27,7 @@ package com.techshroom.unplanned.blitter.textures;
 
 import com.techshroom.unplanned.core.util.GLErrorCheck;
 
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
@@ -37,6 +37,7 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
+import static org.lwjgl.opengl.GL11.GL_RGB;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -50,6 +51,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL11.glTexSubImage2D;
+import static org.lwjgl.opengl.GL12.GL_BGRA;
 import static org.lwjgl.opengl.GL13.GL_CLAMP_TO_BORDER;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -103,6 +105,19 @@ public class GLTexture implements Texture {
         }
     }
 
+    private static int getTextureFormat(TextureFormat format) {
+        switch (format) {
+            case RGB:
+                return GL_RGB;
+            case RGBA:
+                return GL_RGBA;
+            case BGRA:
+                return GL_BGRA;
+            default:
+                throw new IllegalArgumentException(format.toString());
+        }
+    }
+
     private final TextureSettings settings;
     private final TextureData data;
     private int textureId = NO_TEXTURE;
@@ -122,9 +137,10 @@ public class GLTexture implements Texture {
         bind();
         try {
             // upload data to card
-            IntBuffer pixels = data.getDataAsSingleArray();
+            ByteBuffer pixels = data.getData();
             glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, data.getWidth(), data.getHeight());
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, data.getWidth(), data.getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+                data.getWidth(), data.getHeight(), getTextureFormat(data.getFormat()), GL_UNSIGNED_BYTE, pixels);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getMagFilter(settings.getUpscaling()));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getMinFilter(settings.getDownscaling()));

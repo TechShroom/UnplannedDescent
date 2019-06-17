@@ -25,23 +25,22 @@
 
 package com.techshroom.unplanned.blitter.textures.loader;
 
-import static org.lwjgl.stb.STBImage.stbi_failure_reason;
-import static org.lwjgl.stb.STBImage.stbi_load;
+import com.techshroom.unplanned.blitter.textures.TextureData;
+import com.techshroom.unplanned.blitter.textures.TextureFormat;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.system.MemoryStack;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 
-import org.lwjgl.system.MemoryStack;
-
-import com.techshroom.unplanned.blitter.textures.TextureData;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 final class FileStbImageLoader implements FileTextureLoader {
 
     @Override
-    public TextureData load(Path source) throws IOException {
-        int[][] rgba;
+    public TextureData load(Path source) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer xBuf = stack.mallocInt(1);
             IntBuffer yBuf = stack.mallocInt(1);
@@ -53,19 +52,12 @@ final class FileStbImageLoader implements FileTextureLoader {
                 throw new IllegalArgumentException("Image " + source + " could not be loaded: " + why);
             }
 
-            rgba = new int[xBuf.get(0)][yBuf.get(0)];
-            for (int x = 0; x < rgba.length; x++) {
-                int[] row = rgba[x];
-                for (int y = 0; y < row.length; y++) {
-                    int r = data.get() & 0xFF;
-                    int g = data.get() & 0xFF;
-                    int b = data.get() & 0xFF;
-                    int a = data.get() & 0xFF;
-                    row[y] = (r << 0) | (g << 8) | (b << 16) | (a << 24);
-                }
-            }
+            // Copy into our own bytebuffer, so it frees cleanly.
+            ByteBuffer copy = BufferUtils.createByteBuffer(data.remaining());
+            copy.put(data).flip();
+
+            return TextureData.wrap(xBuf.get(0), yBuf.get(0), copy, TextureFormat.RGBA);
         }
-        return TextureData.wrap(rgba);
     }
 
 }

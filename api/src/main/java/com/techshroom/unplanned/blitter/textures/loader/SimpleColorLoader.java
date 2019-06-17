@@ -26,20 +26,24 @@
 package com.techshroom.unplanned.blitter.textures.loader;
 
 import com.techshroom.unplanned.blitter.textures.TextureData;
+import com.techshroom.unplanned.blitter.textures.TextureFormat;
+import org.lwjgl.BufferUtils;
+
+import java.nio.ByteBuffer;
 
 class SimpleColorLoader implements ColorTextureLoader {
 
     @Override
     public TextureData load(ColorTextureSpec source) {
         int color = source.getColor().asABGRInt();
-        int[][] data = new int[source.getSize().getX()][source.getSize().getY()];
-        for (int i = 0; i < data.length; i++) {
-            int[] js = data[i];
-            for (int j = 0; j < js.length; j++) {
-                js[j] = color;
-            }
+        TextureFormat format = TextureFormat.RGBA;
+        ByteBuffer result = BufferUtils.createByteBuffer(
+            source.getSize().getX() * source.getSize().getY() * format.channels
+        );
+        while (result.hasRemaining()) {
+            format.putRGBA(color, result);
         }
-        return TextureData.wrap(data);
+        return TextureData.wrap(source.getSize().getX(), source.getSize().getY(), result, format);
     }
 
 }

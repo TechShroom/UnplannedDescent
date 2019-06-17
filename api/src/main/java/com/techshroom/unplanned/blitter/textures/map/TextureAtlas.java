@@ -25,14 +25,19 @@
 
 package com.techshroom.unplanned.blitter.textures.map;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.util.Map;
-
 import com.techshroom.unplanned.blitter.textures.TextureData;
+import com.techshroom.unplanned.blitter.textures.TextureFormat;
 import com.techshroom.unplanned.core.Settings;
 import com.techshroom.unplanned.core.util.Maths;
 import com.techshroom.unplanned.geometry.WHRectangleI;
+import org.lwjgl.BufferUtils;
+
+import java.nio.ByteBuffer;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Creates a texture atlas by combining multiple {@link TextureData}. U/V
@@ -53,12 +58,13 @@ public final class TextureAtlas {
             h = Math.max(rect.getY() + rect.getHeight(), h);
         }
 
+        TextureFormat format = findMostCommonFormat(individualTextures);
         w = Maths.nextPowerOfTwo(w);
         h = Maths.nextPowerOfTwo(h);
 
-        int[][] target = new int[w][h];
+        ByteBuffer target = BufferUtils.createByteBuffer(w * h * format.channels);
         if (Settings.FILL_TEXTURES_WITH_DEBUG_COLOR) {
-            fillWithDebug(target);
+            fillWithDebug(target, w, h, format);
         }
         optimalPacking.forEach((id, rect) -> {
             // rx,ry,rw,rh are 1px too big on each side to fix mipmaps
@@ -66,30 +72,43 @@ public final class TextureAtlas {
             int rx = rect.getX();
             int ry = rect.getY();
             TextureData tex = individualTextures.get(id);
-            int[][] src = tex.getData();
+            ByteBuffer src = tex.getData();
             // copy each row in
             for (int tx = 0; tx < tex.getWidth(); tx++) {
+                // TODO figure out order of input pixels...
+                throw new AssertionError("Texture atlas currently unimplemented.");
                 // get source col @ tx
-                int[] srcCol = src[tx];
+//                int[] srcCol = src[tx];
                 // to be copied into dest col @ rx + 1 (for 1px offset) + tx
-                int[] destCol = target[rx + 1 + tx];
+//                int[] destCol = target[rx + 1 + tx];
                 // copy from srcCol[:] to destCol[ry+1:th], again accounting for
                 // 1px offset
-                System.arraycopy(srcCol, 0, destCol, ry + 1, tex.getHeight());
+//                System.arraycopy(srcCol, 0, destCol, ry + 1, tex.getHeight());
             }
         });
 
         // create new TD
-        return new TextureAtlas(TextureData.wrap(target), optimalPacking);
+        return new TextureAtlas(TextureData.wrap(w, h, target, format), optimalPacking);
     }
 
-    private static void fillWithDebug(int[][] target) {
-        for (int i = 0; i < target.length; i++) {
-            int[] col = target[i];
-            for (int y = 0; y < col.length; y++) {
+    private static TextureFormat findMostCommonFormat(TextureCollection individualTextures) {
+        Map<TextureData, Integer> formats = new HashMap<>();
+        for (TextureData textureData : individualTextures.getData().keySet()) {
+            formats.compute(textureData, (k, i) -> (i == null ? 0 : i) + 1);
+        }
+        return formats.entrySet().stream()
+            .max(Comparator.comparing(Map.Entry::getValue))
+            .map(Map.Entry::getKey)
+            .map(TextureData::getFormat)
+            .orElse(TextureFormat.RGBA);
+    }
+
+    private static void fillWithDebug(ByteBuffer target, int width, int height, TextureFormat format) {
+        for (int i = 0; i < width; i++) {
+            for (int y = 0; y < height; y++) {
                 int r = 0;// (int) (((i + 1) / (double) target.length) * 255);
-                int g = (int) (((y + 1) / (double) col.length) * 255);
-                col[y] = (r) | (g << 8) | (255 << 24);
+                int g = (int) (((y + 1) / (double) height) * 255);
+                format.putRGBA((r) | (g << 8) | (255 << 24), target);
             }
         }
     }
