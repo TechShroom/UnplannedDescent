@@ -35,6 +35,7 @@ import java.nio.IntBuffer;
 import java.nio.file.Path;
 
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 final class FileStbImageLoader implements FileTextureLoader {
@@ -55,6 +56,7 @@ final class FileStbImageLoader implements FileTextureLoader {
             // Copy into our own bytebuffer, so it frees cleanly.
             ByteBuffer copy = BufferUtils.createByteBuffer(data.remaining());
             copy.put(data).flip();
+            stbi_image_free(data);
 
             return TextureData.wrap(xBuf.get(0), yBuf.get(0), copy, TextureFormat.RGBA);
         }
