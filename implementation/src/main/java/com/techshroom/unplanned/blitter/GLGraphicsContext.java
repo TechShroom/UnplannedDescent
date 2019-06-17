@@ -108,7 +108,7 @@ public class GLGraphicsContext implements GraphicsContext {
         glfwMakeContextCurrent(window.getWindowPointer());
         GL.createCapabilities();
 
-        if (window.getSettings().isMsaa()) {
+        if (window.getSettings().getMsaa() > 0) {
             glEnable(GL_MULTISAMPLE);
             GLErrorCheck.check();
         }
@@ -128,7 +128,7 @@ public class GLGraphicsContext implements GraphicsContext {
 
         if (nanoVgContext == 0) {
             int nvgFlags = 0;
-            if (window.getSettings().isMsaa()) {
+            if (window.getSettings().getMsaa() > 0) {
                 nvgFlags |= NVG_ANTIALIAS;
             }
             if (Settings.GRAPHICS_DEBUG) {

@@ -80,8 +80,8 @@ public class GLFWWindowGenerator implements WindowGenerator {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // use MSAA?
-        if (settings.isMsaa()) {
-            glfwWindowHint(GLFW_SAMPLES, 4);
+        if (settings.getMsaa() > 0) {
+            glfwWindowHint(GLFW_SAMPLES, settings.getMsaa());
         }
         if (settings.isAlwaysOnTop()) {
             glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);

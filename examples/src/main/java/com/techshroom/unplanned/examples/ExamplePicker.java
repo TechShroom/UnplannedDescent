@@ -80,7 +80,7 @@ public class ExamplePicker {
         window = WindowSettings.builder()
                 .screenSize(UI_SIZE)
                 .title("Example Picker")
-                .msaa(true)
+                .msaa(4)
                 .build().createWindow();
         window.getEventBus().register(this);
 

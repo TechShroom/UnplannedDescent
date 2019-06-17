@@ -186,7 +186,7 @@ public class GLOptionPane {
                 .resizable(false)
                 .title(title)
                 .screenSize(600, (int) (choicePosition(choices.size()) + 20 + BUTTON_HEIGHT + BUTTON_MARGIN))
-                .msaa(true)
+                .msaa(4)
                 .alwaysOnTop(true)
                 .build().createWindow();
         ctx = win.getGraphicsContext();
