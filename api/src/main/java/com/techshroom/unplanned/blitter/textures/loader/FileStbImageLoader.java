@@ -56,6 +56,7 @@ final class FileStbImageLoader implements FileTextureLoader {
             // Copy into our own bytebuffer, so it frees cleanly.
             ByteBuffer copy = BufferUtils.createByteBuffer(data.remaining());
             copy.put(data).flip();
+            data.rewind();
             stbi_image_free(data);
 
             return TextureData.wrap(xBuf.get(0), yBuf.get(0), copy, TextureFormat.RGBA);
