@@ -43,6 +43,7 @@ class SimpleColorLoader implements ColorTextureLoader {
         while (result.hasRemaining()) {
             format.putRGBA(color, result);
         }
+        result.flip();
         return TextureData.wrap(source.getSize().getX(), source.getSize().getY(), result, format);
     }
 
